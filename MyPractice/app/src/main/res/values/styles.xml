@@ -1,0 +1,33 @@
+<resources>
+
+    <!--
+        Base application theme, dependent on API level. This theme is replaced
+        by AppBaseTheme from res/values-vXX/styles.xml on newer devices.
+    -->
+    <style name="AppBaseTheme" parent="android:Theme.Light">
+        <!--
+            Theme customizations available in newer API levels can go in
+            res/values-vXX/styles.xml, while customizations related to
+            backward-compatibility can go here.
+        -->
+    </style>
+
+    <!-- Application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light">
+        <item name="android:listPreferredItemPaddingLeft">10dp</item>
+        <item name="android:listPreferredItemPaddingRight">10dp</item>
+        <item name="android:windowActionBar">false</item>
+        <item name="android:textAppearanceMedium">@dimen/text_size_midium</item>
+        <!-- All customizations that are NOT specific to a particular API-level can go here. -->
+    </style>
+
+    <style name="toolbarTheme" parent="Theme.AppCompat">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="colorPrimary">@color/accent_material_dark</item>
+        <item name="colorPrimaryDark">@color/accent_material_light</item>
+        <item name="android:textAppearanceMedium">@dimen/text_size_midium</item>
+
+        <!--<item name="android:navigationBarColor">@color/accent_material_light</item>5.0可以使用,其实就是设置导航栏toolbar的背景色，和backgroupdcolor是一样的-->
+    </style>
+</resources>
