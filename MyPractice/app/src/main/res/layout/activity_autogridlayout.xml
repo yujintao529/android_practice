@@ -1,0 +1,50 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    tools:context="${relativePackage}.${activityClass}" >
+
+    <com.example.mypractice.view.AutoGridLayout
+       	xmlns:au="http://schemas.android.com/apk/res/com.example.autogridlayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/pp"
+        android:visibility="visible"
+        android:background="@color/bg" >
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:background="@color/v1" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:background="@color/v4" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:background="@color/v2" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:background="@color/v3" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:background="@color/v7" />
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:background="@color/v5" />
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:background="@color/v6" />
+    </com.example.mypractice.view.AutoGridLayout>
+
+</RelativeLayout>

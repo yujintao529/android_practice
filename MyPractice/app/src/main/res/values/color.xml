@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="bg">#FFD700</color>
+    <color name="v1">#EEE9BF</color>
+    <color name="v2">#DA70D6</color>
+    <color name="v3">#CCCCCC</color>
+    <color name="v4">#BA55D3</color>
+    
+    <color name="v5">#97FFFF</color>
+    <color name="v6">#7AC5CD</color>
+    <color name="v7">#66CD00</color>
+    <color name="v8">#218868</color>
+    <color name="v9">#00FF00</color>
+    <color name="v10">#00F5FF</color>
+    <color name="v11">#8A2BE2</color>
+</resources>

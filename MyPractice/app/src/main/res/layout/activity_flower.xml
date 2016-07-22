@@ -1,0 +1,42 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="${relativePackage}.${activityClass}" >
+
+    <com.example.mypractice.matrix.Flowers2
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/container"
+        android:layout_centerInParent="true"
+        />
+	<LinearLayout 
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_alignParentBottom="true"
+	    android:orientation="horizontal"
+	    >
+	    <Button 
+	        android:layout_height="wrap_content"
+	        android:layout_width="wrap_content"
+	        android:text="开始"
+	        android:id="@+id/start"
+	        android:onClick="onClick"
+	        />
+	     <Button 
+	        android:layout_height="wrap_content"
+	        android:layout_width="wrap_content"
+	        android:text="暂停"
+	        android:id="@+id/pause"
+	        android:onClick="onClick"
+	        />
+	     <Button 
+	        android:layout_height="wrap_content"
+	        android:layout_width="wrap_content"
+	        android:text="停止"
+	        android:id="@+id/stop"
+	        android:onClick="onClick"
+	        />
+	</LinearLayout>
+
+</RelativeLayout>

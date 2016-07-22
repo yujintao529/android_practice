@@ -1,0 +1,16 @@
+//生成R文件
+aapt package -f -m -J ./gen -S res -I D:\sofeware\adt-bundle-windows-x86_64-20140702\sdk\platforms\android-14\android.jar -M AndroidManifest.xml
+
+
+dx --dex --output=bin/classes.dex bin/classes libs/*.jar
+
+
+//打包资源文件
+aapt package -f -M AndroidManifest.xml -S res -A assets -I  D:\sofeware\adt-bundle-windows-x86_64-20140702\sdk\platforms\android-14\android.jar -F bin/resource.rsc
+
+//生成apk包
+java -cp D:\sofeware\adt-bundle-windows-x86_64-20140702\sdk\tools\lib\sdklib.jar com.android.sdklib.build.ApkBuilderMain -u -v -d -z bin\resource.rsc -f bin\classes.dex -rf src 
+
+
+//jdk1.7版本必须要-digestalg SHA1 -sigalg MD5withRSA，数字签名算法为MD5withRSA 信息摘要算法为SHA1
+jarsigner -verbose -keystore debug.keystore -storepass android -signedjar myNew.apk myAPK.apk androiddebugkey -digestalg SHA1 -sigalg MD5withRSA
