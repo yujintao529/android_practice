@@ -46,7 +46,7 @@ public class PicAndTextView2 extends ViewGroup {
     private RectWapper mCurrentLineRect;//current line rect
     private int mCurrentLine;//测量的当前行
     private int mLineOffset;//行间距
-    private int mMinLineHeight=0;//最小行高
+    private int mMinLineHeight=30;//最小行高
     private Rect temp = new Rect();//仅用于临时rect使用，不做数据保存
 
     public PicAndTextView2(Context context) {
@@ -168,6 +168,7 @@ public class PicAndTextView2 extends ViewGroup {
     }
 
 
+
     private final void addViewEntry(View view, RectWapper currentWrapper) {
         final int height = view.getMeasuredHeight();
         final int width = view.getMeasuredWidth();
@@ -207,6 +208,8 @@ public class PicAndTextView2 extends ViewGroup {
     }
 
 
+
+
     /**
      * 构造行的rectWarrper对象
      *
@@ -232,6 +235,7 @@ public class PicAndTextView2 extends ViewGroup {
     }
 
 
+
     @Override
     protected void dispatchDraw(Canvas canvas) {
         int all = canvas.save();
@@ -248,9 +252,11 @@ public class PicAndTextView2 extends ViewGroup {
         RectWapper rectWapper=mEachLineRect.get(staticLayoutEntry.line);
         final Rect rect=staticLayoutEntry.rect;
         canvas.drawRect(rectWapper.rect,paint);
-        canvas.translate(rectWapper.rect.left+rect.left,rectWapper.rect.bottom+rectWapper.rect.height()-rect.top);
+        canvas.translate(rectWapper.rect.left+rect.left,rectWapper.rect.top+rectWapper.rect.height()-rect.bottom);
         staticLayoutEntry.staticLayout.draw(canvas);
     }
+
+
 
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
