@@ -12,6 +12,7 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.mypractice.Logger;
 import com.example.mypractice.R;
 
 import java.util.ArrayList;
@@ -155,6 +156,7 @@ public class PicAndTextView2 extends ViewGroup {
         if (currentWrapper == null || currentWrapper.full) {
             mCurrentLineRect = makeLineRect(caclueLineHeight(null, temp.height()), currentWrapper, mCurrentLine++);
             mEachLineRect.add(mCurrentLineRect);
+            Logger.d("add line "+mCurrentLineRect.toString());
         }
         //检查高度是否可用
         StaticLayoutEntry staticLayoutEntry = new StaticLayoutEntry(staticLayout, mCurrentLineRect.lineNumber);
@@ -162,6 +164,7 @@ public class PicAndTextView2 extends ViewGroup {
         staticLayoutEntry.rect = new Rect(mCurrentLineRect.x, temp.top, mCurrentLineRect.x + width, height);
         mCurrentLineRect.addWidth(width);
         mStaticLayoutEntries.add(staticLayoutEntry);
+        Logger.d("add staticLayoutEntry "+staticLayoutEntry.toString());
     }
 
 
@@ -171,6 +174,7 @@ public class PicAndTextView2 extends ViewGroup {
         if (currentWrapper == null || currentWrapper.full || currentWrapper.leaveWidth() < width) {
             mCurrentLineRect = makeLineRect(caclueLineHeight(null, height), currentWrapper, mCurrentLine++);
             mEachLineRect.add(mCurrentLineRect);
+
         }
         ViewLayoutEntry viewLayoutEntry = new ViewLayoutEntry(view, mCurrentLineRect.lineNumber);
         caclueLineHeight(mCurrentLineRect.rect, height);
@@ -243,8 +247,8 @@ public class PicAndTextView2 extends ViewGroup {
     private final void drawStaticLayout(Canvas canvas,StaticLayoutEntry staticLayoutEntry){
         RectWapper rectWapper=mEachLineRect.get(staticLayoutEntry.line);
         final Rect rect=staticLayoutEntry.rect;
-        canvas.translate(rectWapper.rect.left+rect.left,rectWapper.rect.top+rectWapper.rect.height()-rect.top);
-        canvas.drawRect(rect,paint);
+        canvas.drawRect(rectWapper.rect,paint);
+        canvas.translate(rectWapper.rect.left+rect.left,rectWapper.rect.bottom+rectWapper.rect.height()-rect.top);
         staticLayoutEntry.staticLayout.draw(canvas);
     }
 
@@ -280,6 +284,15 @@ public class PicAndTextView2 extends ViewGroup {
             this.line = line;
             this.rect = rect;
         }
+
+        @Override
+        public String toString() {
+            return "ViewLayoutEntry{" +
+                    "child=" + child +
+                    ", line=" + line +
+                    ", rect=" + rect +
+                    '}';
+        }
     }
 
     /**
@@ -299,6 +312,15 @@ public class PicAndTextView2 extends ViewGroup {
             this.staticLayout = staticLayout;
             this.line = line;
             this.rect = rect;
+        }
+
+        @Override
+        public String toString() {
+            return "StaticLayoutEntry{" +
+                    "rect=" + rect +
+                    ", line=" + line +
+                    ", staticLayout=" + staticLayout +
+                    '}';
         }
     }
 
@@ -333,6 +355,17 @@ public class PicAndTextView2 extends ViewGroup {
 
         public int leaveWidth() {
             return rect.width() - x;
+        }
+
+        @Override
+        public String toString() {
+            return "RectWapper{" +
+                    "rect=" + rect +
+                    ", x=" + x +
+                    ", y=" + y +
+                    ", full=" + full +
+                    ", lineNumber=" + lineNumber +
+                    '}';
         }
     }
 
