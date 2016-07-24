@@ -30,7 +30,9 @@ public class ScrollerStudyAct extends Activity{
         myScrollerLinearLayout.addView(createImageView(randomID(resources)));
         myScrollerLinearLayout.addView(createImageView(randomID(resources)));
 
+
     }
+
     public void onClick(View view){
         switch (view.getId()){
             case R.id.scroll:

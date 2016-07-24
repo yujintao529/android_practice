@@ -3,6 +3,7 @@ package com.example.mypractice.view;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
+import android.widget.ImageView;
 
 import com.example.mypractice.R;
 
@@ -18,5 +19,13 @@ public class PicAndTextAct extends FragmentActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_pic_text);
+        String content="中华人民共和国中华人民共和国中华人民共和国中华人民共和国中华人民共和国";
+        PicAndTextView2 picAndTextView2= (PicAndTextView2) findViewById(R.id.pic_txt);
+        picAndTextView2.clean();
+        picAndTextView2.addTextChild(content);
+        picAndTextView2.addTextChild("郁金涛郁金涛郁金涛郁金涛郁金涛郁金涛");
+        ImageView imageView=new ImageView(this);
+        imageView.setImageResource(R.drawable.share_icon_qq);
+//        picAndTextView2.addNewChild(imageView);
     }
 }
