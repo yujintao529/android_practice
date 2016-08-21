@@ -10,10 +10,10 @@ import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.util.AttributeSet;
+import android.util.SparseArray;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.mypractice.Logger;
 import com.example.mypractice.R;
 
 import java.util.ArrayList;
@@ -29,14 +29,14 @@ import java.util.ArrayList;
  *
  * @description
  */
-public class PicAndTextView2 extends ViewGroup {
+public class PicAndTextView extends ViewGroup {
 
 
     private TextPaint mPaint;
-    private Paint paint;
     private ArrayList<StaticLayoutEntry> mStaticLayoutEntries = new ArrayList<>();//所有的staticlayout
     private ArrayList<RectWapper> mEachLineRect = new ArrayList<>();//每行的rect
     private ArrayList<Object> mChildList = new ArrayList<>();
+    private SparseArray<TextPaint> mPaintSparseArray=new SparseArray<>();//support spanString
     private int mWidth;//宽度
     private int mHeight;
     private RectWapper mCurrentLineRect;//current line rect
@@ -50,21 +50,21 @@ public class PicAndTextView2 extends ViewGroup {
     private static int TEXT_STYPE=2;
     private static int TEXT_FONT_FAMILY=3;
     private static int TEXT_TYPE_FACE=4;
-    public PicAndTextView2(Context context) {
+    public PicAndTextView(Context context) {
         super(context);
         init(context,null);
     }
 
-    public PicAndTextView2(Context context, AttributeSet attrs) {
+    public PicAndTextView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init(context,attrs);
     }
     @SuppressWarnings("ResourceType")
     private void init(Context context, AttributeSet attrs){
-        mPaint = new TextPaint();
+        mPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG|Paint.DITHER_FLAG);
         int textColor=Color.BLACK;
         int textSize=15;
-        if(attrs==null) {
+        if(attrs!=null) {
             TypedArray typedArray = context.obtainStyledAttributes(attrs, attrArr);
             textColor=typedArray.getColor(TEXT_COLOR,textColor);
             textSize=typedArray.getDimensionPixelSize(TEXT_SIZE,textSize);
@@ -73,9 +73,9 @@ public class PicAndTextView2 extends ViewGroup {
         mPaint.setColor(textColor);
         mPaint.setTextSize(textSize);
         //**************
-        paint.setColor(Color.BLUE);
-        paint.setStrokeWidth(2);
-        paint.setStyle(Paint.Style.STROKE);
+//        paint.setColor(Color.BLUE);
+//        paint.setStrokeWidth(2);
+//        paint.setStyle(Paint.Style.STROKE);
     }
     public TextPaint getPaint(){
         return mPaint;
@@ -87,6 +87,9 @@ public class PicAndTextView2 extends ViewGroup {
     }
 
     public void addNewChild(View view) {
+        if(view.getParent()!=null){
+            ((ViewGroup)view.getParent()).removeView(view);
+        }
         addView(view);
         mChildList.add(view);
     }
@@ -95,7 +98,11 @@ public class PicAndTextView2 extends ViewGroup {
     public void addTextChild(CharSequence text) {
         mChildList.add(text);
     }
+    public void addTextChild(CharSequence text,TextPaint textPaint) {
+        mChildList.add(text);
+        mPaintSparseArray.put(mChildList.size()-1,textPaint);
 
+    }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
@@ -115,7 +122,7 @@ public class PicAndTextView2 extends ViewGroup {
                 measureChildView(view);
             } else if (object instanceof CharSequence) {
                 CharSequence charSequence = (CharSequence) object;
-                measureChildText(charSequence);
+                measureChildText(charSequence,mPaintSparseArray.get(i));
             }
         }
         mHeight = getPaddingBottom() + getPaddingBottom();
@@ -129,39 +136,36 @@ public class PicAndTextView2 extends ViewGroup {
     /**
      * @param charSequence
      */
-    private void measureChildText(CharSequence charSequence) {
+    private void measureChildText(CharSequence charSequence,TextPaint textPaint) {
         int end = 0;
         do {
-            end = splitCharSequence(charSequence);
+            end = splitCharSequence(charSequence,textPaint);
             if (end > 0) {
                 charSequence = charSequence.subSequence(charSequence.length()-end, charSequence.length());
             }
         } while (end > 0);
-
-
     }
 
 
-    private final int splitCharSequence(CharSequence charSequence) {
+    private final int splitCharSequence(CharSequence charSequence,TextPaint textPaint) {
         StaticLayout staticLayout = null;
         if(mCurrentLineRect!=null&&Math.round(mPaint.getTextSize()+0.5f)>mCurrentLineRect.leaveWidth()){
             mCurrentLineRect.full=true;
         }
         if (mCurrentLineRect == null || mCurrentLineRect.full) {
-            staticLayout = generateStaticLayout(charSequence, mWidth);
+            staticLayout = generateStaticLayout(charSequence, mWidth,textPaint);
         } else {
-            staticLayout = generateStaticLayout(charSequence, mCurrentLineRect.leaveWidth());
+            staticLayout = generateStaticLayout(charSequence, mCurrentLineRect.leaveWidth(),textPaint);
         }
         int end = staticLayout.getLineEnd(0);
 
         if(end<charSequence.length()){
             if (mCurrentLineRect == null || mCurrentLineRect.full) {
-                staticLayout = generateStaticLayout(charSequence.subSequence(0,end), mWidth);
+                staticLayout = generateStaticLayout(charSequence.subSequence(0,end), mWidth,textPaint);
             } else {
-                staticLayout = generateStaticLayout(charSequence.subSequence(0,end), mCurrentLineRect.leaveWidth());
+                staticLayout = generateStaticLayout(charSequence.subSequence(0,end), mCurrentLineRect.leaveWidth(),textPaint);
             }
         }
-        Logger.d("split char sequenece "+staticLayout.getText());
         addStaticLayoutEntry(staticLayout, mCurrentLineRect);
         return charSequence.length()-end;
     }
@@ -180,7 +184,6 @@ public class PicAndTextView2 extends ViewGroup {
         if (currentWrapper == null || currentWrapper.full) {
             mCurrentLineRect = makeLineRect(caclueLineHeight(null, temp.height()), currentWrapper, mCurrentLine++);
             mEachLineRect.add(mCurrentLineRect);
-            Logger.d("add line "+mCurrentLineRect.toString());
         }
         //检查高度是否可用
         StaticLayoutEntry staticLayoutEntry = new StaticLayoutEntry(staticLayout, mCurrentLineRect.lineNumber);
@@ -188,7 +191,6 @@ public class PicAndTextView2 extends ViewGroup {
         staticLayoutEntry.rect = new Rect(mCurrentLineRect.x, temp.top, mCurrentLineRect.x + width, height);
         mCurrentLineRect.addWidth(width);
         mStaticLayoutEntries.add(staticLayoutEntry);
-        Logger.d("add staticLayoutEntry "+staticLayoutEntry.toString());
     }
 
 
@@ -257,7 +259,9 @@ public class PicAndTextView2 extends ViewGroup {
     private StaticLayout generateStaticLayout(CharSequence mCharSequence, int width) {
         return new StaticLayout(mCharSequence, mPaint, width, Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
     }
-
+    private StaticLayout generateStaticLayout(CharSequence mCharSequence, int width,TextPaint textPaint) {
+        return new StaticLayout(mCharSequence, textPaint==null?mPaint:textPaint, width, Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
+    }
 
 
     @Override
@@ -275,7 +279,6 @@ public class PicAndTextView2 extends ViewGroup {
     private final void drawStaticLayout(Canvas canvas,StaticLayoutEntry staticLayoutEntry){
         RectWapper rectWapper=mEachLineRect.get(staticLayoutEntry.line);
         final Rect rect=staticLayoutEntry.rect;
-        canvas.drawRect(rectWapper.rect,paint);
         canvas.translate(rectWapper.rect.left+rect.left,rectWapper.rect.top+rectWapper.rect.height()-rect.bottom);
         staticLayoutEntry.staticLayout.draw(canvas);
     }
@@ -284,7 +287,7 @@ public class PicAndTextView2 extends ViewGroup {
 
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
-        if (changed) {
+//        if (changed) {//bu neng
             int childCount = getChildCount();
             for (int i = 0; i < childCount; i++) {
                 View view = getChildAt(i);
@@ -293,7 +296,7 @@ public class PicAndTextView2 extends ViewGroup {
                 final RectWapper rectWapper=mEachLineRect.get(viewLayoutEntry.line);
                 final Rect rect=viewLayoutEntry.rect;
                 view.layout(rectWapper.rect.left+rect.left,rectWapper.rect.bottom-rect.height(),rectWapper.rect.left+rect.left+rect.width(),rectWapper.rect.bottom);
-            }
+//            }
         }
     }
 

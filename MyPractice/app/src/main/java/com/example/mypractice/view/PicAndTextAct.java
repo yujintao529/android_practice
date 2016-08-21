@@ -23,9 +23,13 @@ public class PicAndTextAct extends FragmentActivity {
         PicAndTextView2 picAndTextView2= (PicAndTextView2) findViewById(R.id.pic_txt);
         picAndTextView2.clean();
         picAndTextView2.addTextChild(content);
-        picAndTextView2.addTextChild("郁金涛郁金涛郁金涛郁金涛郁金涛郁金涛");
         ImageView imageView=new ImageView(this);
         imageView.setImageResource(R.drawable.share_icon_qq);
-//        picAndTextView2.addNewChild(imageView);
+        picAndTextView2.addNewChild(imageView);
+        picAndTextView2.addTextChild("郁金涛郁金涛郁金涛郁金涛郁金涛郁金涛");
+        imageView=new ImageView(this);
+        imageView.setImageResource(R.drawable.share_icon_qqzone);
+        picAndTextView2.addNewChild(imageView);
+        picAndTextView2.addTextChild("123456789101112113141516171819202122");
     }
 }
