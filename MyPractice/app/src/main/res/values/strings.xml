@@ -13,4 +13,7 @@
     <string name="title_activity_translate_and_rotation">TranslateAndRotation</string>
     <string name="drawer_open">open</string>
     <string name="drawer_close">close</string>
+    
+    
+    <string name="com.example.practice.permision.RECV_BRO">com.example.practice.permision.RECV_BRO</string>
 </resources>
