@@ -5,8 +5,20 @@
     android:layout_height="match_parent">
     <Button
         style="@style/common_btn"
-        android:text="发送广播"
-        android:id="@+id/start_broadcast"
+        android:text="发送普通广播"
+        android:id="@+id/send_broadcast"
+        android:onClick="onClick"
+        />
+    <Button
+        style="@style/common_btn"
+        android:text="发送receiver权限的广播"
+        android:id="@+id/send_receive_broadcast"
+        android:onClick="onClick"
+        />
+    <Button
+        style="@style/common_btn"
+        android:text="发送sender权限的广播广播"
+        android:id="@+id/send_send_broadcast"
         android:onClick="onClick"
         />
 </LinearLayout>
