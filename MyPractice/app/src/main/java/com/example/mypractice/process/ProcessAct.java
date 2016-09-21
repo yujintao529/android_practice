@@ -7,6 +7,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 import com.example.mypractice.R;
+import com.example.mypractice.R2;
+
+import javax.crypto.spec.RC2ParameterSpec;
+
+import butterknife.BindView;
+import butterknife.BindViews;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 /**
  * <p>Copyright: Copyright (c) 2016</p>
@@ -23,13 +31,17 @@ import com.example.mypractice.R;
  */
 public class ProcessAct extends AppCompatActivity {
 
+    @BindView(R.id.start_forground_service)
+    View view;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_process);
-
+        ButterKnife.bind(this);
 
     }
+    @OnClick({R.id.start_forground_service})
     public void onClick(View view){
         switch (view.getId()){
             case R.id.start_forground_service:

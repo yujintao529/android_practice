@@ -250,23 +250,39 @@
                 <category android:name="com.example.apidemons.CATEGORY_SAMPLES" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".base.LoderActivity"
+            android:label="base/LoderActivity"
+            android:theme="@style/toolbarTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="com.example.apidemons.CATEGORY_SAMPLES" />
+            </intent-filter>
+
+        </activity>
 
         <service android:name=".process.ProcessService" />
         <service android:name=".process.ProcessService$InnerService" />
 
         <receiver android:name=".process.WakeUpBroadCast" />
         <receiver android:name=".broadcast.StanderBro" />
-        <receiver android:name=".broadcast.ReceivePermissionBro" android:exported="true">
+        <receiver
+            android:name=".broadcast.ReceivePermissionBro"
+            android:exported="true">
             <intent-filter>
                 <action android:name="com.example.action.TEST_RECEIVE_BRO" />
             </intent-filter>
         </receiver>
-        <receiver android:name=".broadcast.SendPermissionBro" android:exported="true"
+        <receiver
+            android:name=".broadcast.SendPermissionBro"
+            android:exported="true"
             android:permission="com.example.practice.SEND_PRO">
             <intent-filter>
                 <action android:name="com.example.action.TEST_SNED_BRO" />
             </intent-filter>
         </receiver>
+
+
     </application>
 
 </manifest>
