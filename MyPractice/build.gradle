@@ -20,3 +20,8 @@ allprojects {
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
     }
 }
+ext {
+    rxJavaDependency = "io.reactivex:rxjava:1.1.6"
+    rxAndroidDependency="io.reactivex:rxandroid:1.2.1"
+
+}

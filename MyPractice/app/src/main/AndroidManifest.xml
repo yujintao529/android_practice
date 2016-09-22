@@ -260,7 +260,17 @@
             </intent-filter>
 
         </activity>
+        <activity
+            android:name=".other.RxAndroidAct"
+            android:label="other/RxAndroidAct"
+            android:theme="@style/toolbarTheme"
+            >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="com.example.apidemons.CATEGORY_SAMPLES" />
+            </intent-filter>
 
+        </activity>
         <service android:name=".process.ProcessService" />
         <service android:name=".process.ProcessService$InnerService" />
 
