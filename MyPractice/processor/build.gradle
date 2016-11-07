@@ -1,0 +1,18 @@
+apply plugin: 'java'
+
+
+
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile rootProject.ext.autoService
+    compile rootProject.ext.javapoet
+    compile rootProject.ext.javawrite
+    compile project(":processor-annotation")
+//    compile files(org.gradle.internal.jvm.Jvm.current().getRuntimeJar())
+
+}
+
+sourceCompatibility = "1.8"
+targetCompatibility = "1.8"
+
