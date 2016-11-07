@@ -431,10 +431,30 @@ public class RxAndroidAct extends AppCompatActivity {
                                 Thread.sleep(100);
                             } catch (Exception e) { }
                         });
-
-
-
     }
 
+    @OnClick(R.id.flatmap)
+    public void flatmap(){
+        //concatMap是顺序执行的，flatmap是并行执行的。
+        Observable.just(2,4,6,8,10).concatMap(new Func1<Integer, Observable<Integer>>() {
+            @Override
+            public Observable<Integer> call(Integer integer) {
+                return Observable.create(new Observable.OnSubscribe<Integer>() {
+                    @Override
+                    public void call(Subscriber<? super Integer> subscriber) {
+                        subscriber.onNext(integer);
+                        subscriber.onNext(integer*2);
+                        subscriber.onCompleted();
+                        Logger.d("inner call "+integer+" "+Thread.currentThread().getName());
+                    }
+                }).subscribeOn(Schedulers.io());
+            }
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Integer>() {
+            @Override
+            public void call(Integer integer) {
+                Logger.d("call "+integer);
+            }
+        });
+    }
 
 }
