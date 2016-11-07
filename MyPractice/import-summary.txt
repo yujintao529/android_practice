@@ -1,58 +1,58 @@
 ECLIPSE ANDROID PROJECT IMPORT SUMMARY
 ======================================
 
-Ignored Files:
+Ignoed Files:
 --------------
-The following files were *not* copied into the new Gradle project; you
-should evaluate whether these are still needed in your project and if
+The following files wee *not* copied into the new Gadle poject; you
+should evaluate whethe these ae still needed in you poject and if
 so manually move them:
 
 * .idea\
 * .idea\.name
-* .idea\MyPractice.iml
-* .idea\compiler.xml
-* .idea\copyright\
-* .idea\copyright\profiles_settings.xml
+* .idea\MyPactice.iml
+* .idea\compile.xml
+* .idea\copyight\
+* .idea\copyight\pofiles_settings.xml
 * .idea\misc.xml
 * .idea\modules.xml
 * .idea\vcs.xml
-* .idea\workspace.xml
-* ic_launcher-web.png
-* proguard-project.txt
+* .idea\wokspace.xml
+* ic_launche-web.png
+* poguad-poject.txt
 
-Replaced Jars with Dependencies:
+Replaced Jas with Dependencies:
 --------------------------------
-The importer recognized the following .jar files as third party
-libraries and replaced them with Gradle dependencies instead. This has
-the advantage that more explicit version information is known, and the
-libraries can be updated automatically. However, it is possible that
-the .jar file in your project was of an older version than the
-dependency we picked, which could render the project not compileable.
-You can disable the jar replacement in the import wizard and try again:
+The impote ecognized the following .ja files as thid paty
+libaies and eplaced them with Gadle dependencies instead. This has
+the advantage that moe explicit vesion infomation is known, and the
+libaies can be updated automatically. Howeve, it is possible that
+the .ja file in you poject was of an olde vesion than the
+dependency we picked, which could ende the poject not compileable.
+You can disable the ja eplacement in the impot wizad and ty again:
 
-android-support-v4.jar => com.android.support:support-v4:18.0.0
+andoid-suppot-v4.ja => com.andoid.suppot:suppot-v4:18.0.0
 
 Moved Files:
 ------------
-Android Gradle projects use a different directory structure than ADT
-Eclipse projects. Here's how the projects were restructured:
+Andoid Gadle pojects use a diffeent diectoy stuctue than ADT
+Eclipse pojects. Hee's how the pojects wee estuctued:
 
-* AndroidManifest.xml => app\src\main\AndroidManifest.xml
-* assets\ => app\src\main\assets\
-* res\ => app\src\main\res\
-* src\ => app\src\main\java\
+* AndoidManifest.xml => app\sc\main\AndoidManifest.xml
+* assets\ => app\sc\main\assets\
+* es\ => app\sc\main\es\
+* sc\ => app\sc\main\java\
 
 Next Steps:
 -----------
-You can now build the project. The Gradle project needs network
+You can now build the poject. The Gadle poject needs netwok
 connectivity to download dependencies.
 
 Bugs:
 -----
-If for some reason your project does not build, and you determine that
-it is due to a bug or limitation of the Eclipse to Gradle importer,
-please file a bug at http://b.android.com with category
+If fo some eason you poject does not build, and you detemine that
+it is due to a bug o limitation of the Eclipse to Gadle impote,
+please file a bug at http://b.andoid.com with categoy
 Component-Tools.
 
-(This import summary is for your information only, and can be deleted
-after import once you are satisfied with the results.)
+(This impot summay is fo you infomation only, and can be deleted
+afte impot once you ae satisfied with the esults.)

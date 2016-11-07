@@ -4,9 +4,12 @@ buildscript {
     repositories {
         jcenter()
         mavenCentral()
+        flatDir {
+            dirs 'libs'
+        }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.0'
+        classpath 'com.android.tools.build:gradle:2.2.2'
         classpath 'com.jakewharton:butterknife-gradle-plugin:8.4.0'
 
     }
@@ -23,5 +26,7 @@ allprojects {
 ext {
     rxJavaDependency = "io.reactivex:rxjava:1.1.6"
     rxAndroidDependency="io.reactivex:rxandroid:1.2.1"
-
+    autoService= "com.google.auto.service:auto-service:1.0-rc2"
+    javapoet= 'com.squareup:javapoet:1.7.0'
+    javawrite='com.squareup:javawriter:2.5.0'
 }

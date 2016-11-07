@@ -36,6 +36,14 @@
                 android:id="@+id/timer"
                 style="@style/common_btn"
                 android:text="timer" />
+            <Button
+                android:id="@+id/interval"
+                style="@style/common_btn"
+                android:text="interval" />
+            <Button
+                android:id="@+id/repeat"
+                style="@style/common_btn"
+                android:text="repeat" />
         </LinearLayout>
 
         <LinearLayout
@@ -65,6 +73,82 @@
                 android:id="@+id/groupby"
                 style="@style/common_btn"
                 android:text="groupby" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="过滤" />
+
+            <Button
+                android:id="@+id/debounce"
+                style="@style/common_btn"
+                android:text="debounce" />
+            <Button
+                android:id="@+id/throttleWithTimeout"
+                style="@style/common_btn"
+                android:text="throttleWithTimeout" />
+            <Button
+                android:id="@+id/Distinct"
+                style="@style/common_btn"
+                android:text="Distinct" />
+            <Button
+                android:id="@+id/sample"
+                style="@style/common_btn"
+                android:text="sample" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="整合" />
+
+            <Button
+                android:id="@+id/merge"
+                style="@style/common_btn"
+                android:text="merge" />
+            <Button
+                android:id="@+id/join"
+                style="@style/common_btn"
+                android:text="join" />
+            <Button
+                android:id="@+id/swit"
+                style="@style/common_btn"
+                android:text="swit" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="辅助操作" />
+
+            <Button
+                android:id="@+id/delay"
+                style="@style/common_btn"
+                android:text="delay" />
+            <Button
+                android:id="@+id/delaySubscription"
+                style="@style/common_btn"
+                android:text="delaySubscription" />
+            <Button
+                android:id="@+id/backpressed"
+                style="@style/common_btn"
+                android:text="backpressed" />
         </LinearLayout>
     </LinearLayout>
 </ScrollView>
