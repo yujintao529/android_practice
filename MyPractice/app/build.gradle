@@ -8,9 +8,12 @@ android {
     defaultConfig {
         applicationId "com.example.mypractice"
         minSdkVersion 15
-        targetSdkVersion 21
+        targetSdkVersion 23
         multiDexEnabled true
-        targetSdkVersion 21
+        targetSdkVersion 23
+        jackOptions {
+            enabled true
+        }
     }
 
     sourceSets{
@@ -31,10 +34,20 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_7
-        targetCompatibility JavaVersion.VERSION_1_7
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 }
+
+
+task processorTask(type:Exec){
+    println "执行copy annotation processor"
+    commandLine "cp","../processor/build/libs/processor.jar","libs/"
+}
+processorTask.dependsOn(":processor:build")
+preBuild.dependsOn(processorTask)
+
+
 dependencies {
     compile fileTree(includes: ['*.jar'], dir: 'libs')
     compile 'com.android.support:support-v4:23.1.1'
@@ -44,9 +57,16 @@ dependencies {
     compile 'com.android.support:recyclerview-v7:23.2.1'
     compile 'com.android.support:cardview-v7:23.2.1'
     compile 'com.android.support:appcompat-v7:23.2.1'
+    compile 'com.android.support:support-annotations:23.2.1'
     compile 'com.nineoldandroids:library:2.4.0'
     compile 'com.jakewharton:butterknife:8.4.0'
-    annotationProcessor 'com.jakewharton:butterknife-compiler:8.4.0'
+    compile 'com.jakewharton:butterknife-compiler:8.4.0'
     compile "$rootProject.ext.rxJavaDependency"
     compile "$rootProject.ext.rxAndroidDependency"
+    compile "$rootProject.ext.autoService"
+    compile project(":processor-annotation")
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.4.0'
+    annotationProcessor files("libs/processor.jar")
+//    annotationProcessor project(":processor")
+
 }

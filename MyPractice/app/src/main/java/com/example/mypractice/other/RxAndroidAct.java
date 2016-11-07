@@ -1,8 +1,6 @@
 package com.example.mypractice.other;
 
 import android.os.Bundle;
-import android.os.PersistableBundle;
-import android.support.v4.app.SharedElementCallback;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Button;
 
@@ -16,16 +14,15 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import rx.Observable;
-import rx.Scheduler;
 import rx.Subscriber;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action0;
 import rx.functions.Action1;
 import rx.functions.Func0;
 import rx.functions.Func1;
 import rx.functions.Func2;
-import rx.internal.util.RxJavaPluginUtils;
 import rx.observables.GroupedObservable;
-import rx.plugins.RxJavaPlugins;
 import rx.schedulers.Schedulers;
 
 /**
@@ -37,6 +34,7 @@ public class RxAndroidAct extends AppCompatActivity {
 
     @BindView(R.id.button3)
     Button button3;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -207,6 +205,236 @@ public class RxAndroidAct extends AppCompatActivity {
                 });
     }
 
+     Subscription subscription;
+    @OnClick(R.id.interval)
+    public void interval(){
+        subscription= Observable.interval(2000,TimeUnit.MILLISECONDS).
+        filter(new Func1<Long, Boolean>() {
+            @Override
+            public Boolean call(Long aLong) {
+                Logger.d("Func1 call "+aLong);
+                return aLong%2==0;
+            }
+        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<Long>() {
+                    @Override
+                    public void call(Long aLong) {
+                        Logger.d("Action1 call "+ aLong);
+                        if(aLong==10){
+                            subscription.unsubscribe();
+                        }
+                    }
+                });
+    }
+
+    @OnClick(R.id.repeat)
+    public void repeat(){
+
+    }
+    @OnClick(R.id.debounce)
+    public void debounce(){
+        Observable.create(new Observable.OnSubscribe<Data>() {
+            @Override
+            public void call(Subscriber<? super Data> subscriber) {
+                for(int i=0;i<20;i++){
+                    try {
+                        Thread.sleep(400);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    subscriber.onNext(new Data("yujintao",i));
+                }
+                subscriber.onCompleted();
+
+            }
+        }).debounce(1000,TimeUnit.MILLISECONDS).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<Data>() {
+                    @Override
+                    public void call(Data data) {
+                        Logger.d("action1 call "+data.toString());
+                    }
+                });
+    }
+
+    @OnClick(R.id.throttleWithTimeout)
+    public void throttleWithTimeout(){
+        Observable.create(new Observable.OnSubscribe<Data>() {
+            @Override
+            public void call(Subscriber<? super Data> subscriber) {
+                for(int i=0;i<20;i++){
+                    try {
+                        Thread.sleep(1100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    subscriber.onNext(new Data("yujintao",i));
+                }
+                subscriber.onCompleted();
+
+            }
+        }).throttleWithTimeout(1000,TimeUnit.MILLISECONDS).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<Data>() {
+                    @Override
+                    public void call(Data data) {
+                        Logger.d("action1 call "+data.toString());
+                    }
+                });
+
+    }
+    @OnClick(R.id.Distinct)
+    public void Distinct(){
+        Observable.create(new Observable.OnSubscribe<Data>() {
+            @Override
+            public void call(Subscriber<? super Data> subscriber) {
+                for(int i=0;i<20;i++){
+                    subscriber.onNext(new Data("yujintao",i));
+                }
+                for(int i=0;i<10;i++){
+                    subscriber.onNext(new Data("yujintao",i));
+                }
+                for(int i=0;i<30;i++){
+                    subscriber.onNext(new Data("yujintao",i));
+                }
+                subscriber.onCompleted();
+
+            }
+        }).distinct(new Func1<Data, Integer>() {
+            @Override
+            public Integer call(Data data) {
+                return data.id;
+            }
+        }).subscribe(new Action1<Data>() {
+            @Override
+            public void call(Data data) {
+                Logger.d("action1 call "+data.toString());
+            }
+        });
+    }
+    @OnClick(R.id.sample)
+    public void sample(){
+        Observable.create(new Observable.OnSubscribe<Data>() {
+            @Override
+            public void call(Subscriber<? super Data> subscriber) {
+                for(int i=0;i<20;i++){
+                    try {
+                        Thread.sleep(1100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    subscriber.onNext(new Data("yujintao",i));
+                }
+                subscriber.onCompleted();
+
+            }
+        }).throttleFirst(2000,TimeUnit.MILLISECONDS).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Data>() {
+            @Override
+            public void call(Data data) {
+                Logger.d("action1 call "+data.toString());
+            }
+        });
+    }
+    @OnClick(R.id.merge)
+    public void merge(){
+        Observable<Integer> observable=Observable.just(1,2,3,4);
+        Observable<Integer> observable2=Observable.just(5,6,7,8);
+        Observable.merge(observable,observable2).subscribe(new Action1<Integer>() {
+            @Override
+            public void call(Integer integer) {
+                Logger.d("action call "+integer);
+            }
+        });
+
+
+
+    }
+
+    /**
+     * 这个例子有问题啊
+     */
+    @OnClick(R.id.join)
+    public void join(){
+        Observable<Integer> observable=Observable.just(82,34);
+        Observable<Integer> observable2=Observable.just(100,200);
+        observable.join(observable2, new Func1<Integer, Observable<Integer>>() {
+            @Override
+            public Observable<Integer> call(Integer integer) {
+                Logger.d("left fun1 "+integer);
+                return Observable.just(integer);
+            }
+        }, new Func1<Integer, Observable<Integer>>() {
+            @Override
+            public Observable<Integer> call(Integer integer) {
+                Logger.d("right fun1 "+integer);
+                return Observable.just(integer);
+            }
+        }, new Func2<Integer, Integer, Integer>() {
+            @Override
+            public Integer call(Integer integer, Integer integer2) {
+                Logger.d("result action "+(integer+integer2));
+                return null;
+            }
+        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Integer>() {
+            @Override
+            public void call(Integer integer) {
+                Logger.d("action1 call "+integer);
+            }
+        });
+
+
+    }
+    @OnClick(R.id.delay)
+    public void delay(){
+        Observable.just(1,2,4,5).delay(new Func1<Integer, Observable<Object>>() {
+            @Override
+            public Observable<Object> call(Integer integer) {
+                Logger.d("func1 call "+integer);
+                return Observable.empty().delay(integer+1,TimeUnit.SECONDS);
+            }
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Integer>() {
+            @Override
+            public void call(Integer integer) {
+                Logger.d("action1 call "+integer);
+            }
+        });
+
+    }
+    @OnClick(R.id.delaySubscription)
+    public void delaySubscription(){
+        Observable.just(1,2,4,5).doOnCompleted(new Action0() {
+            @Override
+            public void call() {
+
+            }
+        }).delaySubscription(1000,TimeUnit.MILLISECONDS).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Integer>() {
+            @Override
+            public void call(Integer integer) {
+                Logger.d("action1 call "+integer);
+            }
+        });
+        Observable.just(1,2,4,5).delay(1000,TimeUnit.MILLISECONDS).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<Integer>() {
+            @Override
+            public void call(Integer integer) {
+                Logger.d("action1 call "+integer);
+            }
+        });
+    }
+    @OnClick(R.id.backpressed)
+    public void backpressed(){
+        Observable.interval(1, TimeUnit.MILLISECONDS)
+                .onBackpressureDrop()
+                .observeOn(Schedulers.newThread())
+
+                .subscribe(
+                        i -> {
+                            System.out.println(i);
+                            try {
+                                Thread.sleep(100);
+                            } catch (Exception e) { }
+                        });
+
+
+
+    }
 
 
 }
