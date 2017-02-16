@@ -37,6 +37,15 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    packagingOptions {
+        exclude 'lib/armeabi-v7a/*'
+        exclude 'lib/arm64-v8a/*'
+        exclude 'lib/x86_64/*'
+        exclude 'lib/mips/*'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
+    }
+
 }
 
 
