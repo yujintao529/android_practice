@@ -20,4 +20,16 @@
         android:background="@drawable/ripple_1"
         android:clickable="true"
         android:layout_height="30dp"></FrameLayout>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ripple_2"
+        android:background="@drawable/ripple_2"
+        />
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ripple_3"
+        android:background="@drawable/ripple_3"
+        />
 </LinearLayout>
