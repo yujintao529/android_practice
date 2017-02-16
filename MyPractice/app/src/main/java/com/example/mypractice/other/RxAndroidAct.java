@@ -1,5 +1,6 @@
 package com.example.mypractice.other;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Button;
@@ -7,6 +8,7 @@ import android.widget.Button;
 import com.example.mypractice.Logger;
 import com.example.mypractice.R;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -19,6 +21,7 @@ import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action0;
 import rx.functions.Action1;
+import rx.functions.Action2;
 import rx.functions.Func0;
 import rx.functions.Func1;
 import rx.functions.Func2;
@@ -432,6 +435,18 @@ public class RxAndroidAct extends AppCompatActivity {
                             } catch (Exception e) { }
                         });
     }
+    @OnClick(R.id.collect)
+    public void collect(){
+        //collect 收集发射的数据然后统一进行发射
+        Observable.just(1,2,4,5,6,7,8,9,4,42).collect(()->{
+            return new ArrayList<>();
+        }, (List<Integer> list,Integer integer)->{
+            list.add(integer);
+        }).subscribe((List<Integer> list)->{
+                Logger.d("inner call "+list);
+        });
+    }
+
 
     @OnClick(R.id.flatmap)
     public void flatmap(){
