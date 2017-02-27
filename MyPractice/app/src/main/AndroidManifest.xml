@@ -261,6 +261,16 @@
 
         </activity>
         <activity
+            android:name=".v7.CardViewAct"
+            android:label="v7/CardViewAct"
+            android:theme="@style/AppTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="com.example.apidemons.CATEGORY_SAMPLES" />
+            </intent-filter>
+
+        </activity>
+        <activity
             android:name=".other.RxAndroidAct"
             android:label="other/RxAndroidAct"
             android:theme="@style/toolbarTheme"
