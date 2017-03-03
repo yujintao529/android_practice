@@ -7,6 +7,7 @@ import android.widget.Button;
 
 import com.example.mypractice.Logger;
 import com.example.mypractice.R;
+import com.example.mypractice.YUApplication;
 import com.litesuits.orm.LiteOrm;
 
 /**
@@ -20,6 +21,7 @@ import com.litesuits.orm.LiteOrm;
  * @modify
  */
 public class SQLiteAct extends Activity implements View.OnClickListener {
+    public static
     Button mButton;
     DbHelper dbHelper;
     @Override
@@ -29,6 +31,7 @@ public class SQLiteAct extends Activity implements View.OnClickListener {
         mButton= (Button) findViewById(R.id.create);
         mButton.setOnClickListener(this);
         dbHelper=new DbHelper(this);
+        LiteOrm.newSingleInstance(getApplicationContext(),"yu_database");
     }
 
     @Override
