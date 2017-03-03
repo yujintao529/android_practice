@@ -21,6 +21,8 @@ public class DbHelper extends SQLiteOpenHelper {
     public DbHelper(Context context,String table) {
         super(context,"my_database",null,1);
         this.table=table;
+
+
 //        createTable();
     }
 

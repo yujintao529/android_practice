@@ -28,6 +28,8 @@ public class SQLiteAct extends Activity implements View.OnClickListener {
         mButton= (Button) findViewById(R.id.create);
         mButton.setOnClickListener(this);
         dbHelper=new DbHelper(this,"Student");
+
+
     }
 
     @Override
