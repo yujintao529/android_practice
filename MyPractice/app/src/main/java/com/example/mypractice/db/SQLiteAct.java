@@ -7,6 +7,7 @@ import android.widget.Button;
 
 import com.example.mypractice.Logger;
 import com.example.mypractice.R;
+import com.litesuits.orm.LiteOrm;
 
 /**
  * <p>Copyright: Copyright (c) 2016</p>
