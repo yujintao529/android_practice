@@ -27,13 +27,14 @@ public class SQLiteAct extends Activity implements View.OnClickListener {
         setContentView(R.layout.activity_sqlite);
         mButton= (Button) findViewById(R.id.create);
         mButton.setOnClickListener(this);
-        dbHelper=new DbHelper(this);
+        dbHelper=new DbHelper(this,"Student");
     }
 
     @Override
     public void onClick(View view) {
-      dbHelper.createTable();
-        long id=dbHelper.insert();
-        Logger.d("insert data "+id);
+//      dbHelper.createTable();
+        dbHelper=new DbHelper(this,"teacher");
+//        long id=dbHelper.insert();
+//        Logger.d("insert data "+id);
     }
 }

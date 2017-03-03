@@ -17,9 +17,11 @@ import android.database.sqlite.SQLiteOpenHelper;
  * @modify
  */
 public class DbHelper extends SQLiteOpenHelper {
-
-    public DbHelper(Context context) {
-        super(context,"sdf",null,1);
+    private String table;
+    public DbHelper(Context context,String table) {
+        super(context,"my_database",null,1);
+        this.table=table;
+//        createTable();
     }
 
     public DbHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version, DatabaseErrorHandler errorHandler) {
@@ -29,7 +31,7 @@ public class DbHelper extends SQLiteOpenHelper {
     public void createTable(){
         SQLiteDatabase sqLiteDatabase=getWritableDatabase();
         sqLiteDatabase.beginTransaction();
-        sqLiteDatabase.execSQL("create table msg1(id integer)");
+        sqLiteDatabase.execSQL("create table "+table+"(id integer)");
         sqLiteDatabase.endTransaction();
 
     }
@@ -42,7 +44,7 @@ public class DbHelper extends SQLiteOpenHelper {
     }
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
-        sqLiteDatabase.execSQL("create table msg1(id integer)");
+        sqLiteDatabase.execSQL("create table "+table+"(id integer)");
     }
 
     @Override

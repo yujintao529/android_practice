@@ -73,6 +73,7 @@ dependencies {
     compile "$rootProject.ext.rxAndroidDependency"
     compile "$rootProject.ext.autoService"
     compile project(":processor-annotation")
+    compile "com.amitshekhar.android:debug-db:0.4.0"
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.4.0'
     annotationProcessor files("libs/processor.jar")
 //    annotationProcessor project(":processor")
