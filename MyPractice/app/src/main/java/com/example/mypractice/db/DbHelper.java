@@ -18,35 +18,46 @@ import android.database.sqlite.SQLiteOpenHelper;
  */
 public class DbHelper extends SQLiteOpenHelper {
 
+    public static DbHelper dbHelper;
+
+    private String databaseName;
+
+    public static synchronized SQLiteOpenHelper getInstance(Context context) {
+        if (dbHelper == null) {
+            dbHelper = new DbHelper(context.getApplicationContext());
+        }
+        return dbHelper;
+    }
+
     public DbHelper(Context context) {
-        super(context,"sdf",null,1);
+        super(context, "yu_database", null, 1);
+        databaseName="yu_database";
     }
 
     public DbHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version, DatabaseErrorHandler errorHandler) {
         super(context, name, factory, version, errorHandler);
     }
 
-    public void createTable(){
-        SQLiteDatabase sqLiteDatabase=getWritableDatabase();
-        sqLiteDatabase.beginTransaction();
-        sqLiteDatabase.execSQL("create table msg1(id integer)");
-        sqLiteDatabase.endTransaction();
+    @Override
+    public String getDatabaseName() {
+        return databaseName;
+    }
 
+    public void setDatabaseName(String databaseName) {
+        this.databaseName = databaseName;
     }
-    public long insert(){
-        SQLiteDatabase sqLiteDatabase=getWritableDatabase();
-        sqLiteDatabase.beginTransaction();
-        ContentValues cv=new ContentValues();
-        cv.put("id", 1);
-        return sqLiteDatabase.insert("msg1",null,cv);
-    }
+
+
+
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
-        sqLiteDatabase.execSQL("create table msg1(id integer)");
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
 
+    }
+
+    public void createTable(String sql){
     }
 }
