@@ -10,6 +10,10 @@ import com.example.mypractice.R;
 import com.example.mypractice.YUApplication;
 import com.litesuits.orm.LiteOrm;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+
 /**
  * <p>Copyright: Copyright (c) 2016</p>
  * <p/>
@@ -21,23 +25,23 @@ import com.litesuits.orm.LiteOrm;
  * @modify
  */
 public class SQLiteAct extends Activity implements View.OnClickListener {
-    public static
+    @BindView(R.id.create)
     Button mButton;
     DbHelper dbHelper;
+    static LiteOrm liteOrm;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sqlite);
-        mButton= (Button) findViewById(R.id.create);
-        mButton.setOnClickListener(this);
-        dbHelper=new DbHelper(this);
-        LiteOrm.newSingleInstance(getApplicationContext(),"yu_database");
+        ButterKnife.bind(this);
+        if(liteOrm==null) {
+            liteOrm = LiteOrm.newSingleInstance(getApplicationContext(), "yu_database");
+        }
     }
 
     @Override
+    @OnClick(R.id.create)
     public void onClick(View view) {
-      dbHelper.createTable();
-        long id=dbHelper.insert();
-        Logger.d("insert data "+id);
+        liteOrm.insert(new Student());
     }
 }
