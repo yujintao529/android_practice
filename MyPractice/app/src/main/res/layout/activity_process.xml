@@ -7,7 +7,6 @@
         style="@style/common_btn"
         android:text="启动forground的service"
         android:id="@+id/start_forground_service"
-        android:onClick="onClick"
         />
     <Button
         style="@style/common_btn"
