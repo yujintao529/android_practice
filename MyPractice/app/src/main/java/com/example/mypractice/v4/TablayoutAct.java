@@ -34,19 +34,20 @@ public class TablayoutAct extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tab_layout);
         ButterKnife.bind(this);
-        MfwTabLayout.Tab tab=mfwTabLayout.newTab();
-        tab.setTitle("我的title很长1");
-        mfwTabLayout.addTab(tab);
-        tab=mfwTabLayout.newTab();
-        tab.setTitle("我的title很长2");
-        mfwTabLayout.addTab(tab);
-        tab=mfwTabLayout.newTab();
-        tab.setTitle("我的title很长3");
-        mfwTabLayout.addTab(tab);
-        tab=mfwTabLayout.newTab();
-        tab.setTitle("我的title很长4");
-        mfwTabLayout.addTab(tab);
+//        MfwTabLayout.Tab tab=mfwTabLayout.newTab();
+//        tab.setTitle("我的title很长1");
+//        mfwTabLayout.addTab(tab);
+//        tab=mfwTabLayout.newTab();
+//        tab.setTitle("我的title很长2");
+//        mfwTabLayout.addTab(tab);
+//        tab=mfwTabLayout.newTab();
+//        tab.setTitle("我的title很长3");
+//        mfwTabLayout.addTab(tab);
+//        tab=mfwTabLayout.newTab();
+//        tab.setTitle("我的title很长4");
+//        mfwTabLayout.addTab(tab);
         final int[] images=new int[]{R.drawable.resource_1,R.drawable.resource_2,R.drawable.resource_3,R.drawable.resource_4};
+//        final int[] images=new int[]{R.drawable.resource_1,R.drawable.resource_2};
         viewPager.setAdapter(new PagerAdapter() {
             @Override
             public int getCount() {
