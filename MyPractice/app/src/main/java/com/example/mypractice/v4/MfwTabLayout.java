@@ -14,9 +14,11 @@ import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -62,20 +64,18 @@ public class MfwTabLayout extends HorizontalScrollView {
     private InnerView mInnerView;
 
     //view attr
-    private ColorStateList mTabColorStateList;
+    private ColorStateList mTabTextColorStateList;
     private int mMode;//tab填充模式
     private int mMinTabWidth;//tab最小宽度,只有在model为WARP时起作用
     private int mTabStartMargin;//tab开始margin，距左边距的位置
-    private int mTabEndMargin;//tab结束的margin,距右边距的位置,利用填充一个空白view实现
-    private int mTabPaddingStart;
-    private int mTabPaddingEnd;
-    private int mTabPaddingTop;
-    private int mTabPaddingBottom;
-
+    private int mTabEndMargin;//tab结束的margin,距右边距的位置
+    private int mTabPaddingStart;//tab padding left
+    private int mTabPaddingEnd;//tab padding right
+    private int mTabPaddingTop;//tab padding top
+    private int mTabPaddingBottom;//tab padding bottom
     private int mIndicatorHeight;
     private int mIndicatorColor;
-    @StyleRes
-    int mTabApparence;
+    private float mTextSize;
 
     public MfwTabLayout(Context context) {
         this(context, null);
@@ -90,9 +90,10 @@ public class MfwTabLayout extends HorizontalScrollView {
         setHorizontalScrollBarEnabled(false);
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.mfw_tab_layout);
         mMode = typedArray.getInt(R.styleable.mfw_tab_layout_mfwtab_mode, MODE_MATCH);
-        int colorTabDfault = typedArray.getColor(R.styleable.mfw_tab_layout_mfwtab_tab_color, TAB_DEFAULT_COLOR);
-        int colorTabSelectedDfault = typedArray.getColor(R.styleable.mfw_tab_layout_mfwtab_tab_color, TAB_DEFAULT_SELECT_COLOR);
-        mTabColorStateList = createColorStateList(colorTabDfault, colorTabSelectedDfault);
+        int colorTabDfault = typedArray.getColor(R.styleable.mfw_tab_layout_mfwtab_tab_text_color, TAB_DEFAULT_COLOR);
+        int colorTabSelectedDefault = typedArray.getColor(R.styleable.mfw_tab_layout_mfwtab_tab_text_select_color, TAB_DEFAULT_SELECT_COLOR);
+        mTabTextColorStateList = createColorStateList(colorTabDfault, colorTabSelectedDefault);
+        mTextSize=typedArray.getDimensionPixelSize(R.styleable.mfw_tab_layout_mfwtab_tab_text_size,15);
         mMinTabWidth = typedArray.getDimensionPixelSize(R.styleable.mfw_tab_layout_mfwtab_tab_minwidth, TAB_DEFAULT_TAB_MINWIDTH);
         mIndicatorHeight = typedArray.getDimensionPixelSize(R.styleable.mfw_tab_layout_mfwtab_indicator_height, INDICATOR_DEFAULT_HEIGHT);
         mTabPaddingStart = typedArray.getDimensionPixelSize(R.styleable.mfw_tab_layout_mfwtab_tab_padding_start, 0);
@@ -105,10 +106,9 @@ public class MfwTabLayout extends HorizontalScrollView {
         typedArray.recycle();
         mTabs = new ArrayList<>();
         mTabSelectedListeners = new ArrayList<>();
-        setFillViewport(true);
         mInnerView = new InnerView(context);
         mInnerView.setPadding(mTabStartMargin,0,mTabEndMargin,0);
-        addView(mInnerView, new HorizontalScrollView.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT));
+        addView(mInnerView, new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT));
 
     }
 
@@ -159,12 +159,12 @@ public class MfwTabLayout extends HorizontalScrollView {
     }
 
 
-    void addTab(Tab tab) {
+    public void addTab(Tab tab) {
         addTabInterval(tab, mTabs.size(), mTabs.isEmpty());
     }
 
 
-    void selectTabPosition(int position) {
+    public void selectTabPosition(int position) {
         if (mTabs.size() > position) {
             selectTab(mTabs.get(position), true);
         }
@@ -238,7 +238,6 @@ public class MfwTabLayout extends HorizontalScrollView {
 
     private void addTabInterval(Tab tab, int index, boolean isSelected) {
         mInnerView.addView(tab, index, createLayoutParam());
-        mInnerView.setWeightSum(mTabs.size());
         mTabs.add(index, tab);
         resetTabPosition();
         if (isSelected) {
@@ -266,6 +265,62 @@ public class MfwTabLayout extends HorizontalScrollView {
     }
 
 
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        Log.d(TAG,"tablayout "+getMeasureMode(widthMeasureSpec)+" "+MeasureSpec.getSize(widthMeasureSpec));
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        Log.d(TAG,"tablayout width "+getMeasuredWidth());
+        if(mMode==MODE_MATCH&&getChildCount()>0){
+            final View child=getChildAt(0);
+            int paddingSum=child.getPaddingLeft()+child.getPaddingRight();//这个值也就是mTabStartMargin和mTabEndMargin
+            if(child.getMeasuredWidth()>getMeasuredWidth()){
+                child.measure(MeasureSpec.makeMeasureSpec(getMeasuredWidth(),MeasureSpec.EXACTLY),heightMeasureSpec);
+            }else if(child.getMeasuredWidth()<getMeasuredWidth()){
+                //均分模式，不采用weight的方法，而采用margin的方式
+                ViewGroup viewGroup= (ViewGroup) child;
+                final int count = viewGroup.getChildCount();
+                if(count<=1){
+                    return;
+                }
+                int aveWidth=(getMeasuredWidth()-paddingSum)/count;
+                for(int i=0,size=count;i<size;i++){
+                    View inner=viewGroup.getChildAt(i);
+                    int innerWidth=inner.getMeasuredWidth();
+                    updateInnerMargin((MarginLayoutParams) inner.getLayoutParams(),innerWidth,aveWidth);
+                }
+                child.measure(MeasureSpec.makeMeasureSpec(getMeasuredWidth(),MeasureSpec.EXACTLY),heightMeasureSpec);
+            }else{
+                //ignore
+            }
+        }
+    }
+
+    private static void updateInnerMargin(MarginLayoutParams layoutParams,int measureWidth,int needWidth){
+        if(measureWidth>=needWidth){
+            return;
+        }
+        int margin=Math.round((needWidth-measureWidth)/2);
+        layoutParams.setMargins(margin,0,margin,0);
+    }
+
+
+
+    private static final String getMeasureMode(int measureSpec){
+        String mode="";
+        switch (MeasureSpec.getMode(measureSpec)){
+            case MeasureSpec.AT_MOST:
+                mode="at_most";
+                break;
+            case MeasureSpec.EXACTLY:
+                mode="exactly";
+                break;
+            case MeasureSpec.UNSPECIFIED:
+                mode="unspecified";
+                break;
+        }
+        return mode;
+    }
+
     private static ColorStateList createColorStateList(int defaultColor, int selectedColor) {
         final int[][] states = new int[2][];
         final int[] colors = new int[2];
@@ -282,10 +337,14 @@ public class MfwTabLayout extends HorizontalScrollView {
         return new ColorStateList(states, colors);
     }
 
+    /**
+     * 目前返回相同的layoutParam，后面方便扩展
+     * @return
+     */
     private LinearLayout.LayoutParams createLayoutParam() {
         LinearLayout.LayoutParams layoutParams;
         if (mMode == MODE_MATCH) {
-            layoutParams = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1);
+            layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT, 0);
         } else {
             layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT, 0);
         }
@@ -305,13 +364,9 @@ public class MfwTabLayout extends HorizontalScrollView {
 
         private int mLastPosition = -1;
         private float mPositionOffset = 0;//0-1
-
         private int indicatorLeft;
         private int indicatorRight;
-
         private Paint mIndicatorPaint;
-
-
 
 
         public InnerView(Context context) {
@@ -330,8 +385,15 @@ public class MfwTabLayout extends HorizontalScrollView {
 
         @Override
         protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+            Log.d(TAG,"innerView "+getMeasureMode(widthMeasureSpec)+" "+MeasureSpec.getSize(widthMeasureSpec));
             super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+            Log.d(TAG,"innerView width "+getMeasuredWidth());
+            if(MeasureSpec.getMode(widthMeasureSpec)==MeasureSpec.UNSPECIFIED){
+                return;
+            }
+
         }
+
 
         @Override
         public void draw(Canvas canvas) {
@@ -343,6 +405,7 @@ public class MfwTabLayout extends HorizontalScrollView {
 
         @Override
         protected void onLayout(boolean changed, int l, int t, int r, int b) {
+            super.onLayout(changed,l,t,r,b);
             updateIndicator();
         }
 
@@ -429,7 +492,8 @@ public class MfwTabLayout extends HorizontalScrollView {
         }
 
         private void updateTab() {
-            textView.setTextColor(tabLayout.mTabColorStateList);
+            textView.setTextColor(tabLayout.mTabTextColorStateList);
+            textView.setTextSize(TypedValue.COMPLEX_UNIT_PX,tabLayout.mTextSize);
             textView.setMinWidth(tabLayout.mMinTabWidth);
             setPadding(tabLayout.mTabPaddingStart, tabLayout.mTabPaddingTop, tabLayout.mTabPaddingEnd, tabLayout.mTabPaddingBottom);
         }
@@ -527,15 +591,4 @@ public class MfwTabLayout extends HorizontalScrollView {
     }
 
 
-    private static class SpecialLinearLayout extends LinearLayout{
-
-        public SpecialLinearLayout(Context context) {
-            super(context);
-        }
-
-        @Override
-        protected void onLayout(boolean changed, int l, int t, int r, int b) {
-            super.onLayout(changed, l, t, r, b);
-        }
-    }
 }

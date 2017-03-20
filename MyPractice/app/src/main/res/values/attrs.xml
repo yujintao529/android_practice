@@ -12,8 +12,9 @@
             <enum name="MATCH" value="0"/>
             <enum name="WRAP" value="1"/>
         </attr>
-        <attr name="mfwtab_tab_color" format="color|reference"/>
-        <attr name="mfwtab_tab_select_color" format="color|reference"/>
+        <attr name="mfwtab_tab_text_color" format="color|reference"/>
+        <attr name="mfwtab_tab_text_size" format="dimension|reference"/>
+        <attr name="mfwtab_tab_text_select_color" format="color|reference"/>
         <attr name="mfwtab_tab_minwidth" format="dimension|reference"/>
         <attr name="mfwtab_tab_padding_start" format="dimension|reference"/>
         <attr name="mfwtab_tab_padding_end" format="dimension|reference"/>
