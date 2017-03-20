@@ -7,4 +7,21 @@
         <attr name="line_full" format="boolean"></attr>
     </declare-styleable>
         <attr name="theme_def" format="reference"/>
+    <declare-styleable name="mfw_tab_layout">
+        <attr name="mfwtab_mode" format="enum">
+            <enum name="MATCH" value="0"/>
+            <enum name="WRAP" value="1"/>
+        </attr>
+        <attr name="mfwtab_tab_color" format="color|reference"/>
+        <attr name="mfwtab_tab_select_color" format="color|reference"/>
+        <attr name="mfwtab_tab_minwidth" format="dimension|reference"/>
+        <attr name="mfwtab_tab_padding_start" format="dimension|reference"/>
+        <attr name="mfwtab_tab_padding_end" format="dimension|reference"/>
+        <attr name="mfwtab_tab_padding_top" format="dimension|reference"/>
+        <attr name="mfwtab_tab_padding_bottom" format="dimension|reference"/>
+        <attr name="mfwtab_tab_start_margin" format="dimension|reference"/>
+        <attr name="mfwtab_tab_end_margin" format="dimension|reference"/>
+        <attr name="mfwtab_indicator_height" format="dimension|reference"/>
+        <attr name="mfwtab_indicator_color" format="dimension|reference"/>
+    </declare-styleable>
 </resources>
