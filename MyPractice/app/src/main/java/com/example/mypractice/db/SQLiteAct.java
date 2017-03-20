@@ -12,7 +12,11 @@ import com.example.mypractice.Logger;
 import com.example.mypractice.R;
 import com.example.mypractice.YUApplication;
 import com.litesuits.orm.LiteOrm;
+import com.litesuits.orm.db.assit.Transaction;
 import com.litesuits.orm.db.impl.SQLiteHelper;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -59,7 +63,7 @@ public class SQLiteAct extends Activity implements View.OnClickListener {
     public void createTable(){
         SQLiteOpenHelper dbHelper=DbHelper.getInstance(this);
         SQLiteDatabase sqLiteDatabase=dbHelper.getWritableDatabase();
-        String creataTable="create table if not exists teacher (id integer primary key autoincrement)";
+        String creataTable="create table if not exists teacher (id integer primary key autoincrement,insert_time date)";
         SQLiteStatement sqLiteStatement=sqLiteDatabase.compileStatement(creataTable);
         sqLiteStatement.execute();
         sqLiteStatement.close();
@@ -73,5 +77,13 @@ public class SQLiteAct extends Activity implements View.OnClickListener {
         SQLiteStatement sqLiteStatement=sqLiteDatabase.compileStatement(updateTable);
         sqLiteStatement.execute();
         sqLiteStatement.close();
+    }
+    @OnClick(R.id.insert_data)
+    public void insertData(){
+        SimpleDateFormat simpleDateFormat=new SimpleDateFormat("yyyy-MM-dd");
+        SQLiteOpenHelper dbHelper=DbHelper.getInstance(this);
+        SQLiteDatabase sqLiteDatabase=dbHelper.getWritableDatabase();
+        String updateTable="insert into teacher(insert_time) values("+simpleDateFormat.format(new Date())+")";
+        sqLiteDatabase.execSQL(updateTable);
     }
 }

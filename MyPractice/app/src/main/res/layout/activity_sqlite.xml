@@ -20,4 +20,9 @@
         android:layout_height="wrap_content"
         android:text="修改表"
         android:id="@+id/update_table"/>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="插入数据"
+        android:id="@+id/insert_data"/>
 </LinearLayout>
