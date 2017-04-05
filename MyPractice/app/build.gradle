@@ -3,7 +3,7 @@ apply plugin: 'com.jakewharton.butterknife'
 
 android {
     compileSdkVersion 23
-    buildToolsVersion '24.0.2'
+    buildToolsVersion '25.0.0'
 
     defaultConfig {
         applicationId "com.example.mypractice"
@@ -64,7 +64,7 @@ dependencies {
     compile "$rootProject.ext.rxJavaDependency"
     compile "$rootProject.ext.rxAndroidDependency"
     compile "$rootProject.ext.autoService"
-    compile project(":processor-annotation")
+//    compile project(":processor-annotation")
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.4.0'
     annotationProcessor files("libs/processor.jar")
 //    annotationProcessor project(":processor")
