@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-      <declare-styleable name="Autogrid_layout">
-        <attr name="lineColor" format="color|reference"/>
-        <attr name="lineSize" format="dimension"/>
-        <attr name="number" format="integer"/>
+    <declare-styleable name="Autogrid_layout">
+        <attr name="lineColor" format="color|reference" />
+        <attr name="lineSize" format="dimension" />
+        <attr name="number" format="integer" />
         <attr name="line_full" format="boolean"></attr>
     </declare-styleable>
-        <attr name="theme_def" format="reference"/>
+    <attr name="theme_def" format="reference" />
+    <declare-styleable name="double_seek_bar">
+        <attr name="dsb_test" format="dimension|reference"/>
+
+    </declare-styleable>
 </resources>
