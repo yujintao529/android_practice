@@ -422,17 +422,7 @@ public class RxAndroidAct extends AppCompatActivity {
     public void backpressed(){
         Observable.interval(1, TimeUnit.MILLISECONDS)
                 .onBackpressureDrop()
-                .observeOn(Schedulers.newThread())
-
-                .subscribe(
-                        i -> {
-                            System.out.println(i);
-                            try {
-                                Thread.sleep(100);
-                            } catch (Exception e) { }
-                        });
-
-
+                .observeOn(Schedulers.newThread());
 
     }
 
