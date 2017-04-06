@@ -1,6 +1,5 @@
 package com.example.mypractice.view;
 
-import android.animation.Animator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
@@ -15,6 +14,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.support.v4.view.MotionEventCompat;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.util.SparseIntArray;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -73,10 +73,18 @@ public class DoubleSeekBar extends View {
     private int mode = MODE_MUL;
 
 
-    private boolean autoNest=false;//牛逼的属性，自动NumPart位置调整。
+    private boolean autoNest = true;//牛逼的属性，自动NumPart位置调整。
 
-    private LeftAnimatorUpdateListener leftAnimatorUpdateListener=new LeftAnimatorUpdateListener();
-    private RightAnimatorUpdateListener rightAnimatorUpdateListener=new RightAnimatorUpdateListener();
+    private LeftAnimatorUpdateListener leftAnimatorUpdateListener = new LeftAnimatorUpdateListener();
+    private RightAnimatorUpdateListener rightAnimatorUpdateListener = new RightAnimatorUpdateListener();
+
+
+    private ArrayList<Point> points = new ArrayList<>();
+    private ArrayList<String> content = new ArrayList<>();
+    private ArrayList<Point> contentPoint = new ArrayList<>();
+
+
+    private OnDotTextAdapter onDotTextAdapter;
 
     public DoubleSeekBar(Context context) {
         this(context, null);
@@ -100,10 +108,16 @@ public class DoubleSeekBar extends View {
                 //消除animator
                 if (mode == MODE_MUL && (x <= mCurrentStartP.x || ((x < mCurrentEndP.x) && Math.abs(x - mCurrentStartP.x) < Math.abs(x - mCurrentEndP.x)))) {
                     status = STATUE_LEFT_DRAG;
-                    currentStart = caculteCurrentValue(x);
+                    currentStart = calculateCurrentValue(x);
+                    if (leftAnimator != null) {
+                        leftAnimator.cancel();
+                    }
                 } else {
+                    if (rightAnimator != null) {
+                        rightAnimator.cancel();
+                    }
                     status = STATUE_RIGHT_DRAG;
-                    currentEnd = caculteCurrentValue(x);
+                    currentEnd = calculateCurrentValue(x);
                 }
                 if (onScrollChangeListener != null) {
                     onScrollChangeListener.onChanged(currentStart, currentEnd);
@@ -114,11 +128,11 @@ public class DoubleSeekBar extends View {
                 break;
             case MotionEvent.ACTION_MOVE:
                 if (status == STATUE_LEFT_DRAG) {
-                    int value = caculteCurrentValue(x);
+                    int value = calculateCurrentValue(x);
                     currentStart = Math.min(value, currentEnd);
 //                    Log.d(TAG,"motion move currentStart "+currentStart);
                 } else if (status == STATUE_RIGHT_DRAG) {
-                    int value = caculteCurrentValue(x);
+                    int value = calculateCurrentValue(x);
                     currentEnd = Math.max(value, currentStart);
 //                    Log.d(TAG,"motion move currentEnd "+currentEnd);
                 }
@@ -130,11 +144,37 @@ public class DoubleSeekBar extends View {
                 break;
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
-                status = STATUE_DILE;
+
                 if (onScrollChangeListener != null) {
                     onScrollChangeListener.onChanged(currentStart, currentEnd);
                 }
-                handle = false;
+                if (autoNest) {
+                    if (status == STATUE_LEFT_DRAG) {
+                        int value = calculateCurrentValue(x);
+                        if (leftAnimator == null) {
+                            leftAnimator = new ValueAnimator();
+                            leftAnimator.addUpdateListener(leftAnimatorUpdateListener);
+                        }
+                        currentStart = Math.min(value, currentEnd);
+                        for (int i = 0, size = integers.size() - 1; i < size; i++) {
+                            if (currentStart >= integers.get(i) && currentStart <= integers.get(i + 1)) {
+                                int middleValue = (integers.get(i) + integers.get(i + 1)) / 2;
+                                if (currentStart > middleValue) {
+                                    animateToPartInterval(leftAnimator, currentStart, integers.get(i + 1));
+                                } else {
+                                    animateToPartInterval(leftAnimator,currentStart,integers.get(i));
+                                }
+                                break;
+                            }
+                        }
+                    } else if (status == STATUE_RIGHT_DRAG) {
+                        int value = calculateCurrentValue(x);
+                        currentEnd = Math.max(value, currentStart);
+//                    Log.d(TAG,"motion move currentEnd "+currentEnd);
+
+                    }
+                }
+                status = STATUE_DILE;
                 break;
         }
 
@@ -142,7 +182,7 @@ public class DoubleSeekBar extends View {
     }
 
 
-    private int caculteCurrentValue(float pointX) {
+    private int calculateCurrentValue(float pointX) {
         float per = (pointX - mMinP.x) / (mMaxP.x - mMinP.x);
         float correctPer = Math.max(Math.min(1, per), 0);
         return (int) ((max - min) * correctPer + min);
@@ -164,7 +204,6 @@ public class DoubleSeekBar extends View {
 
         }
     }
-
 
 
     /**
@@ -207,6 +246,8 @@ public class DoubleSeekBar extends View {
         requestLayout();
     }
 
+    private ArrayList<Integer> integers = new ArrayList<>();
+
     /**
      * 因为文案是通过接口传递进来的，为了保证回掉函数不在onMeasure里执行，所以把文字的计算单独拿出来
      *
@@ -216,10 +257,13 @@ public class DoubleSeekBar extends View {
         this.onDotTextAdapter = onDotTextAdapter;
         content.clear();
         contentPoint.clear();
+        integers.clear();
         if (this.onDotTextAdapter != null) {
             for (int i = 0, size = points.size(); i < size; i++) {
                 float per = i * 1f / (size - 1);
-                String text = onDotTextAdapter.content(i, (int) ((max - min) * per + min), size);
+                int value = (int) ((max - min) * per + min);
+                integers.add(value);
+                String text = onDotTextAdapter.content(i, value, size);
                 content.add(text);
                 contentPoint.add(new Point());
             }
@@ -239,9 +283,20 @@ public class DoubleSeekBar extends View {
         requestLayout();
     }
 
-
-    private void animateToPartInterval(int startValue,int endValue,ValueAnimator.AnimatorUpdateListener updateListener){
-
+    /**
+     * 执行自动的归整
+     *
+     * @param valueAnimator
+     * @param startValue
+     * @param endValue
+     */
+    private void animateToPartInterval(ValueAnimator valueAnimator, int startValue, int endValue) {
+        if (valueAnimator.isRunning()) {
+            valueAnimator.cancel();
+        }
+        valueAnimator.setIntValues(startValue, endValue);
+        valueAnimator.setDuration(200);
+        valueAnimator.start();
     }
 
     @Override
@@ -331,9 +386,9 @@ public class DoubleSeekBar extends View {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 //        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         //height默认仅支持wrap_content
-        if(isInEditMode()){
+        if (isInEditMode()) {
             super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-            return ;
+            return;
         }
         Log.d(TAG, "on measure " + MeasureSpec.getMode(widthMeasureSpec) + " " + MeasureSpec.getMode(heightMeasureSpec));
         int width = MeasureSpec.getSize(widthMeasureSpec);
@@ -366,13 +421,6 @@ public class DoubleSeekBar extends View {
         }
 
     }
-
-    private ArrayList<Point> points = new ArrayList<>();
-    private ArrayList<String> content = new ArrayList<>();
-    private ArrayList<Point> contentPoint = new ArrayList<>();
-
-
-    private OnDotTextAdapter onDotTextAdapter;
 
 
     private void initAttrs(Context context, AttributeSet attrs) {
@@ -407,20 +455,21 @@ public class DoubleSeekBar extends View {
         void onChanged(int startValue, int endValue);
     }
 
-    private class RightAnimatorUpdateListener implements ValueAnimator.AnimatorUpdateListener{
+    private class RightAnimatorUpdateListener implements ValueAnimator.AnimatorUpdateListener {
 
         @Override
         public void onAnimationUpdate(ValueAnimator animation) {
-            int value= (int) animation.getAnimatedValue();
-            setCurrentValue(currentStart,value);
+            int value = (int) animation.getAnimatedValue();
+            setCurrentValue(currentStart, value);
         }
     }
-    private class LeftAnimatorUpdateListener implements ValueAnimator.AnimatorUpdateListener{
+
+    private class LeftAnimatorUpdateListener implements ValueAnimator.AnimatorUpdateListener {
 
         @Override
         public void onAnimationUpdate(ValueAnimator animation) {
-            int value= (int) animation.getAnimatedValue();
-            setCurrentValue(value,currentEnd);
+            int value = (int) animation.getAnimatedValue();
+            setCurrentValue(value, currentEnd);
         }
     }
 
