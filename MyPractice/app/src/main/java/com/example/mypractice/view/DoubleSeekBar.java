@@ -159,10 +159,10 @@ public class DoubleSeekBar extends View {
                         for (int i = 0, size = integers.size() - 1; i < size; i++) {
                             if (currentStart >= integers.get(i) && currentStart <= integers.get(i + 1)) {
                                 int middleValue = (integers.get(i) + integers.get(i + 1)) / 2;
-                                if (currentStart > middleValue) {
+                                if (currentStart > middleValue && currentEnd > integers.get(i + 1)) {
                                     animateToPartInterval(leftAnimator, currentStart, integers.get(i + 1));
                                 } else {
-                                    animateToPartInterval(leftAnimator,currentStart,integers.get(i));
+                                    animateToPartInterval(leftAnimator, currentStart, integers.get(i));
                                 }
                                 break;
                             }
@@ -170,6 +170,21 @@ public class DoubleSeekBar extends View {
                     } else if (status == STATUE_RIGHT_DRAG) {
                         int value = calculateCurrentValue(x);
                         currentEnd = Math.max(value, currentStart);
+                        if (rightAnimator == null) {
+                            rightAnimator = new ValueAnimator();
+                            rightAnimator.addUpdateListener(rightAnimatorUpdateListener);
+                        }
+                        for (int i = 0, size = integers.size() - 1; i < size; i++) {
+                            if (currentEnd >= integers.get(i) && currentEnd <= integers.get(i + 1)) {
+                                int middleValue = (integers.get(i) + integers.get(i + 1)) / 2;
+                                if (currentEnd < middleValue && currentStart < integers.get(i)) {
+                                    animateToPartInterval(rightAnimator, currentEnd, integers.get(i));
+                                } else {
+                                    animateToPartInterval(rightAnimator, currentEnd, integers.get(i + 1));
+                                }
+                                break;
+                            }
+                        }
 //                    Log.d(TAG,"motion move currentEnd "+currentEnd);
 
                     }
@@ -216,7 +231,7 @@ public class DoubleSeekBar extends View {
         currentStart = start;
         currentEnd = end;
         currentStart = Math.min(currentStart, currentEnd);
-        currentStart = Math.min(min, currentStart);
+        currentStart = Math.max(min, currentStart);
         currentEnd = Math.min(currentEnd, max);
         caculateLineIn();
         postInvalidate();
