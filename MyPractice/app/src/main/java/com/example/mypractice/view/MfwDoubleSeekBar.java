@@ -1,7 +1,9 @@
 package com.example.mypractice.view;
 
+import android.animation.Animator;
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -13,12 +15,13 @@ import android.graphics.Xfermode;
 import android.graphics.drawable.BitmapDrawable;
 import android.support.v4.view.MotionEventCompat;
 import android.util.AttributeSet;
-import android.util.Log;
-import android.util.SparseIntArray;
 import android.view.MotionEvent;
 import android.view.View;
 
+
 import com.example.mypractice.R;
+import com.example.mypractice.view.MfwCommon;
+import com.example.mypractice.view.MfwLog;
 
 import java.util.ArrayList;
 
@@ -26,8 +29,8 @@ import java.util.ArrayList;
  * Created by yujintao on 2017/4/5.
  */
 
-public class DoubleSeekBar extends View {
-    private static final String TAG = DoubleSeekBar.class.getSimpleName();
+public class MfwDoubleSeekBar extends View {
+    private static final String TAG = MfwDoubleSeekBar.class.getSimpleName();
 
     //doubleSeekBar模式，两种
     public static final int MODE_SINGLE = 0;
@@ -40,17 +43,17 @@ public class DoubleSeekBar extends View {
     private static final int sSTATUE_RIGHT_SCROLL = 3;
 
     //val
-    private int lineHeight = 10;//线的高度
-    private int lineOutColor = Color.RED;
-    private int lineInColor = Color.BLUE;
-    private int dotInColor = Color.RED;
-    private int dotOutColor = Color.BLUE;
-    private int numPart = 4;
-    private int dotRadius = 10;
+    private int lineHeight;//线的高度
+    private int lineOutColor;
+    private int lineInColor;
+    private int dotInColor;
+    private int dotOutColor;
+    private int numPart;
+    private int dotRadius;
     private Xfermode xfermode = new PorterDuffXfermode(PorterDuff.Mode.SRC_OVER);
     //value
     private int min = 0;//最小值
-    private int max = 400;//最大值
+    private int max = 1000;//最大值
     private int currentStart = 20;//当前左边的值
     private int currentEnd = 300;//当前右边的值
     private Rect lineRect = new Rect();//横线的rect
@@ -86,17 +89,58 @@ public class DoubleSeekBar extends View {
 
     private OnDotTextAdapter onDotTextAdapter;
 
-    public DoubleSeekBar(Context context) {
+    public MfwDoubleSeekBar(Context context) {
         this(context, null);
     }
 
-    public DoubleSeekBar(Context context, AttributeSet attrs) {
+    public MfwDoubleSeekBar(Context context, AttributeSet attrs) {
         super(context, attrs, 0);
         if (isInEditMode()) {
             return;
         }
         initAttrs(context, attrs);
     }
+
+
+    /**
+     * <attr name="mfwdsb_line_height" format="dimension|reference"/>
+     *
+     * @param context
+     * @param attrs
+     */
+
+    private void initAttrs(Context context, AttributeSet attrs) {
+        TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.mfw_double_seek_bar);
+        max = typedArray.getInt(R.styleable.mfw_double_seek_bar_mfwdsb_max, max);
+        min = typedArray.getInt(R.styleable.mfw_double_seek_bar_mfwdsb_min, min);
+        currentStart = typedArray.getInt(R.styleable.mfw_double_seek_bar_mfwdsb_start, min);
+        currentEnd = typedArray.getInt(R.styleable.mfw_double_seek_bar_mfwdsb_end, max);
+        numPart = typedArray.getInt(R.styleable.mfw_double_seek_bar_mfwdsb_numpart, 1);
+        autoNest = typedArray.getBoolean(R.styleable.mfw_double_seek_bar_mfwdsb_autonest, false);
+        lineInColor = typedArray.getColor(R.styleable.mfw_double_seek_bar_mfwdsb_incolor, 0xffff9d00);
+        lineOutColor = typedArray.getColor(R.styleable.mfw_double_seek_bar_mfwdsb_outcolor, 0xffececec);
+        dotInColor = typedArray.getColor(R.styleable.mfw_double_seek_bar_mfwdsb_dotincolor, 0xffff9d00);
+        dotOutColor = typedArray.getColor(R.styleable.mfw_double_seek_bar_mfwdsb_dotoutcolor, 0xffececec);
+        lineHeight = typedArray.getDimensionPixelSize(R.styleable.mfw_double_seek_bar_mfwdsb_line_height, 5);
+        int textSize = typedArray.getDimensionPixelSize(R.styleable.mfw_double_seek_bar_mfwdsb_text_size, 30);
+        textPaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG);
+        textPaint.setTextSize(textSize);
+        dotRadius = (int) (lineHeight * 1.2);
+        typedArray.recycle();
+        barThumb = (BitmapDrawable) context.getResources().getDrawable(R.drawable.hotel_filter_seek_bar_thumb);
+        linePaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG);
+        mCurrentStartP = new Point();
+        mCurrentEndP = new Point();
+        mMinP = new Point();
+        mMaxP = new Point();
+        barThumb.setCallback(this);
+        barThumb.setBounds(0, 0, barThumb.getIntrinsicWidth(), barThumb.getIntrinsicHeight());
+        for (int i = 0; i <= numPart; i++) {
+            points.add(new Point());
+        }
+
+    }
+
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
@@ -119,41 +163,34 @@ public class DoubleSeekBar extends View {
                     status = STATUE_RIGHT_DRAG;
                     currentEnd = calculateCurrentValue(x);
                 }
+                setCurrentValue(currentStart, currentEnd);
                 if (onScrollChangeListener != null) {
                     onScrollChangeListener.onChanged(currentStart, currentEnd);
                 }
-                caculateLineIn();
-                invalidate();
                 handle = true;
                 break;
             case MotionEvent.ACTION_MOVE:
                 if (status == STATUE_LEFT_DRAG) {
                     int value = calculateCurrentValue(x);
                     currentStart = Math.min(value, currentEnd);
-//                    Log.d(TAG,"motion move currentStart "+currentStart);
                 } else if (status == STATUE_RIGHT_DRAG) {
                     int value = calculateCurrentValue(x);
                     currentEnd = Math.max(value, currentStart);
-//                    Log.d(TAG,"motion move currentEnd "+currentEnd);
                 }
+                setCurrentValue(currentStart, currentEnd);
                 if (onScrollChangeListener != null) {
                     onScrollChangeListener.onChanging(currentStart, currentEnd);
                 }
-                caculateLineIn();
-                invalidate();
                 break;
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
-
-                if (onScrollChangeListener != null) {
-                    onScrollChangeListener.onChanged(currentStart, currentEnd);
-                }
                 if (autoNest) {
                     if (status == STATUE_LEFT_DRAG) {
                         int value = calculateCurrentValue(x);
                         if (leftAnimator == null) {
                             leftAnimator = new ValueAnimator();
                             leftAnimator.addUpdateListener(leftAnimatorUpdateListener);
+                            leftAnimator.addListener(new AnimatorListener());
                         }
                         currentStart = Math.min(value, currentEnd);
                         for (int i = 0, size = integers.size() - 1; i < size; i++) {
@@ -173,6 +210,8 @@ public class DoubleSeekBar extends View {
                         if (rightAnimator == null) {
                             rightAnimator = new ValueAnimator();
                             rightAnimator.addUpdateListener(rightAnimatorUpdateListener);
+                            rightAnimator.addListener(new AnimatorListener());
+
                         }
                         for (int i = 0, size = integers.size() - 1; i < size; i++) {
                             if (currentEnd >= integers.get(i) && currentEnd <= integers.get(i + 1)) {
@@ -185,8 +224,6 @@ public class DoubleSeekBar extends View {
                                 break;
                             }
                         }
-//                    Log.d(TAG,"motion move currentEnd "+currentEnd);
-
                     }
                 }
                 status = STATUE_DILE;
@@ -207,7 +244,7 @@ public class DoubleSeekBar extends View {
     private void onDrawDot(Canvas canvas) {
         Point point;
         for (int i = 0, size = points.size(); i < size; i++) {
-            int radius = (i == 0 || i == size - 1) ? dotRadius + 5 : dotRadius;
+            int radius = (i == 0 || i == size - 1) ? (int) (dotRadius * 1.2) : dotRadius;
             point = points.get(i);
             if (point.x < mCurrentStartP.x || point.x > mCurrentEndP.x) {
                 linePaint.setColor(dotOutColor);
@@ -258,6 +295,10 @@ public class DoubleSeekBar extends View {
      */
     public void setPartNum(int num) {
         this.numPart = Math.max(num, 1);
+        points.clear();
+        for (int i = 0; i <= numPart; i++) {
+            points.add(new Point());
+        }
         requestLayout();
     }
 
@@ -405,7 +446,6 @@ public class DoubleSeekBar extends View {
             super.onMeasure(widthMeasureSpec, heightMeasureSpec);
             return;
         }
-        Log.d(TAG, "on measure " + MeasureSpec.getMode(widthMeasureSpec) + " " + MeasureSpec.getMode(heightMeasureSpec));
         int width = MeasureSpec.getSize(widthMeasureSpec);
         int height = Math.max(barThumb.getIntrinsicHeight(), lineHeight);
         setMeasuredDimension(MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY)
@@ -438,24 +478,6 @@ public class DoubleSeekBar extends View {
     }
 
 
-    private void initAttrs(Context context, AttributeSet attrs) {
-        context.obtainStyledAttributes(attrs, R.styleable.double_seek_bar);
-        barThumb = (BitmapDrawable) context.getResources().getDrawable(R.drawable.hotel_filter_seek_bar_thumb);
-        linePaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG);
-        mCurrentStartP = new Point();
-        mCurrentEndP = new Point();
-        mMinP = new Point();
-        mMaxP = new Point();
-        textPaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG);
-        textPaint.setTextSize(30);
-        barThumb.setCallback(this);
-        barThumb.setBounds(0, 0, barThumb.getIntrinsicWidth(), barThumb.getIntrinsicHeight());
-        for (int i = 0; i <= numPart; i++) {
-            points.add(new Point());
-        }
-
-    }
-
     public void setOnScrollChangeListener(OnScrollChangeListener onScrollChangeListener) {
         this.onScrollChangeListener = onScrollChangeListener;
     }
@@ -479,12 +501,58 @@ public class DoubleSeekBar extends View {
         }
     }
 
+    private class AnimatorListener implements ValueAnimator.AnimatorListener {
+
+        @Override
+        public void onAnimationStart(Animator animation) {
+            if (MfwCommon.DEBUG) {
+                MfwLog.d(TAG, "onAnimationStart  = ");
+            }
+            if (onScrollChangeListener != null) {
+                onScrollChangeListener.onChanged(currentStart, currentEnd);
+            }
+        }
+
+        @Override
+        public void onAnimationEnd(Animator animation) {
+            if (onScrollChangeListener != null) {
+                onScrollChangeListener.onChanged(currentStart, currentEnd);
+            }
+            if (MfwCommon.DEBUG) {
+                MfwLog.d(TAG, "onAnimationEnd  = ");
+            }
+        }
+
+        @Override
+        public void onAnimationCancel(Animator animation) {
+            if (onScrollChangeListener != null) {
+                onScrollChangeListener.onChanged(currentStart, currentEnd);
+            }
+            if (MfwCommon.DEBUG) {
+                MfwLog.d(TAG, "onAnimationCancel  = ");
+            }
+        }
+
+        @Override
+        public void onAnimationRepeat(Animator animation) {
+
+        }
+    }
+
+
     private class LeftAnimatorUpdateListener implements ValueAnimator.AnimatorUpdateListener {
 
         @Override
         public void onAnimationUpdate(ValueAnimator animation) {
+
             int value = (int) animation.getAnimatedValue();
+            if (MfwCommon.DEBUG) {
+                MfwLog.d(TAG, "onAnimationUpdate  = " + value);
+            }
             setCurrentValue(value, currentEnd);
+            if (onScrollChangeListener != null) {
+                onScrollChangeListener.onChanging(currentStart, currentEnd);
+            }
         }
     }
 
