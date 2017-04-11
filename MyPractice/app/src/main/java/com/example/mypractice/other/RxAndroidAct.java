@@ -422,15 +422,9 @@ public class RxAndroidAct extends AppCompatActivity {
     public void backpressed(){
         Observable.interval(1, TimeUnit.MILLISECONDS)
                 .onBackpressureDrop()
-                .observeOn(Schedulers.newThread())
+                .observeOn(Schedulers.newThread());
 
-                .subscribe(
-                        i -> {
-                            System.out.println(i);
-                            try {
-                                Thread.sleep(100);
-                            } catch (Exception e) { }
-                        });
+
     }
 
     @OnClick(R.id.flatmap)
@@ -438,7 +432,7 @@ public class RxAndroidAct extends AppCompatActivity {
         //concatMap是顺序执行的，flatmap是并行执行的。
         Observable.just(2,4,6,8,10).concatMap(new Func1<Integer, Observable<Integer>>() {
             @Override
-            public Observable<Integer> call(Integer integer) {
+            public Observable<Integer> call(final Integer integer) {
                 return Observable.create(new Observable.OnSubscribe<Integer>() {
                     @Override
                     public void call(Subscriber<? super Integer> subscriber) {
