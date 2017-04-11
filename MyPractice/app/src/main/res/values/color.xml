@@ -13,6 +13,14 @@
     <color name="v9">#00FF00</color>
     <color name="v10">#00F5FF</color>
     <color name="v11">#8A2BE2</color>
+    <color name="c_100_white">#ffffffff</color>
+    <color name="c_95_white">#f2ffffff</color>
+    <color name="c_90_white">#e6ffffff</color>
+    <color name="c_85_white">#d9ffffff</color>
+    <color name="c_80_white">#ccffffff</color>
+    <color name="c_75_white">#bfffffff</color>
+    <color name="c_70_white">#b3ffffff</color>
+    <color name="c_60_white">#99ffffff</color>
     <color name="color_C1">#ffffff</color>
     <color name="color_C1_1">#b4ffffff</color>
     <color name="color_C2">#d8d8d8</color>
