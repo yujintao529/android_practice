@@ -41,3 +41,4 @@ captures/
 /MyPractice/.idea
 /MyPractice/*.iml
 *.iml
+*.hprof
