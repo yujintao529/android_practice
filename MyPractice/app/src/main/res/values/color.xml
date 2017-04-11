@@ -13,4 +13,21 @@
     <color name="v9">#00FF00</color>
     <color name="v10">#00F5FF</color>
     <color name="v11">#8A2BE2</color>
+    <color name="color_C1">#ffffff</color>
+    <color name="color_C1_1">#b4ffffff</color>
+    <color name="color_C2">#d8d8d8</color>
+    <color name="color_C2_1">#c1c1c1</color>
+    <color name="color_C3">#999999</color>
+    <color name="color_C4">#696969</color>
+    <color name="color_C5">#111111</color>
+    <color name="color_C6">#99ffffff</color>
+    <color name="color_C7">#ff8400</color>
+    <color name="color_C8">#ff2020</color>
+    <color name="color_C9">#555555</color>
+    <color name="color_CO">#ff9d00</color>
+    <color name="color_CO_80">#ccff9d00</color>
+    <color name="color_CO_60">#9aff9d00</color>
+    <color name="color_CR">#ff7373</color>
+    <color name="color_CG">#7fc55d</color>
+    <color name="color_CB">#288dd9</color>
 </resources>

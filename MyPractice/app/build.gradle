@@ -26,7 +26,13 @@ android {
            jniLibs.srcDir 'libs'
        }
     }
-
+    packagingOptions{
+        exclude 'lib/armeabi-v7a/*'
+        exclude 'lib/arm64-v8a/*'
+        exclude 'lib/x86_64/*'
+        exclude 'lib/mips/*'
+        exclude 'lib/x86/*'
+    }
     buildTypes {
         release {
             minifyEnabled true
@@ -37,6 +43,7 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
 }
 
 
@@ -58,6 +65,7 @@ dependencies {
     compile 'com.android.support:cardview-v7:23.2.1'
     compile 'com.android.support:appcompat-v7:23.2.1'
     compile 'com.android.support:support-annotations:23.2.1'
+    compile 'com.android.support:design:23.2.1'
     compile 'com.nineoldandroids:library:2.4.0'
     compile 'com.jakewharton:butterknife:8.4.0'
     compile 'com.jakewharton:butterknife-compiler:8.4.0'
@@ -66,6 +74,7 @@ dependencies {
     compile "$rootProject.ext.autoService"
     compile project(":processor-annotation")
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.4.0'
+    compile "com.amitshekhar.android:debug-db:0.4.0"
     annotationProcessor files("libs/processor.jar")
 //    annotationProcessor project(":processor")
 
