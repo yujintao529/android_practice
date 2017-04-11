@@ -66,6 +66,10 @@
                 style="@style/common_btn"
                 android:text="map" />
             <Button
+                android:id="@+id/flatmap"
+                style="@style/common_btn"
+                android:text="flatmap" />
+            <Button
                 android:id="@+id/scan"
                 style="@style/common_btn"
                 android:text="scan" />
