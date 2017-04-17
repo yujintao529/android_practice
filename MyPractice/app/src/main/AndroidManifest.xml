@@ -335,6 +335,17 @@
             </intent-filter>
 
         </activity>
+        <activity
+            android:name=".resource.drawable.DrawableAct"
+            android:label="resource/drawable/DrawableAct"
+            android:theme="@style/AppTheme"
+            >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="com.example.apidemons.CATEGORY_SAMPLES" />
+            </intent-filter>
+
+        </activity>
         <service android:name=".process.ProcessService" />
         <service android:name=".process.ProcessService$InnerService" />
 
