@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:background="@color/v3"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:paddingTop="20dp"
+    android:gravity="center_horizontal"
+    android:layout_height="match_parent">
+    <com.example.mypractice.view.MfwDoubleSeekBar
+        android:id="@+id/seek_bar"
+        android:layout_width="match_parent"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_gravity="center"
+        android:layout_height="40dp"
+        app:mfwdsb_numpart="4"
+        app:mfwdsb_line_height="3dp"
+        app:mfwdsb_autonest="true"
+        />
+
+    <com.example.mypractice.view.MfwDoubleSeekBar
+        android:id="@+id/seek_bar_2"
+        android:layout_width="match_parent"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_gravity="center"
+        android:layout_height="40dp"
+        app:mfwdsb_numpart="4"
+        app:mfwdsb_line_height="3dp"
+        app:mfwdsb_autonest="true"
+        />
+</LinearLayout>
