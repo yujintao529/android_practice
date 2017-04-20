@@ -129,6 +129,10 @@
                 android:id="@+id/swit"
                 style="@style/common_btn"
                 android:text="swit" />
+            <Button
+                android:id="@+id/collect"
+                style="@style/common_btn"
+                android:text="collect" />
         </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"
