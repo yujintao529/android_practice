@@ -27,7 +27,11 @@ android {
         }
 
     }
-
+    packagingOptions {
+        exclude "lib/armeabi-v7a/*"
+        exclude "lib/armeabi/*"
+        exclude "lib/x86-64/*"
+    }
     sourceSets{
        main{
            jniLibs.srcDir 'libs'
