@@ -282,9 +282,9 @@ public class MfwDoubleSeekBar extends View {
      * @param end
      */
     private void setCurrentValueInterval(float start, float end) {
-        if (status == STATUE_RIGHT_DRAG) {
+        if (status == STATUE_RIGHT_DRAG||status==STATUE_RIGHT_SCROLL) {
             end = Math.max(end, start);
-        } else if (status == STATUE_LEFT_DRAG) {
+        } else if (status == STATUE_LEFT_DRAG||status==STATUE_LEFT_SCROLL) {
             start = Math.min(end, start);
         }
         if (MfwCommon.DEBUG) {
