@@ -5,7 +5,6 @@ import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.PorterDuff;
@@ -40,7 +39,7 @@ public class MfwDoubleSeekBar extends View {
     private static final int STATUE_LEFT_DRAG = 1;
     private static final int STATUE_RIGHT_DRAG = 2;
     private static final int STATUE_LEFT_SCROLL = 3;
-    private static final int sSTATUE_RIGHT_SCROLL = 3;
+    private static final int STATUE_RIGHT_SCROLL = 4;
 
     //val
     private int lineHeight;//线的高度
@@ -48,14 +47,9 @@ public class MfwDoubleSeekBar extends View {
     private int lineInColor;
     private int dotInColor;
     private int dotOutColor;
-    private int numPart;
     private int dotRadius;
     private Xfermode xfermode = new PorterDuffXfermode(PorterDuff.Mode.SRC_OVER);
-    //value
-    private int min = 0;//最小值
-    private int max = 1000;//最大值
-    private int currentStart = 20;//当前左边的值
-    private int currentEnd = 300;//当前右边的值
+
     private Rect lineRect = new Rect();//横线的rect
     private Rect lineInRect = new Rect();//选择区域的rect
     Point mCurrentStartP;//左边的值的point
@@ -73,10 +67,10 @@ public class MfwDoubleSeekBar extends View {
 
     private OnScrollChangeListener onScrollChangeListener;
 
-    private int mode = MODE_MUL;
+    private int mode;//模式
 
 
-    private boolean autoNest = true;//牛逼的属性，自动NumPart位置调整。
+    private boolean autoNest;//牛逼的属性，自动NumPart位置调整。
 
     private LeftAnimatorUpdateListener leftAnimatorUpdateListener = new LeftAnimatorUpdateListener();
     private RightAnimatorUpdateListener rightAnimatorUpdateListener = new RightAnimatorUpdateListener();
@@ -88,6 +82,9 @@ public class MfwDoubleSeekBar extends View {
 
 
     private OnDotTextAdapter onDotTextAdapter;
+
+
+    private SeekbarStrategy seekbarStrategy;
 
     public MfwDoubleSeekBar(Context context) {
         this(context, null);
@@ -103,19 +100,21 @@ public class MfwDoubleSeekBar extends View {
 
 
     /**
-     * <attr name="mfwdsb_line_height" format="dimension|reference"/>
-     *
      * @param context
      * @param attrs
      */
 
     private void initAttrs(Context context, AttributeSet attrs) {
+        seekbarStrategy = new LinearStrategry();//default
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.mfw_double_seek_bar);
-        max = typedArray.getInt(R.styleable.mfw_double_seek_bar_mfwdsb_max, max);
-        min = typedArray.getInt(R.styleable.mfw_double_seek_bar_mfwdsb_min, min);
-        currentStart = typedArray.getInt(R.styleable.mfw_double_seek_bar_mfwdsb_start, min);
-        currentEnd = typedArray.getInt(R.styleable.mfw_double_seek_bar_mfwdsb_end, max);
-        numPart = typedArray.getInt(R.styleable.mfw_double_seek_bar_mfwdsb_numpart, 1);
+        int max = typedArray.getInt(R.styleable.mfw_double_seek_bar_mfwdsb_max, 100);
+        int min = typedArray.getInt(R.styleable.mfw_double_seek_bar_mfwdsb_min, 0);
+        int currentStart = typedArray.getInt(R.styleable.mfw_double_seek_bar_mfwdsb_start, min);
+        int currentEnd = typedArray.getInt(R.styleable.mfw_double_seek_bar_mfwdsb_end, max);
+        int numPart = typedArray.getInt(R.styleable.mfw_double_seek_bar_mfwdsb_numpart, 1);
+        setInitValue(min, max);
+        setPartNum(numPart);
+        seekbarStrategy.setCurrentValue(currentStart, currentEnd);
         autoNest = typedArray.getBoolean(R.styleable.mfw_double_seek_bar_mfwdsb_autonest, false);
         lineInColor = typedArray.getColor(R.styleable.mfw_double_seek_bar_mfwdsb_incolor, 0xffff9d00);
         lineOutColor = typedArray.getColor(R.styleable.mfw_double_seek_bar_mfwdsb_outcolor, 0xffececec);
@@ -123,9 +122,12 @@ public class MfwDoubleSeekBar extends View {
         dotOutColor = typedArray.getColor(R.styleable.mfw_double_seek_bar_mfwdsb_dotoutcolor, 0xffececec);
         lineHeight = typedArray.getDimensionPixelSize(R.styleable.mfw_double_seek_bar_mfwdsb_line_height, 5);
         int textSize = typedArray.getDimensionPixelSize(R.styleable.mfw_double_seek_bar_mfwdsb_text_size, 30);
+        int textColor = typedArray.getColor(R.styleable.mfw_double_seek_bar_mfwdsb_text_color, 0xff696969);
         textPaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG);
         textPaint.setTextSize(textSize);
+        textPaint.setColor(textColor);
         dotRadius = (int) (lineHeight * 1.2);
+        mode = typedArray.getInt(R.styleable.mfw_double_seek_bar_mfwdsb_mode, MODE_MUL);
         typedArray.recycle();
         barThumb = (BitmapDrawable) context.getResources().getDrawable(R.drawable.hotel_filter_seek_bar_thumb);
         linePaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG);
@@ -135,10 +137,6 @@ public class MfwDoubleSeekBar extends View {
         mMaxP = new Point();
         barThumb.setCallback(this);
         barThumb.setBounds(0, 0, barThumb.getIntrinsicWidth(), barThumb.getIntrinsicHeight());
-        for (int i = 0; i <= numPart; i++) {
-            points.add(new Point());
-        }
-
     }
 
 
@@ -146,87 +144,108 @@ public class MfwDoubleSeekBar extends View {
     public boolean onTouchEvent(MotionEvent event) {
         boolean handle = false;
         final float x = event.getX();
+        float currentStart = seekbarStrategy.getCurrentStart();
+        float currentEnd = seekbarStrategy.getCurrentEnd();
+        float per = calculateCurrentValuePer(x);
+        if (MfwCommon.DEBUG) {
+            MfwLog.d(TAG, "onTouchEvent per = " + per);
+        }
         //先不考虑多点触控
         switch (MotionEventCompat.getActionMasked(event)) {
             case MotionEvent.ACTION_DOWN:
                 //消除animator
                 if (mode == MODE_MUL && (x <= mCurrentStartP.x || ((x < mCurrentEndP.x) && Math.abs(x - mCurrentStartP.x) < Math.abs(x - mCurrentEndP.x)))) {
                     status = STATUE_LEFT_DRAG;
-                    currentStart = calculateCurrentValue(x);
                     if (leftAnimator != null) {
                         leftAnimator.cancel();
                     }
+
+                    currentStart = seekbarStrategy.caculateValue(per);
                 } else {
                     if (rightAnimator != null) {
                         rightAnimator.cancel();
                     }
                     status = STATUE_RIGHT_DRAG;
-                    currentEnd = calculateCurrentValue(x);
+                    currentEnd = seekbarStrategy.caculateValue(per);
                 }
-                setCurrentValue(currentStart, currentEnd);
-                if (onScrollChangeListener != null) {
-                    onScrollChangeListener.onChanged(currentStart, currentEnd);
-                }
+                setCurrentValueInterval(currentStart, currentEnd);
                 handle = true;
+                getParent().requestDisallowInterceptTouchEvent(true);
+                if (onScrollChangeListener != null) {
+                    onScrollChangeListener.onChanged(seekbarStrategy.getCurrentStart(), seekbarStrategy.getCurrentEnd());
+                }
                 break;
             case MotionEvent.ACTION_MOVE:
                 if (status == STATUE_LEFT_DRAG) {
-                    int value = calculateCurrentValue(x);
-                    currentStart = Math.min(value, currentEnd);
+                    currentStart = seekbarStrategy.caculateValue(per);
                 } else if (status == STATUE_RIGHT_DRAG) {
-                    int value = calculateCurrentValue(x);
-                    currentEnd = Math.max(value, currentStart);
+                    currentEnd = seekbarStrategy.caculateValue(per);
                 }
-                setCurrentValue(currentStart, currentEnd);
+                setCurrentValueInterval(currentStart, currentEnd);
+                if (MfwCommon.DEBUG) {
+                    MfwLog.d(TAG, "onTouchEvent move = " + currentStart + " " + currentEnd);
+                }
                 if (onScrollChangeListener != null) {
-                    onScrollChangeListener.onChanging(currentStart, currentEnd);
+                    onScrollChangeListener.onChanging(seekbarStrategy.getCurrentStart(), seekbarStrategy.getCurrentEnd());
                 }
                 break;
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
+                getParent().requestDisallowInterceptTouchEvent(false);
                 if (autoNest) {
                     if (status == STATUE_LEFT_DRAG) {
-                        int value = calculateCurrentValue(x);
                         if (leftAnimator == null) {
                             leftAnimator = new ValueAnimator();
                             leftAnimator.addUpdateListener(leftAnimatorUpdateListener);
                             leftAnimator.addListener(new AnimatorListener());
                         }
-                        currentStart = Math.min(value, currentEnd);
-                        for (int i = 0, size = integers.size() - 1; i < size; i++) {
-                            if (currentStart >= integers.get(i) && currentStart <= integers.get(i + 1)) {
-                                int middleValue = (integers.get(i) + integers.get(i + 1)) / 2;
-                                if (currentStart > middleValue && currentEnd > integers.get(i + 1)) {
-                                    animateToPartInterval(leftAnimator, currentStart, integers.get(i + 1));
+                        currentStart = seekbarStrategy.caculateValue(per);
+                        for (int i = 0, size = seekbarStrategy.getPartNum(); i < size; i++) {
+                            if (currentStart >= seekbarStrategy.getPartValue(i) && currentStart <= seekbarStrategy.getPartValue(i + 1)) {
+                                int middleValue = (seekbarStrategy.getPartValue(i) + seekbarStrategy.getPartValue(i + 1)) / 2;
+                                status = STATUE_LEFT_SCROLL;
+                                if (currentStart > middleValue && currentEnd >= seekbarStrategy.getPartValue(i + 1)) {
+                                    animateToPartInterval(leftAnimator, currentStart, seekbarStrategy.getPartValue(i + 1));
                                 } else {
-                                    animateToPartInterval(leftAnimator, currentStart, integers.get(i));
+                                    animateToPartInterval(leftAnimator, currentStart, seekbarStrategy.getPartValue(i));
                                 }
                                 break;
                             }
                         }
                     } else if (status == STATUE_RIGHT_DRAG) {
-                        int value = calculateCurrentValue(x);
-                        currentEnd = Math.max(value, currentStart);
+                        currentEnd = seekbarStrategy.caculateValue(per);
                         if (rightAnimator == null) {
                             rightAnimator = new ValueAnimator();
                             rightAnimator.addUpdateListener(rightAnimatorUpdateListener);
                             rightAnimator.addListener(new AnimatorListener());
 
                         }
-                        for (int i = 0, size = integers.size() - 1; i < size; i++) {
-                            if (currentEnd >= integers.get(i) && currentEnd <= integers.get(i + 1)) {
-                                int middleValue = (integers.get(i) + integers.get(i + 1)) / 2;
-                                if (currentEnd < middleValue && currentStart < integers.get(i)) {
-                                    animateToPartInterval(rightAnimator, currentEnd, integers.get(i));
+                        for (int i = 0, size = seekbarStrategy.getPartNum(); i < size; i++) {
+                            if (currentEnd >= seekbarStrategy.getPartValue(i) && currentEnd <= seekbarStrategy.getPartValue(i + 1)) {
+                                int middleValue = (seekbarStrategy.getPartValue(i) + seekbarStrategy.getPartValue(i + 1)) / 2;
+                                status = STATUE_RIGHT_SCROLL;
+                                if (currentEnd < middleValue && currentStart <= seekbarStrategy.getPartValue(i)) {
+                                    animateToPartInterval(rightAnimator, currentEnd, seekbarStrategy.getPartValue(i));
                                 } else {
-                                    animateToPartInterval(rightAnimator, currentEnd, integers.get(i + 1));
+                                    animateToPartInterval(rightAnimator, currentEnd, seekbarStrategy.getPartValue(i + 1));
                                 }
                                 break;
                             }
                         }
                     }
+                } else {
+                    if (status == STATUE_LEFT_DRAG) {
+                        currentStart = seekbarStrategy.caculateValue(per);
+                    } else if (status == STATUE_RIGHT_DRAG) {
+                        currentEnd = seekbarStrategy.caculateValue(per);
+                    }
+                    setCurrentValueInterval(currentStart, currentEnd);
+                    if (onScrollChangeListener != null) {
+                        onScrollChangeListener.onChanged(seekbarStrategy.getCurrentStart(), seekbarStrategy.getCurrentEnd());
+                    }
+                    status = STATUE_DILE;
                 }
-                status = STATUE_DILE;
+
                 break;
         }
 
@@ -234,10 +253,8 @@ public class MfwDoubleSeekBar extends View {
     }
 
 
-    private int calculateCurrentValue(float pointX) {
-        float per = (pointX - mMinP.x) / (mMaxP.x - mMinP.x);
-        float correctPer = Math.max(Math.min(1, per), 0);
-        return (int) ((max - min) * correctPer + min);
+    private float calculateCurrentValuePer(float pointX) {
+        return Math.max(0, Math.min((pointX - mMinP.x) / (mMaxP.x - mMinP.x), 1));
     }
 
 
@@ -264,12 +281,16 @@ public class MfwDoubleSeekBar extends View {
      * @param start
      * @param end
      */
-    public void setCurrentValue(int start, int end) {
-        currentStart = start;
-        currentEnd = end;
-        currentStart = Math.min(currentStart, currentEnd);
-        currentStart = Math.max(min, currentStart);
-        currentEnd = Math.min(currentEnd, max);
+    private void setCurrentValueInterval(float start, float end) {
+        if (status == STATUE_RIGHT_DRAG) {
+            end = Math.max(end, start);
+        } else if (status == STATUE_LEFT_DRAG) {
+            start = Math.min(end, start);
+        }
+        if (MfwCommon.DEBUG) {
+            MfwLog.d(TAG, "setCurrentValueInterval start = " + start + " end = " + end);
+        }
+        seekbarStrategy.setCurrentValue(start, end);
         caculateLineIn();
         postInvalidate();
     }
@@ -281,10 +302,8 @@ public class MfwDoubleSeekBar extends View {
      * @param max
      */
     public void setInitValue(int min, int max) {
-        this.min = min;
-        this.max = max;
-        this.min = Math.max(min, 0);
-        this.max = Math.max(min, max);
+        seekbarStrategy.setInitValue(min, max);
+        seekbarStrategy.setPartNum(seekbarStrategy.getPartNum());
         requestLayout();
     }
 
@@ -294,15 +313,14 @@ public class MfwDoubleSeekBar extends View {
      * @param num
      */
     public void setPartNum(int num) {
-        this.numPart = Math.max(num, 1);
+        seekbarStrategy.setPartNum(num);
         points.clear();
-        for (int i = 0; i <= numPart; i++) {
+        for (int i = 0, size = seekbarStrategy.getPartNum(); i <= size; i++) {
             points.add(new Point());
         }
         requestLayout();
     }
 
-    private ArrayList<Integer> integers = new ArrayList<>();
 
     /**
      * 因为文案是通过接口传递进来的，为了保证回掉函数不在onMeasure里执行，所以把文字的计算单独拿出来
@@ -313,13 +331,9 @@ public class MfwDoubleSeekBar extends View {
         this.onDotTextAdapter = onDotTextAdapter;
         content.clear();
         contentPoint.clear();
-        integers.clear();
         if (this.onDotTextAdapter != null) {
-            for (int i = 0, size = points.size(); i < size; i++) {
-                float per = i * 1f / (size - 1);
-                int value = (int) ((max - min) * per + min);
-                integers.add(value);
-                String text = onDotTextAdapter.content(i, value, size);
+            for (int i = 0, size = seekbarStrategy.getPartNum(); i <= size; i++) {
+                String text = onDotTextAdapter.content(i, seekbarStrategy.getPartValue(i), size);
                 content.add(text);
                 contentPoint.add(new Point());
             }
@@ -346,11 +360,11 @@ public class MfwDoubleSeekBar extends View {
      * @param startValue
      * @param endValue
      */
-    private void animateToPartInterval(ValueAnimator valueAnimator, int startValue, int endValue) {
+    private void animateToPartInterval(ValueAnimator valueAnimator, float startValue, float endValue) {
         if (valueAnimator.isRunning()) {
             valueAnimator.cancel();
         }
-        valueAnimator.setIntValues(startValue, endValue);
+        valueAnimator.setFloatValues(startValue, endValue);
         valueAnimator.setDuration(200);
         valueAnimator.start();
     }
@@ -361,7 +375,6 @@ public class MfwDoubleSeekBar extends View {
         if (isInEditMode()) {
             return;
         }
-        canvas.drawColor(Color.WHITE);
         onDrawLine(canvas);
         onDrawDot(canvas);
         onDrawBar(canvas);
@@ -420,13 +433,15 @@ public class MfwDoubleSeekBar extends View {
 
     }
 
+    //便于使用
+    float[] arrTemp = new float[2];
+
     /**
      * 计算当前刻度，设置rect
      */
     private final void caculateLineIn() {
-        float starPercent = (currentStart - min) * 1f / (max - min);
-        float endPercent = (currentEnd - min) * 1f / (max - min);
-        lineInRect.set((int) ((lineRect.right - lineRect.left) * starPercent) + lineRect.left, lineRect.top, (int) ((lineRect.right - lineRect.left) * endPercent) + lineRect.left, lineRect.bottom);
+        seekbarStrategy.getPercentIn(arrTemp);
+        lineInRect.set((int) ((lineRect.right - lineRect.left) * arrTemp[0]) + lineRect.left, lineRect.top, (int) ((lineRect.right - lineRect.left) * arrTemp[1]) + lineRect.left, lineRect.bottom);
         mCurrentStartP.set(lineInRect.left, lineInRect.centerY());
         mCurrentEndP.set(lineInRect.right, lineInRect.centerY());
     }
@@ -457,6 +472,7 @@ public class MfwDoubleSeekBar extends View {
         caculateLineIn();
         Point point;
         boolean reMeasure = false;
+
         for (int i = 0, size = points.size(); i < size; i++) {
             point = points.get(i);
             float per = i * 1f / (size - 1);
@@ -466,20 +482,51 @@ public class MfwDoubleSeekBar extends View {
                 float w = textPaint.measureText(content.get(i));
                 Point textPoint = contentPoint.get(i);
                 //这个地方不是通用的，是为了满足drawable空白才特定设置的
-                textPoint.set((int) (point.x - w / 2), (int) (getMeasuredHeight() - getPaddingBottom() + textPaint.getTextSize() / 4));
+                if (i == 0) {
+                    textPoint.set((int) ((point.x) - dotRadius * 1.2), (int) (getMeasuredHeight() - getPaddingBottom() + textPaint.getTextSize() / 2));
+                } else if (i == size - 1) {
+                    textPoint.set((int) (getMeasuredWidth() - getPaddingRight() - w), (int) (getMeasuredHeight() - getPaddingBottom() + textPaint.getTextSize() / 2));
+                } else {
+                    textPoint.set((int) (point.x - w / 2 + dotRadius * 1.2), (int) (getMeasuredHeight() - getPaddingBottom() + textPaint.getTextSize() / 2));
+                }
+
             }
 
         }
         if (reMeasure) {
+            //最后加上1dp的值，为了text下面有点空白
             setMeasuredDimension(MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY)
-                    , MeasureSpec.makeMeasureSpec((int) (getMeasuredHeight() + textPaint.getTextSize() / 4), MeasureSpec.EXACTLY));
+                    , MeasureSpec.makeMeasureSpec((int) (getMeasuredHeight() + textPaint.getTextSize() / 2 + dip2px(getContext(), 1)), MeasureSpec.EXACTLY));
         }
 
     }
 
+    public static int dip2px(Context context, int dp) {
+        return Math.round(context.getResources().getDisplayMetrics().density * dp);
+    }
+
+    public int getMin() {
+        return seekbarStrategy.getMin();
+    }
+
+    public int getMax() {
+        return seekbarStrategy.getMax();
+    }
+
+    public int getCurrentStart() {
+        return seekbarStrategy.getCurrentStart();
+    }
+
+    public int getCurrentEnd() {
+        return seekbarStrategy.getCurrentEnd();
+    }
 
     public void setOnScrollChangeListener(OnScrollChangeListener onScrollChangeListener) {
         this.onScrollChangeListener = onScrollChangeListener;
+    }
+
+    public void setCurrentValue(int currentStart, int currentEnd) {
+        setCurrentValueInterval(currentStart, currentEnd);
     }
 
     public interface OnDotTextAdapter {
@@ -496,8 +543,14 @@ public class MfwDoubleSeekBar extends View {
 
         @Override
         public void onAnimationUpdate(ValueAnimator animation) {
-            int value = (int) animation.getAnimatedValue();
-            setCurrentValue(currentStart, value);
+            float value = (float) animation.getAnimatedValue();
+            setCurrentValueInterval(seekbarStrategy.getCurrentStart(), value);
+            if (MfwCommon.DEBUG) {
+                MfwLog.d(TAG, "onAnimationUpdate  = " + value);
+            }
+            if (onScrollChangeListener != null) {
+                onScrollChangeListener.onChanging(seekbarStrategy.getCurrentStart(), seekbarStrategy.getCurrentEnd());
+            }
         }
     }
 
@@ -509,15 +562,16 @@ public class MfwDoubleSeekBar extends View {
                 MfwLog.d(TAG, "onAnimationStart  = ");
             }
             if (onScrollChangeListener != null) {
-                onScrollChangeListener.onChanged(currentStart, currentEnd);
+                onScrollChangeListener.onChanged(seekbarStrategy.getCurrentStart(), seekbarStrategy.getCurrentEnd());
             }
         }
 
         @Override
         public void onAnimationEnd(Animator animation) {
             if (onScrollChangeListener != null) {
-                onScrollChangeListener.onChanged(currentStart, currentEnd);
+                onScrollChangeListener.onChanged(seekbarStrategy.getCurrentStart(), seekbarStrategy.getCurrentEnd());
             }
+            status = STATUE_DILE;
             if (MfwCommon.DEBUG) {
                 MfwLog.d(TAG, "onAnimationEnd  = ");
             }
@@ -526,8 +580,9 @@ public class MfwDoubleSeekBar extends View {
         @Override
         public void onAnimationCancel(Animator animation) {
             if (onScrollChangeListener != null) {
-                onScrollChangeListener.onChanged(currentStart, currentEnd);
+                onScrollChangeListener.onChanged(seekbarStrategy.getCurrentStart(), seekbarStrategy.getCurrentEnd());
             }
+            status = STATUE_DILE;
             if (MfwCommon.DEBUG) {
                 MfwLog.d(TAG, "onAnimationCancel  = ");
             }
@@ -545,15 +600,223 @@ public class MfwDoubleSeekBar extends View {
         @Override
         public void onAnimationUpdate(ValueAnimator animation) {
 
-            int value = (int) animation.getAnimatedValue();
+            float value = (float) animation.getAnimatedValue();
             if (MfwCommon.DEBUG) {
                 MfwLog.d(TAG, "onAnimationUpdate  = " + value);
             }
-            setCurrentValue(value, currentEnd);
+            setCurrentValueInterval(value, seekbarStrategy.getCurrentEnd());
             if (onScrollChangeListener != null) {
-                onScrollChangeListener.onChanging(currentStart, currentEnd);
+                onScrollChangeListener.onChanging(seekbarStrategy.getCurrentStart(), seekbarStrategy.getCurrentEnd());
             }
         }
+    }
+
+    /**
+     * 计算seekbar策略
+     * 为了保证平滑滑动，所以内部使用float类型进行计算,但是提供外面的全是int类型
+     */
+    public static abstract class SeekbarStrategy {
+
+        int partNum;
+        float mMax;
+        float mMin;
+        float mCurrentStart;
+        float mCurrentEnd;
+
+        public SeekbarStrategy() {
+            partNum = 1;
+        }
+
+
+        public void setInitValue(int min, int max) {
+            this.mMin = min;
+            this.mMax = max;
+            this.mMin = Math.max(min, 0);
+            this.mMax = Math.max(min, max);
+            mCurrentStart = Math.max(mCurrentStart, min);
+            mCurrentEnd = Math.min(mCurrentEnd, max);
+            setPartNum(partNum);
+        }
+
+        public int getMax() {
+            return (int) mMax;
+        }
+
+        public int getMin() {
+            return (int) mMin;
+        }
+
+        private void setCurrentValue(float start, float end) {
+            if (start > end) {
+                throw new IllegalArgumentException("start must not bigger than end");
+            }
+            start = Math.max(start, mMin);
+            end = Math.min(end, mMax);
+            mCurrentStart = start;
+            mCurrentEnd = end;
+        }
+
+        public int getCurrentStart() {
+            return (int) mCurrentStart;
+        }
+
+        public int getCurrentEnd() {
+            return (int) mCurrentEnd;
+        }
+
+        public abstract float caculateValue(float per);
+
+        public abstract void getPercentIn(float[] arr);
+
+        public abstract int getPartValue(int part);
+
+        public void setPartNum(int num) {
+            this.partNum = num;
+            this.partNum = Math.max(1, num);
+        }
+
+        public int getPartNum() {
+            return partNum;
+        }
+    }
+
+    public void setSeekbarStrategy(SeekbarStrategy seekbarStrategy) {
+        if (this.seekbarStrategy != null) {
+            seekbarStrategy.setInitValue(this.seekbarStrategy.getMin(), this.seekbarStrategy.getMax());
+            seekbarStrategy.setPartNum(this.seekbarStrategy.getPartNum());
+        }
+        this.seekbarStrategy = seekbarStrategy;
+        setPartNum(seekbarStrategy.partNum);
+        requestLayout();
+    }
+
+    /**
+     * 集合策略，填入几个值做为刻度
+     */
+    public static class ArrStrategry extends SeekbarStrategy {
+
+        ArrayList<Integer> integers;
+
+
+        /**
+         * @param integers size必须大于等于2
+         */
+        public ArrStrategry(ArrayList<Integer> integers) {
+            super();
+            this.integers = integers;
+            setPartNum(integers.size() - 1);
+            setInitValue(integers.get(0), integers.get(integers.size() - 1));
+        }
+
+        @Override
+        public void setPartNum(int num) {
+            //忽略输入值
+            super.setPartNum(integers.size() - 1);
+
+        }
+
+        @Override
+        public void setInitValue(int min, int max) {
+            super.setInitValue(min, max);
+        }
+
+        /**
+         * @param per 百分比，必须>=0，<=1
+         * @return
+         */
+        @Override
+        public float caculateValue(float per) {
+            if (per >= 1) {
+                return integers.get(partNum);
+            } else if (per <= 0) {
+                return integers.get(0);
+            }
+            float perAvg = 1f / partNum;
+            int part = (int) (per / perAvg);
+            float avg = per - part * perAvg;
+            if (MfwCommon.DEBUG) {
+                MfwLog.d(TAG, "caculateValue  = " + per);
+            }
+            return integers.get(part) + (integers.get(part + 1) - integers.get(part)) / perAvg * avg;
+        }
+
+        @Override
+        public void getPercentIn(float[] arr) {
+            float startPer = 0f;
+            float endPer = 1f;
+            final int size = integers.size() - 1;
+            final float perAvg = 1f / size;
+            for (int i = 0; i < size; i++) {
+                if (mCurrentStart >= integers.get(i) && mCurrentStart <= integers.get(i + 1)) {
+                    float off = mCurrentStart - integers.get(i);
+                    float diff = integers.get(i + 1) - integers.get(i);
+                    float per = off / diff;
+                    startPer = perAvg * i + per * perAvg;
+                }
+                if (mCurrentEnd >= integers.get(i) && mCurrentEnd <= integers.get(i + 1)) {
+                    float off = mCurrentEnd - integers.get(i);
+                    float diff = integers.get(i + 1) - integers.get(i);
+                    float per = off / diff;
+
+                    endPer = i * perAvg + per * perAvg;
+                    if (MfwCommon.DEBUG) {
+                        MfwLog.d(TAG, "getPercentIn " + mCurrentEnd + " " + endPer);
+                    }
+                }
+            }
+
+            arr[0] = startPer;
+            arr[1] = endPer;
+        }
+
+        @Override
+        public int getPartValue(int part) {
+            part = Math.min(part, partNum);
+            part = Math.max(0, part);
+            return integers.get(part);
+        }
+    }
+
+
+    public static class LinearStrategry extends SeekbarStrategy {
+
+        private ArrayList<Integer> partNums;
+
+        public LinearStrategry() {
+            super();
+            partNums = new ArrayList<>();
+        }
+
+        @Override
+        public void setPartNum(int num) {
+            super.setPartNum(num);
+            partNums.clear();
+            for (int i = 0; i <= partNum; i++) {
+                float avgPart = i * 1f / partNum;
+                partNums.add((int) ((mMax - mMin) * avgPart + mMin));
+            }
+        }
+
+        @Override
+        public float caculateValue(float per) {
+            return (mMax - mMin) * per + mMin;
+        }
+
+        @Override
+        public void getPercentIn(float[] arr) {
+            float startPer = (mCurrentStart - mMin) / (mMax - mMin);
+            float endPer = (mCurrentEnd - mMin) / (mMax - mMin);
+            arr[0] = startPer;
+            arr[1] = endPer;
+        }
+
+        @Override
+        public int getPartValue(int part) {
+            part = Math.min(part, partNum);
+            part = Math.max(0, part);
+            return partNums.get(part);
+        }
+
     }
 
 }
