@@ -6,7 +6,6 @@
         <attr name="number" format="integer" />
         <attr name="line_full" format="boolean"></attr>
     </declare-styleable>
-    <attr name="theme_def" format="reference" />
     <declare-styleable name="mfw_double_seek_bar">
         <attr name="mfwdsb_max" format="integer|reference" />
         <attr name="mfwdsb_min" format="integer|reference" />
@@ -22,27 +21,26 @@
         <attr name="mfwdsb_text_size" format="dimension|reference" />
         <attr name="mfwdsb_text_color" format="color|reference" />
         <attr name="mfwdsb_mode" format="enum">
-            <enum name="MUL" value="1"/>
-            <enum name="SINGLE" value="0"/>
+            <enum name="MUL" value="1" />
+            <enum name="SINGLE" value="0" />
         </attr>
     </declare-styleable>
-        <attr name="theme_def" format="reference"/>
     <declare-styleable name="mfw_tab_layout">
         <attr name="mfwtab_mode" format="enum">
-            <enum name="MATCH" value="0"/>
-            <enum name="WRAP" value="1"/>
+            <enum name="MATCH" value="0" />
+            <enum name="WRAP" value="1" />
         </attr>
-        <attr name="mfwtab_tab_text_color" format="color|reference"/>
-        <attr name="mfwtab_tab_text_size" format="dimension|reference"/>
-        <attr name="mfwtab_tab_text_select_color" format="color|reference"/>
-        <attr name="mfwtab_tab_minwidth" format="dimension|reference"/>
-        <attr name="mfwtab_tab_padding_start" format="dimension|reference"/>
-        <attr name="mfwtab_tab_padding_end" format="dimension|reference"/>
-        <attr name="mfwtab_tab_padding_top" format="dimension|reference"/>
-        <attr name="mfwtab_tab_padding_bottom" format="dimension|reference"/>
-        <attr name="mfwtab_tab_start_margin" format="dimension|reference"/>
-        <attr name="mfwtab_tab_end_margin" format="dimension|reference"/>
-        <attr name="mfwtab_indicator_height" format="dimension|reference"/>
-        <attr name="mfwtab_indicator_color" format="dimension|reference"/>
+        <attr name="mfwtab_tab_text_color" format="color|reference" />
+        <attr name="mfwtab_tab_text_size" format="dimension|reference" />
+        <attr name="mfwtab_tab_text_select_color" format="color|reference" />
+        <attr name="mfwtab_tab_minwidth" format="dimension|reference" />
+        <attr name="mfwtab_tab_padding_start" format="dimension|reference" />
+        <attr name="mfwtab_tab_padding_end" format="dimension|reference" />
+        <attr name="mfwtab_tab_padding_top" format="dimension|reference" />
+        <attr name="mfwtab_tab_padding_bottom" format="dimension|reference" />
+        <attr name="mfwtab_tab_start_margin" format="dimension|reference" />
+        <attr name="mfwtab_tab_end_margin" format="dimension|reference" />
+        <attr name="mfwtab_indicator_height" format="dimension|reference" />
+        <attr name="mfwtab_indicator_color" format="dimension|reference" />
     </declare-styleable>
 </resources>
