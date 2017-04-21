@@ -432,13 +432,13 @@ public class RxAndroidAct extends AppCompatActivity {
     @OnClick(R.id.collect)
     public void collect(){
         //collect 收集发射的数据然后统一进行发射
-        Observable.just(1,2,4,5,6,7,8,9,4,42).collect(()->{
-            return new ArrayList<>();
-        }, (List<Integer> list,Integer integer)->{
-            list.add(integer);
-        }).subscribe((List<Integer> list)->{
-                Logger.d("inner call "+list);
-        });
+//        Observable.just(1,2,4,5,6,7,8,9,4,42).collect(()->{
+//            return new ArrayList<>();
+//        }, (List<Integer> list,Integer integer)->{
+//            list.add(integer);
+//        }).subscribe((List<Integer> list)->{
+//                Logger.d("inner call "+list);
+//        });
     }
 
 
