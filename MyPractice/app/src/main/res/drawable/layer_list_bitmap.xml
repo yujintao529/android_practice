@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:gravity="left"
+        >
+        <bitmap android:src="@drawable/resource_1" android:antialias="true" android:tintMode="multiply"/>
+    </item>
+    <item
+        android:gravity="left"
+        android:top="30dp"
+        android:left="30dp"
+        >
+        <bitmap android:src="@drawable/resource_2" android:antialias="true" />
+    </item>
+    <item
+        android:gravity="left"
+        android:top="50dp"
+        android:left="50dp"
+        >
+        <bitmap android:src="@drawable/resource_3" android:antialias="true" />
+    </item>
+    <item
+        android:gravity="left"
+        android:top="70dp"
+        android:left="70dp"
+        >
+        <bitmap android:src="@drawable/resource_4" android:antialias="true" />
+    </item>
+</layer-list>
