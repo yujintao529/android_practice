@@ -282,6 +282,17 @@
 
         </activity>
         <activity
+            android:name=".canvas.ClippathAct"
+            android:label="canvas/ClippathAct"
+            android:theme="@style/toolbarTheme"
+            >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="com.example.apidemons.CATEGORY_SAMPLES" />
+            </intent-filter>
+
+        </activity>
+        <activity
             android:name=".v4.TablayoutAct"
             android:label="v4/TablayoutAct"
             android:theme="@style/AppTheme"
