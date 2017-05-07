@@ -72,17 +72,34 @@ public class ClipPathView extends FrameLayout {
          *    Region.Op.UNION：是A和B的全集
          *    Region.Op.XOR：是全集形状减去交集形状之后的部分
          */
-        canvas.save();
-        final int width = getMeasuredWidth();
-        final int height=getMeasuredHeight();
-        canvas.setDrawFilter(paintFlagsDrawFilter);
-        leftTopRF.set(0,0,width,height);
-        leftTop.moveTo(0,0);
-        leftTop.lineTo(width/2,0);
-        leftTop.addRoundRect(leftTopRF,50,50, Path.Direction.CCW);
-        canvas.clipPath(leftTop, Region.Op.INTERSECT);
-        super.dispatchDraw(canvas);
-        canvas.restore();
+//        canvas.save();
+//        final int width = getMeasuredWidth();
+//        final int height=getMeasuredHeight();
+//        canvas.setDrawFilter(paintFlagsDrawFilter);
+//        leftTopRF.set(0,0,width,height);
+//        leftTop.moveTo(0,0);
+//        leftTop.lineTo(width/2,0);
+//        leftTop.addRoundRect(leftTopRF,50,50, Path.Direction.CCW);
+//        canvas.clipPath(leftTop, Region.Op.INTERSECT);
+//        super.dispatchDraw(canvas);
+//        canvas.restore();
         /** end*/
+
+
+        /** 实现小方块*/
+
+        canvas.save();
+
+        canvas.clipRect(10,10,20,20, Region.Op.DIFFERENCE);
+        canvas.clipRect(40,40,50,50, Region.Op.DIFFERENCE);
+        canvas.clipRect(80,80,100,100, Region.Op.DIFFERENCE);
+        canvas.clipRect(50,10,100,30, Region.Op.DIFFERENCE);
+        super.dispatchDraw(canvas);
+
+        canvas.restore();
+
+
+        /** end */
+
     }
 }
