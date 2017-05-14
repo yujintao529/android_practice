@@ -19,8 +19,6 @@ import android.view.View;
 
 
 import com.example.mypractice.R;
-import com.example.mypractice.view.MfwCommon;
-import com.example.mypractice.view.MfwLog;
 
 import java.util.ArrayList;
 
@@ -282,9 +280,9 @@ public class MfwDoubleSeekBar extends View {
      * @param end
      */
     private void setCurrentValueInterval(float start, float end) {
-        if (status == STATUE_RIGHT_DRAG||status==STATUE_RIGHT_SCROLL) {
+        if (status == STATUE_RIGHT_DRAG || status == STATUE_RIGHT_SCROLL) {
             end = Math.max(end, start);
-        } else if (status == STATUE_LEFT_DRAG||status==STATUE_LEFT_SCROLL) {
+        } else if (status == STATUE_LEFT_DRAG || status == STATUE_LEFT_SCROLL) {
             start = Math.min(end, start);
         }
         if (MfwCommon.DEBUG) {
@@ -527,6 +525,9 @@ public class MfwDoubleSeekBar extends View {
 
     public void setCurrentValue(int currentStart, int currentEnd) {
         setCurrentValueInterval(currentStart, currentEnd);
+        if (onScrollChangeListener != null) {
+            onScrollChangeListener.onChanged(seekbarStrategy.getCurrentStart(), seekbarStrategy.getCurrentEnd());
+        }
     }
 
     public interface OnDotTextAdapter {
