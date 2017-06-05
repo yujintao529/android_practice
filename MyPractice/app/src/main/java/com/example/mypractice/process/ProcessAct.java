@@ -7,12 +7,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 import com.example.mypractice.R;
-import com.example.mypractice.R2;
-
-import javax.crypto.spec.RC2ParameterSpec;
 
 import butterknife.BindView;
-import butterknife.BindViews;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
