@@ -1,5 +1,5 @@
 apply plugin: 'com.android.application'
-apply plugin: 'com.jakewharton.butterknife'
+//apply plugin: 'com.jakewharton.butterknife'
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
@@ -26,11 +26,6 @@ android {
             universalApk false
         }
 
-    }
-    packagingOptions {
-        exclude "lib/armeabi-v7a/*"
-        exclude "lib/armeabi/*"
-        exclude "lib/x86-64/*"
     }
     sourceSets{
        main{
@@ -65,12 +60,12 @@ android {
 }
 
 
-task processorTask(type:Exec){
-    println "执行copy annotation processor"
-    commandLine "cp","../processor/build/libs/processor.jar","libs/"
-}
-processorTask.dependsOn(":processor:build")
-preBuild.dependsOn(processorTask)
+//task processorTask(type:Exec){
+//    println "执行copy annotation processor"
+//    commandLine "cp","../processor/build/libs/processor.jar","libs/"
+//}
+//processorTask.dependsOn(":processor:build")
+//preBuild.dependsOn(processorTask)
 
 
 dependencies {
@@ -90,10 +85,7 @@ dependencies {
     compile "$rootProject.ext.rxJavaDependency"
     compile "$rootProject.ext.rxAndroidDependency"
     compile "$rootProject.ext.autoService"
-    compile project(":processor-annotation")
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.4.0'
     compile "com.amitshekhar.android:debug-db:0.4.0"
-    annotationProcessor files("libs/processor.jar")
-//    annotationProcessor project(":processor")
 
 }
