@@ -43,5 +43,7 @@
         <attr name="mfwtab_indicator_height" format="dimension|reference" />
         <attr name="mfwtab_indicator_color" format="dimension|reference" />
         <attr name="mfwtab_tab_margin" format="dimension|reference" />
+        <attr name="mfwtab_indicator_drawable" format="reference" />
+        <attr name="mfwtab_title_icon_padding" format="dimension|reference" />
     </declare-styleable>
 </resources>
