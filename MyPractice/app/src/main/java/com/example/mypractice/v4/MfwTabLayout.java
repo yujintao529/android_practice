@@ -324,7 +324,7 @@ public class MfwTabLayout extends HorizontalScrollView {
             final int nextWidth = nextChild != null ? nextChild.getWidth() : 0;
 
             return selectedChild.getLeft()
-                    + ((int) ((selectedWidth + nextWidth) * positionOffset * 0.5f))
+                    + (int) (((selectedWidth + nextWidth) * 0.5f+mTabMargin)*positionOffset)
                     + (selectedChild.getWidth() / 2)
                     - (getWidth() / 2);
         }
@@ -370,8 +370,8 @@ public class MfwTabLayout extends HorizontalScrollView {
     public void removeTab(Tab tab) {
         mTabs.remove(tab);
         mInnerView.removeView(tab);
+        resetTabPosition();
         if (tab == mCurrentTab && mTabs.size() > 0) {
-            performTabSelect(0);
             mCurrentTab = null;
             selectTab(tab, true);
         }
@@ -477,7 +477,7 @@ public class MfwTabLayout extends HorizontalScrollView {
             return;
         }
         Logger.debug(TAG,"measure width "+MeasureSpec.getSize(widthMeasureSpec)+" state "+getMeasureMode(widthMeasureSpec));
-        Logger.debug(TAG," size " + getMeasuredWidth()+" state "+getMeasureMode(widthMeasureSpec));
+        Logger.debug(TAG,"tablayout 1 size " + getMeasuredWidth()+" state "+getMeasureMode(widthMeasureSpec));
         final ViewGroup viewGroup = (ViewGroup) getChildAt(0);
         final int paddingSum = viewGroup.getPaddingLeft() + viewGroup.getPaddingRight();//这个值也就是mTabStartMargin和mTabEndMargin
         final int childCount = viewGroup.getChildCount();
@@ -506,14 +506,15 @@ public class MfwTabLayout extends HorizontalScrollView {
                 return;
             }
             int spaceWidth =contentWidth -sumWidth;
-            int margin = spaceWidth / childCount / 2;
+            int margin = Math.round(spaceWidth*1f / childCount / 2);
             if (margin > 0) {
                 for (int i = 0; i < childCount; i++) {
                     View inner = viewGroup.getChildAt(i);
                     updateInnerMargin((MarginLayoutParams) inner.getLayoutParams(), margin);
                 }
             }
-            viewGroup.measure(MeasureSpec.makeMeasureSpec(getMeasuredWidth(), MeasureSpec.EXACTLY), heightMeasureSpec);
+            super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+            Logger.debug(TAG,"tablayout 2 size " + getMeasuredWidth()+" state "+getMeasureMode(widthMeasureSpec));
         } else if (mMode == MODE_WRAP) {
             for (int i = 0; i < childCount; i++) {
                 View inner = viewGroup.getChildAt(i);
@@ -523,7 +524,6 @@ public class MfwTabLayout extends HorizontalScrollView {
                 }
             }
             super.onMeasure(widthMeasureSpec,heightMeasureSpec);
-//            viewGroup.measure(MeasureSpec.makeMeasureSpec(getMeasuredWidth(), MeasureSpec.EXACTLY), heightMeasureSpec);
         }
     }
 

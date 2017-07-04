@@ -119,6 +119,11 @@ public class TablayoutAct extends AppCompatActivity {
         tabLayout2.addTab(tab);
     }
 
+    @OnClick(R.id.remove)
+    public void onDelete(){
+        tabLayout2.removeIndex(0);
+    }
+
     @OnClick(R.id.set_tab_4)
     public void onSelect4() {
         viewPager.setCurrentItem(3);
