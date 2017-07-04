@@ -5,12 +5,14 @@ import android.support.annotation.Nullable;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 
+import com.example.mypractice.Logger;
 import com.example.mypractice.R;
 
 import butterknife.BindView;
@@ -29,6 +31,12 @@ public class TablayoutAct extends AppCompatActivity {
 
     @BindView(R.id.set_tab_4)
     Button select4;
+
+
+    @BindView(R.id.tab_layout_2)
+    MfwTabLayout tabLayout2;
+
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,7 +54,7 @@ public class TablayoutAct extends AppCompatActivity {
 //        tab=mfwTabLayout.newTab();
 //        tab.setTitle("我的title很长4");
 //        mfwTabLayout.addTab(tab);
-        final int[] images=new int[]{R.drawable.resource_1,R.drawable.resource_2,R.drawable.resource_3,R.drawable.resource_4};
+        final int[] images = new int[]{R.drawable.resource_1, R.drawable.resource_2, R.drawable.resource_3, R.drawable.resource_4};
 //        final int[] images=new int[]{R.drawable.resource_1,R.drawable.resource_2};
         viewPager.setAdapter(new PagerAdapter() {
             @Override
@@ -56,15 +64,16 @@ public class TablayoutAct extends AppCompatActivity {
 
             @Override
             public Object instantiateItem(ViewGroup container, int position) {
-                View view=LayoutInflater.from(getBaseContext()).inflate(R.layout.tab_layout_view_pager_item,null);
-                ImageView imageView= (ImageView) view.findViewById(R.id.image);
+                View view = LayoutInflater.from(getBaseContext()).inflate(R.layout.tab_layout_view_pager_item, null);
+                ImageView imageView = (ImageView) view.findViewById(R.id.image);
                 imageView.setImageResource(images[position]);
                 container.addView(view);
                 return view;
             }
+
             @Override
             public boolean isViewFromObject(View view, Object object) {
-                return view==object;
+                return view == object;
             }
 
             @Override
@@ -74,24 +83,44 @@ public class TablayoutAct extends AppCompatActivity {
 
             @Override
             public CharSequence getPageTitle(int position) {
-                return "我的图片名字很长"+position;
+                return "我的图片名字很长" + position;
             }
         });
         mfwTabLayout.setupViewPager(viewPager);
 //        viewPager.getAdapter().notifyDataSetChanged();
-//        tab=mfwTabLayout.newTab();
-//        tab.setTitle("我的title很长5");
-//        mfwTabLayout.addTab(tab);
-//        tab=mfwTabLayout.newTab();
-//        tab.setTitle("我的title很长6");
-//        mfwTabLayout.addTab(tab);
-//        tab=mfwTabLayout.newTab();
-//        tab.setTitle("我的title很长7");
-//        mfwTabLayout.addTab(tab);
+        MfwTabLayout.Tab tab = tabLayout2.newTab();
+        tab.setTitle("我的title1");
+        tabLayout2.addTab(tab);
+        tab = tabLayout2.newTab();
+        tab.setTitle("我的title2");
+        tabLayout2.addTab(tab);
+        tab = tabLayout2.newTab();
+        tab.setTitle("我的title2");
+        tabLayout2.addTab(tab);
+
+        tabLayout2.addTabSelectListener(new MfwTabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(MfwTabLayout.Tab tab) {
+                Logger.d("tab seleonTabSelectedcted " + tab);
+            }
+
+            @Override
+            public void onTabUnselected(MfwTabLayout.Tab tab) {
+                Logger.d("tab onTabUnselected " + tab);
+            }
+        });
+
+    }
+
+
+    @OnClick(R.id.add)
+    public void onAdd() {
+        MfwTabLayout.Tab tab = tabLayout2.newTab().setTitle("我的名称");
+        tabLayout2.addTab(tab);
     }
 
     @OnClick(R.id.set_tab_4)
-    public void onSelect4(){
+    public void onSelect4() {
         viewPager.setCurrentItem(3);
     }
 }

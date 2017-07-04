@@ -46,5 +46,6 @@
 
     </style>
     <style name="MfwTabDefaultStyle">
+        <item name="mfwtab_indicator_drawable">@drawable/tablayout_indicator_bg</item>
     </style>
 </resources>
