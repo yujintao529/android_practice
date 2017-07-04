@@ -9,6 +9,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.RectF;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.Nullable;
@@ -519,8 +520,6 @@ public class MfwTabLayout extends HorizontalScrollView {
                 sumWidth += innerView.getMeasuredWidth();
             }
             if (sumWidth + MIN_TAB_MARGIN * childCount > contentWidth) {//如果所有子view的大小加上最小间距大小已经超过了match大小的话，直接采用WARP模式
-                Logger.debug(TAG, "tab width is small ,so change mode to wrap");
-                setTabMode(MODE_WRAP);
                 for (int i = 0; i < childCount; i++) {
                     View inner = viewGroup.getChildAt(i);
                     if (i != childCount - 1) {
@@ -834,6 +833,11 @@ public class MfwTabLayout extends HorizontalScrollView {
         @Override
         public final void setSelected(boolean selected) {
             super.setSelected(selected);
+            if(selected){
+                textView.setTypeface(Typeface.DEFAULT_BOLD);
+            }else{
+                textView.setTypeface(Typeface.DEFAULT);
+            }
             textView.setSelected(selected);
             icon.setSelected(selected);
             if (customView != null) {
