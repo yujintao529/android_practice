@@ -89,13 +89,13 @@ public class TablayoutAct extends AppCompatActivity {
         mfwTabLayout.setupViewPager(viewPager);
 //        viewPager.getAdapter().notifyDataSetChanged();
         MfwTabLayout.Tab tab = tabLayout2.newTab();
-        tab.setTitle("我的title1");
+        tab.setTitle("我的我的123");
         tabLayout2.addTab(tab);
         tab = tabLayout2.newTab();
-        tab.setTitle("我的title2");
+        tab.setTitle("我的title123");
         tabLayout2.addTab(tab);
         tab = tabLayout2.newTab();
-        tab.setTitle("我的title2");
+        tab.setTitle("我的我的");
         tabLayout2.addTab(tab);
 
         tabLayout2.addTabSelectListener(new MfwTabLayout.OnTabSelectedListener() {

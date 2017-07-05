@@ -45,7 +45,7 @@
         android:layout_marginTop="30dp"
         android:background="@color/color_C9"
         app:mfwtab_indicator_height="10dp"
-        app:mfwtab_mode="MATCH"
+        app:mfwtab_mode="EXACT"
         app:mfwtab_tab_end_margin="10dp"
         app:mfwtab_tab_start_margin="10dp"
         app:mfwtab_tab_margin="10dp"
