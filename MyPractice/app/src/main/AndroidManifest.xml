@@ -273,8 +273,7 @@
         <activity
             android:name=".other.RxAndroidAct"
             android:label="other/RxAndroidAct"
-            android:theme="@style/toolbarTheme"
-            >
+            android:theme="@style/toolbarTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="com.example.apidemons.CATEGORY_SAMPLES" />
@@ -284,8 +283,7 @@
         <activity
             android:name=".canvas.ClippathAct"
             android:label="canvas/ClippathAct"
-            android:theme="@style/toolbarTheme"
-            >
+            android:theme="@style/toolbarTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="com.example.apidemons.CATEGORY_SAMPLES" />
@@ -295,8 +293,7 @@
         <activity
             android:name=".resource.drawable.LayerListDrawableAct"
             android:label="resource/drawable/LayerListDrawableAct"
-            android:theme="@style/toolbarTheme"
-            >
+            android:theme="@style/toolbarTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="com.example.apidemons.CATEGORY_SAMPLES" />
@@ -306,8 +303,7 @@
         <activity
             android:name=".v4.TablayoutAct"
             android:label="v4/TablayoutAct"
-            android:theme="@style/AppTheme"
-            >
+            android:theme="@style/AppTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="com.example.apidemons.CATEGORY_SAMPLES" />
@@ -317,8 +313,7 @@
         <activity
             android:name=".v7.MaterilActivity"
             android:label="v7/MaterilActivity"
-            android:theme="@style/AppTheme"
-            >
+            android:theme="@style/AppTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="com.example.apidemons.CATEGORY_SAMPLES" />
@@ -327,8 +322,17 @@
         </activity>
         <activity
             android:name=".view.DoubleSeekBarAct"
-            android:label="view/DoubleSeekBarAct"
-            >
+            android:label="view/DoubleSeekBarAct">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="com.example.apidemons.CATEGORY_SAMPLES" />
+            </intent-filter>
+
+        </activity>
+
+        <activity
+            android:name=".test.FrameLayoutTestAct"
+            android:label="test/frameLayoutTest">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="com.example.apidemons.CATEGORY_SAMPLES" />
@@ -346,6 +350,7 @@
             </intent-filter>
 
         </activity>
+
         <service android:name=".process.ProcessService" />
         <service android:name=".process.ProcessService$InnerService" />
 
