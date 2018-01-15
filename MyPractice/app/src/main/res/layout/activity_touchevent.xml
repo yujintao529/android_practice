@@ -1,0 +1,24 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white">
+
+    <com.example.mypractice.view.TouchEventFrameLayout
+        android:id="@+id/parent"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:layout_gravity="center"
+        android:background="@color/color_C7">
+
+        <com.example.mypractice.view.TouchEventFrameLayout
+            android:id="@+id/child"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:layout_gravity="center"
+            android:background="@color/color_C2">
+
+        </com.example.mypractice.view.TouchEventFrameLayout>
+    </com.example.mypractice.view.TouchEventFrameLayout>
+
+</RelativeLayout>
