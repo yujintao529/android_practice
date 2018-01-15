@@ -19,7 +19,6 @@ public class TouchEventFrameLayout extends FrameLayout {
 
     public TouchEventFrameLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
-        setClickable(true);
     }
 
     public TouchEventFrameLayout(Context context, AttributeSet attrs, int defStyle) {
@@ -31,7 +30,7 @@ public class TouchEventFrameLayout extends FrameLayout {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if (iEvent != null) {
-            return iEvent.onTouchEvent(event) || super.onTouchEvent(event);
+            return iEvent.onTouchEvent(event);//|| super.onTouchEvent(event);
         }
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
@@ -41,13 +40,13 @@ public class TouchEventFrameLayout extends FrameLayout {
                 Logger.debug(TAG, "onTouchEvent ACTION_MOVE");
                 break;
             case MotionEvent.ACTION_UP:
-                Logger.debug(TAG, "onTouchEvent ACTION_MOVE");
+                Logger.debug(TAG, "onTouchEvent ACTION_UP");
                 break;
             case MotionEvent.ACTION_CANCEL:
                 Logger.debug(TAG, "onTouchEvent ACTION_CANCEL");
                 break;
         }
-        return false;//super.onTouchEvent(event);
+        return super.onTouchEvent(event);
     }
 
     @Override
@@ -65,7 +64,7 @@ public class TouchEventFrameLayout extends FrameLayout {
                 Logger.debug(TAG, "onInterceptTouchEvent ACTION_MOVE");
                 break;
             case MotionEvent.ACTION_UP:
-                Logger.debug(TAG, "onInterceptTouchEvent ACTION_MOVE");
+                Logger.debug(TAG, "onInterceptTouchEvent ACTION_UP");
                 break;
             case MotionEvent.ACTION_CANCEL:
                 Logger.debug(TAG, "onInterceptTouchEvent ACTION_CANCEL");
