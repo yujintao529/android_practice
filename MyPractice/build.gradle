@@ -1,6 +1,9 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 //这个是整个项目的构建文件，他的作用阀是通过setttings.gradle来控制的。
 buildscript {
+    ext{
+        kotlin_version='1.0.6'
+    }
     repositories {
         jcenter()
         mavenCentral()
@@ -11,7 +14,7 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:2.3.1'
         classpath 'com.jakewharton:butterknife-gradle-plugin:8.4.0'
-
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
 
@@ -29,7 +32,7 @@ ext {
     buildToolsVersion = "25.0.0"
     minSdkVersion = 16
     targetSdkVersion = 23
-
+    kotlin_version='1.0.6'
     rxJavaDependency = "io.reactivex:rxjava:1.1.6"
     rxAndroidDependency="io.reactivex:rxandroid:1.2.1"
     autoService= "com.google.auto.service:auto-service:1.0-rc2"
