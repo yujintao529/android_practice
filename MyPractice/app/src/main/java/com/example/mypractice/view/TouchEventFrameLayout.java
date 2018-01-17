@@ -58,8 +58,8 @@ public class TouchEventFrameLayout extends FrameLayout {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 Logger.debug(TAG, "onInterceptTouchEvent ACTION_DOWN");
-                return true;
-//            break;
+//                return true;
+            break;
             case MotionEvent.ACTION_MOVE:
                 Logger.debug(TAG, "onInterceptTouchEvent ACTION_MOVE");
                 break;
