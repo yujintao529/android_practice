@@ -16,13 +16,11 @@ class ThemeConfig {
     }
 
     fun searchSkin(config: SearchSkin.() -> Unit) {
-        _searchSkin = SearchSkin("搜索皮肤")
-        _searchSkin?.config()
+        _searchSkin = SearchSkin("搜索皮肤").apply(config)
     }
 
     fun categorySkin(config: CategorySkin.() -> Unit) {
-        _categorySkin = CategorySkin("分类大饼皮肤")
-        _categorySkin?.config()
+        _categorySkin = CategorySkin("分类大饼皮肤").apply(config)
     }
 
     fun bottomSkin(config: BottomSkin.() -> Unit) {
