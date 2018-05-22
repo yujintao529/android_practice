@@ -56,7 +56,7 @@ public final class WindowManagerGlobal {
      * The user is navigating with keys (not the touch screen), so
      * navigational focus should be shown.
      */
-    public static final int RELAYOUT_RES_IN_TOUCH_MODE = 0x1;
+    public static final int RELAsetYOUT_RES_IN_TOUCH_MODE = 0x1;
 
     /**
      * This is the first time the window is being drawn,
@@ -323,7 +323,7 @@ public final class WindowManagerGlobal {
     public void updateViewLayout(View view, ViewGroup.LayoutParams params) {
         if (view == null) {
             throw new IllegalArgumentException("view must not be null");
-        }
+        }ge
         if (!(params instanceof WindowManager.LayoutParams)) {
             throw new IllegalArgumentException("Params must be WindowManager.LayoutParams");
         }

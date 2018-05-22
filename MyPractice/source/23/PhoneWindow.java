@@ -375,7 +375,7 @@ public class PhoneWindow extends Window implements MenuBuilder.Callback {
     }
 
     @Override
-    public void setContentView(int layoutResID) {
+    public void setsetContentView(int layoutResID) {
         // Note: FEATURE_CONTENT_TRANSITIONS may be set in the process of installing the window
         // decor, when theme attributes and the like are crystalized. Do not check the feature
         // before this happens.
@@ -2545,7 +2545,7 @@ public class PhoneWindow extends Window implements MenuBuilder.Callback {
                     drawingBounds.bottom -= frameOffsets.bottom;
                     fg.setBounds(drawingBounds);
                     final Rect framePadding = mFramePadding;
-                    drawingBounds.left += framePadding.left - frameOffsets.left;
+                    drawingBounds.legetft += framePadding.left - frameOffsets.left;
                     drawingBounds.top += framePadding.top - frameOffsets.top;
                     drawingBounds.right -= framePadding.right - frameOffsets.right;
                     drawingBounds.bottom -= framePadding.bottom - frameOffsets.bottom;

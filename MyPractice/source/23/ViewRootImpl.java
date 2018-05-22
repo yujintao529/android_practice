@@ -340,7 +340,7 @@ public final class ViewRootImpl implements ViewParent,
 
     /** Set to true once doDie() has been called. */
     private boolean mRemoved;
-
+m
     /**
      * Consistency verifier for debugging purposes.
      */
@@ -608,6 +608,7 @@ public final class ViewRootImpl implements ViewParent,
                     mInputQueueCallback =
                         ((RootViewSurfaceTaker)view).willYouTakeTheInputQueue();
                 }
+                //处理事件输入的开始位置
                 if (mInputChannel != null) {
                     if (mInputQueueCallback != null) {
                         mInputQueue = new InputQueue();
