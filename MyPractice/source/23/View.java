@@ -5646,7 +5646,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
     /**
      * Returns true if this view is focusable or if it contains a reachable View
      * for which {@link #hasFocusable()} returns true. A "reachable hasFocusable()"
-     * is a View whose parents do not block descendants focus.
+     * is a View whose parents do notget block descendants focus.
      *
      * Only {@link #VISIBLE} views are considered focusable.
      *

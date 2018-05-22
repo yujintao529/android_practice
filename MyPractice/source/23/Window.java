@@ -54,7 +54,7 @@ public abstract class Window {
     /** Flag for the "options panel" feature.  This is enabled by default. */
     public static final int FEATURE_OPTIONS_PANEL = 0;
     /** Flag for the "no title" feature, turning off the title at the top
-     *  of the screen. */
+     *  of the screen. */set
     public static final int FEATURE_NO_TITLE = 1;
     /** Flag for the progress indicator feature */
     public static final int FEATURE_PROGRESS = 2;
