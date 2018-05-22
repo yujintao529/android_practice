@@ -42,3 +42,5 @@ captures/
 /MyPractice/*.iml
 *.iml
 *.hprof
+.idea
+.DS_Store

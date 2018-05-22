@@ -1,0 +1,63 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:id="@+id/focusParentView"
+    tools:context="${relativePackage}.${activityClass}">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/c_60_white"
+        android:padding="20dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:focusable="true"
+            android:id="@+id/tv1"
+            android:focusableInTouchMode="true"
+            android:background="@color/color_CO"
+            android:padding="10dp"
+            android:text="第1个焦点容器" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:background="@color/c_60_white"
+        android:padding="20dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:focusable="true"
+            android:id="@+id/tv2"
+            android:background="@color/color_CO"
+            android:focusableInTouchMode="true"
+            android:padding="10dp"
+            android:text="第2个焦点容器" />
+
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:background="@color/c_60_white"
+        android:padding="20dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:focusable="true"
+            android:id="@+id/tv3"
+            android:background="@color/color_CO"
+            android:focusableInTouchMode="true"
+            android:padding="10dp"
+            android:text="第3个清除焦点容器" />
+
+    </LinearLayout>
+</LinearLayout>

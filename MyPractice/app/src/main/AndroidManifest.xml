@@ -69,15 +69,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".jsy.StreamSettingAct"
-            android:label="jsy/streamSettingAct">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="com.example.apidemons.CATEGORY_SAMPLES" />
-            </intent-filter>
-        </activity>
-        <activity
             android:name=".gradient.RadialGradientAct"
             android:label="gradient/radialgradient">
             <intent-filter>
@@ -361,6 +352,14 @@
         <activity
             android:name=".kotlin.DelegateActivity"
             android:label="kotlin/DelegateActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="com.example.apidemons.CATEGORY_SAMPLES" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".source.FouceActivity"
+            android:label="source/FouceActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="com.example.apidemons.CATEGORY_SAMPLES" />
