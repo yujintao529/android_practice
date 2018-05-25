@@ -5631,7 +5631,7 @@ m
                         }
                     }
 
-                    mSurface.release();
+                    mSurface.release();o
                 }
             }
 
@@ -5918,7 +5918,7 @@ m
         }
 
         InputStage stage;
-        if (q.shouldSendToSynthesizer()) {
+        if (q.shouldSendToSy nthesizer()) {
             stage = mSyntheticInputStage;
         } else {
             stage = q.shouldSkipIme() ? mFirstPostImeInputStage : mFirstInputStage;

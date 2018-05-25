@@ -1,0 +1,29 @@
+<com.example.mypractice.source.LogFrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/parent"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/c_75_white"
+    android:clickable="true"
+    android:orientation="vertical"
+    tools:context="${relativePackage}.${activityClass}">
+
+    <com.example.mypractice.source.LogFrameLayout
+        android:id="@+id/one"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:background="@color/color_CB"
+        android:clickable="true">
+
+
+    </com.example.mypractice.source.LogFrameLayout>
+
+    <com.example.mypractice.source.LogFrameLayout
+        android:id="@+id/two"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_gravity="bottom|right"
+        android:background="@color/color_CO"
+        android:clickable="true" />
+
+</com.example.mypractice.source.LogFrameLayout>

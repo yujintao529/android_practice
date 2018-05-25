@@ -2086,6 +2086,7 @@ public abstract class ViewGroup extends View implements ViewParent, ViewManager 
         }
 
         boolean handled = false;
+        //检测安全按钮，透明遮盖是否分发
         if (onFilterTouchEventForSecurity(ev)) {
             final int action = ev.getAction();
             final int actionMasked = action & MotionEvent.ACTION_MASK;
@@ -2101,6 +2102,7 @@ public abstract class ViewGroup extends View implements ViewParent, ViewManager 
 
             // Check for interception.
             final boolean intercepted;
+            //是否进行拦截
             if (actionMasked == MotionEvent.ACTION_DOWN
                     || mFirstTouchTarget != null) {
                 final boolean disallowIntercept = (mGroupFlags & FLAG_DISALLOW_INTERCEPT) != 0;
@@ -2127,11 +2129,11 @@ public abstract class ViewGroup extends View implements ViewParent, ViewManager 
                     || actionMasked == MotionEvent.ACTION_CANCEL;
 
             // Update list of touch targets for pointer down, if needed.
-            final boolean split = (mGroupFlags & FLAG_SPLIT_MOTION_EVENTS) != 0;
+            final boolean split = (mGroupFlags & FLAG_SPLIT_MOTION_EVENTS) != 0;//是否进行事件拆分的标示。
             TouchTarget newTouchTarget = null;
             boolean alreadyDispatchedToNewTouchTarget = false;
             if (!canceled && !intercepted) {
-
+                //判断确认target的阶段
                 // If the event is targeting accessiiblity focus we give it to the
                 // view that has accessibility focus and if it does not handle it
                 // we clear the flag and dispatch the event to all children as usual.
@@ -2139,16 +2141,18 @@ public abstract class ViewGroup extends View implements ViewParent, ViewManager 
                 // state since these events are very rare.
                 View childWithAccessibilityFocus = ev.isTargetAccessibilityFocus()
                         ? findChildWithAccessibilityFocus() : null;
-
+                //只有这三个事件才需要判断分发target
                 if (actionMasked == MotionEvent.ACTION_DOWN
                         || (split && actionMasked == MotionEvent.ACTION_POINTER_DOWN)
                         || actionMasked == MotionEvent.ACTION_HOVER_MOVE) {
                     final int actionIndex = ev.getActionIndex(); // always 0 for down
+                    //如果viewGroup支持拆分，找到具体pinterId并设置到一个int类型里
                     final int idBitsToAssign = split ? 1 << ev.getPointerId(actionIndex)
                             : TouchTarget.ALL_POINTER_IDS;
 
                     // Clean up earlier touch targets for this pointer id in case they
                     // have become out of sync.
+                    //删除已经绑定idBitsToAssign这个值的target，没有用了他，换人了
                     removePointersFromTouchTargets(idBitsToAssign);
 
                     final int childrenCount = mChildrenCount;
@@ -2157,6 +2161,7 @@ public abstract class ViewGroup extends View implements ViewParent, ViewManager 
                         final float y = ev.getY(actionIndex);
                         // Find a child that can receive the event.
                         // Scan children from front to back.
+                        //处理子view处理事件的顺序
                         final ArrayList<View> preorderedList = buildOrderedChildList();
                         final boolean customOrder = preorderedList == null
                                 && isChildrenDrawingOrderEnabled();
@@ -2178,13 +2183,13 @@ public abstract class ViewGroup extends View implements ViewParent, ViewManager 
                                 childWithAccessibilityFocus = null;
                                 i = childrenCount - 1;
                             }
-
+                            //判断是否能接受pinter事件，是否在view里，这里只是down事件，move事件是可以在view的外面发生的
                             if (!canViewReceivePointerEvents(child)
                                     || !isTransformedTouchPointInView(x, y, child, null)) {
                                 ev.setTargetAccessibilityFocus(false);
                                 continue;
                             }
-
+                            //获取touchTarget对象，如果某个子view已经处理一个pinterID的down事件了，那么这个就是null，就直接跳过就可以了。
                             newTouchTarget = getTouchTarget(child);
                             if (newTouchTarget != null) {
                                 // Child is already receiving touch within its bounds.
@@ -2194,6 +2199,8 @@ public abstract class ViewGroup extends View implements ViewParent, ViewManager 
                             }
 
                             resetCancelNextUpFlag(child);
+
+                            //通过分发来判断touchTarget目标，如果返回true则表明该view处理这个事件序列，
                             if (dispatchTransformedTouchEvent(ev, false, child, idBitsToAssign)) {
                                 // Child wants to receive touch within its bounds.
                                 mLastTouchDownTime = ev.getDownTime();
@@ -2210,7 +2217,9 @@ public abstract class ViewGroup extends View implements ViewParent, ViewManager 
                                 }
                                 mLastTouchDownX = ev.getX();
                                 mLastTouchDownY = ev.getY();
+                                //将这个view和pinterid的值添加到touchTarget链表里。
                                 newTouchTarget = addTouchTarget(child, idBitsToAssign);
+                                //因为是通过分发来确定的所以，设置个标示位，表示已经分发过了，后面就直接跳过分发流程
                                 alreadyDispatchedToNewTouchTarget = true;
                                 break;
                             }
@@ -2221,7 +2230,7 @@ public abstract class ViewGroup extends View implements ViewParent, ViewManager 
                         }
                         if (preorderedList != null) preorderedList.clear();
                     }
-
+                    //如果没有找到处理该事件的view，那么用最后一次处理事件的touchTarget，如果mFirstTouchTarget也为null，那么就不处理继续下面
                     if (newTouchTarget == null && mFirstTouchTarget != null) {
                         // Did not find a child to receive the event.
                         // Assign the pointer to the least recently added target.
@@ -2233,8 +2242,9 @@ public abstract class ViewGroup extends View implements ViewParent, ViewManager 
                     }
                 }
             }
-
+            //分发阶段
             // Dispatch to touch targets.
+            //如果此时没有个一个子view处理事件，就用自身处理了。child=null就是代表viewGroup自己处理
             if (mFirstTouchTarget == null) {
                 // No touch targets so treat this as an ordinary view.
                 handled = dispatchTransformedTouchEvent(ev, canceled, null,
