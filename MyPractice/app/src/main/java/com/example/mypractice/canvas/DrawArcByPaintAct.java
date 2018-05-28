@@ -1,5 +1,6 @@
 package com.example.mypractice.canvas;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Canvas;
@@ -9,8 +10,10 @@ import android.graphics.Paint.Align;
 import android.graphics.Paint.Cap;
 import android.graphics.Paint.FontMetrics;
 import android.graphics.Paint.Style;
+import android.graphics.Path;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -43,6 +46,9 @@ public class DrawArcByPaintAct extends Activity {
                 frameLayout.removeAllViews();
                 frameLayout.addView(new DrawArc(this), 0);
                 break;
+            case R.id.shanxing:
+                frameLayout.removeAllViews();
+                frameLayout.addView(new Shanxing(this), 0);
             default:
                 break;
         }
@@ -141,6 +147,37 @@ public class DrawArcByPaintAct extends Activity {
             if (mStartAngle >= 360) {
                 mStartAngle = 0;
             }
+        }
+    }
+
+
+    public static class Shanxing extends View {
+
+        Path path = new Path();
+        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG);
+
+        public Shanxing(Context context) {
+            super(context);
+            paint.setColor(Color.BLACK);
+            paint.setStyle(Style.FILL_AND_STROKE);
+        }
+
+        @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+        @Override
+        protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+//            super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+            setMeasuredDimension(300, 80);
+            path.reset();
+            path.moveTo(50, 0);
+            path.addArc(0, -230, 300, 70, 0, 360);
+            path.close();
+        }
+
+        @Override
+        protected void onDraw(Canvas canvas) {
+            super.onDraw(canvas);
+            canvas.drawColor(Color.CYAN);
+            canvas.drawPath(path, paint);
         }
     }
 
@@ -245,6 +282,8 @@ public class DrawArcByPaintAct extends Activity {
             circle.setStrokeWidth(2);
             canvas.drawPoints(new float[]{100, 100}, circle);
             canvas.drawText("圆形", 100, 100 - height / 2, text);
+
         }
+
     }
 }
