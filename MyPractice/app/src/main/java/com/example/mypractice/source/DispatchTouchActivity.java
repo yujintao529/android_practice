@@ -18,17 +18,16 @@ import javax.net.ssl.HttpsURLConnection;
 public class DispatchTouchActivity extends Activity implements View.OnClickListener {
 
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_source_dispatch_touch);
-        ((LogFrameLayout)findViewById(R.id.parent)).setName("parent");
+        ((LogFrameLayout) findViewById(R.id.parent)).setName("parent");
+//        ((LogFrameLayout) findViewById(R.id.parent)).setMotionEventSplittingEnabled(false);
         findViewById(R.id.one).setOnClickListener(this);
-        ((LogFrameLayout)findViewById(R.id.one)).setName("one");
+        ((LogFrameLayout) findViewById(R.id.one)).setName("one");
         findViewById(R.id.two).setOnClickListener(this);
-        ((LogFrameLayout)findViewById(R.id.two)).setName("two");
+        ((LogFrameLayout) findViewById(R.id.two)).setName("two");
         findViewById(R.id.one).setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -47,7 +46,6 @@ public class DispatchTouchActivity extends Activity implements View.OnClickListe
     @Override
     public void onClick(View v) {
     }
-
 
 
 }
