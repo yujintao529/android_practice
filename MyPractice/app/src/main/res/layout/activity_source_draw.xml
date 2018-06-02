@@ -1,0 +1,39 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:id="@+id/drawParent"
+    tools:context="${relativePackage}.${activityClass}">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:layout_height="match_parent">
+
+        <FrameLayout
+            android:layout_width="100dp"
+            android:background="@color/color_C5"
+            android:layout_height="100dp">
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_marginTop="10dp"
+            android:layout_width="100dp"
+            android:id="@+id/deleteView"
+            android:background="@color/color_C8"
+            android:layout_height="100dp">
+        </FrameLayout>
+
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_gravity="bottom"
+        android:layout_height="wrap_content">
+        <Button
+            android:text="执行删除动画"
+            android:onClick="onDeleteClick"
+            android:layout_width="wrap_content"
+            android:padding="20dp"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+</FrameLayout>

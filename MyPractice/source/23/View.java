@@ -15783,6 +15783,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
             if (!a.willChangeBounds()) {
                 if ((flags & (ViewGroup.FLAG_OPTIMIZE_INVALIDATE | ViewGroup.FLAG_ANIMATION_DONE)) ==
                         ViewGroup.FLAG_OPTIMIZE_INVALIDATE) {
+                    //添加标示为，会导致父view调用dispatchDraw后，触发一次invalidate
                     parent.mGroupFlags |= ViewGroup.FLAG_INVALIDATE_REQUIRED;
                 } else if ((flags & ViewGroup.FLAG_INVALIDATE_REQUIRED) == 0) {
                     // The child need to draw an animation, potentially offscreen, so
@@ -15866,11 +15867,13 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
          * If a view is dettached, its DisplayList shouldn't exist. If the canvas isn't
          * HW accelerated, it can't handle drawing RenderNodes.
          */
+        //是否支持硬件加速
         boolean drawingWithRenderNode = mAttachInfo != null
                 && mAttachInfo.mHardwareAccelerated
                 && hardwareAcceleratedCanvas;
 
         boolean more = false;
+        //
         final boolean childHasIdentityMatrix = hasIdentityMatrix();
         final int parentFlags = parent.mGroupFlags;
 
@@ -15930,9 +15933,10 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
             mRecreateDisplayList = (mPrivateFlags & PFLAG_INVALIDATED) != 0;
             mPrivateFlags &= ~PFLAG_INVALIDATED;
         }
-
+        //缓存处理
         RenderNode renderNode = null;
         Bitmap cache = null;
+        //只有硬件加速才支持硬件缓存，如果没有开启硬件减速，那么缓存类型会强制为LAYER_TYPE_SOFTWARE。
         int layerType = getLayerType(); // TODO: signify cache state with just 'cache' local
         if (layerType == LAYER_TYPE_SOFTWARE
                 || (!drawingWithRenderNode && layerType != LAYER_TYPE_NONE)) {
@@ -15962,6 +15966,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
             sx = mScrollX;
             sy = mScrollY;
         }
+
 
         final boolean drawingWithDrawingCache = cache != null && !drawingWithRenderNode;
         final boolean offsetForScroll = cache == null && !drawingWithRenderNode;
@@ -16059,6 +16064,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
 
         if (!drawingWithRenderNode) {
             // apply clips directly, since RenderNode won't do it for this draw
+            //软绘制,FLAG_CLIP_CHILDREN保证不超出自身的范围.一个问题：如果view执行动画时，超出部分会消失么？
             if ((parentFlags & ViewGroup.FLAG_CLIP_CHILDREN) != 0 && cache == null) {
                 if (offsetForScroll) {
                     canvas.clipRect(sx, sy, sx + getWidth(), sy + getHeight());
@@ -16077,6 +16083,8 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
             }
         }
 
+
+        //如果没有使用缓存，进行派发处理
         if (!drawingWithDrawingCache) {
             if (drawingWithRenderNode) {
                 mPrivateFlags &= ~PFLAG_DIRTY_MASK;
@@ -16122,6 +16130,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
             parent.finishAnimatingView(this, a);
         }
 
+        //如果有动画，
         if (more && hardwareAcceleratedCanvas) {
             if (a.hasAlpha() && (mPrivateFlags & PFLAG_ALPHA_SET) == PFLAG_ALPHA_SET) {
                 // alpha animations should cause the child to recreate its display list

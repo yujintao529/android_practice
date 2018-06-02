@@ -2252,6 +2252,7 @@ public abstract class ViewGroup extends View implements ViewParent, ViewManager 
             } else {
                 // Dispatch to touch targets, excluding the new touch target if we already
                 // dispatched to it.  Cancel touch targets if necessary.
+                //分发子view事件，同时会根据resetCancelNextUpFlag和intercepted标示更改为cancle事件。
                 TouchTarget predecessor = null;
                 TouchTarget target = mFirstTouchTarget;
                 while (target != null) {
@@ -2259,6 +2260,7 @@ public abstract class ViewGroup extends View implements ViewParent, ViewManager 
                     if (alreadyDispatchedToNewTouchTarget && target == newTouchTarget) {
                         handled = true;
                     } else {
+
                         final boolean cancelChild = resetCancelNextUpFlag(target.child)
                                 || intercepted;
                         if (dispatchTransformedTouchEvent(ev, cancelChild,
@@ -3338,7 +3340,7 @@ public abstract class ViewGroup extends View implements ViewParent, ViewManager 
         final int childrenCount = mChildrenCount;
         final View[] children = mChildren;
         int flags = mGroupFlags;
-
+        //布局动画，对子view进行的动画
         if ((flags & FLAG_RUN_ANIMATION) != 0 && canAnimate()) {
             final boolean buildCache = !isHardwareAccelerated();
             for (int i = 0; i < childrenCount; i++) {
@@ -3356,7 +3358,7 @@ public abstract class ViewGroup extends View implements ViewParent, ViewManager 
             }
 
             controller.start();
-
+            //重制状态
             mGroupFlags &= ~FLAG_RUN_ANIMATION;
             mGroupFlags &= ~FLAG_ANIMATION_DONE;
 
@@ -3365,6 +3367,7 @@ public abstract class ViewGroup extends View implements ViewParent, ViewManager 
             }
         }
 
+        //是否允许子view超出父view的范围.通过setClipToPadding设置
         int clipSaveCount = 0;
         final boolean clipToPadding = (flags & CLIP_TO_PADDING_MASK) == CLIP_TO_PADDING_MASK;
         if (clipToPadding) {
@@ -3378,19 +3381,24 @@ public abstract class ViewGroup extends View implements ViewParent, ViewManager 
         mPrivateFlags &= ~PFLAG_DRAW_ANIMATION;
         mGroupFlags &= ~FLAG_INVALIDATE_REQUIRED;
 
+        //more代表是否有动画正在执行
         boolean more = false;
         final long drawingTime = getDrawingTime();
 
         if (usingRenderNodeProperties) canvas.insertReorderBarrier();
+        //暂存态的view，可以通过addTransientView和removeTransientView添加删除。目前系统隐藏相关的api
         final int transientCount = mTransientIndices == null ? 0 : mTransientIndices.size();
         int transientIndex = transientCount != 0 ? 0 : -1;
         // Only use the preordered list if not HW accelerated, since the HW pipeline will do the
         // draw reordering internally
+        //绘制顺序，有些view可能需要不同的绘制顺序，可以重写buildOrderedChildList 获取自定义的顺序,同时
+        //需要设置setChildrenDrawingOrderEnabled(true)
         final ArrayList<View> preorderedList = usingRenderNodeProperties
                 ? null : buildOrderedChildList();
         final boolean customOrder = preorderedList == null
                 && isChildrenDrawingOrderEnabled();
         for (int i = 0; i < childrenCount; i++) {
+            //绘制暂存态的view
             while (transientIndex >= 0 && mTransientIndices.get(transientIndex) == i) {
                 final View transientChild = mTransientViews.get(transientIndex);
                 if ((transientChild.mViewFlags & VISIBILITY_MASK) == VISIBLE ||
@@ -3405,10 +3413,12 @@ public abstract class ViewGroup extends View implements ViewParent, ViewManager 
             int childIndex = customOrder ? getChildDrawingOrder(childrenCount, i) : i;
             final View child = (preorderedList == null)
                     ? children[childIndex] : preorderedList.get(childIndex);
+            //如果子view是可以见的或者有正在执行的动画那么绘制子view
             if ((child.mViewFlags & VISIBILITY_MASK) == VISIBLE || child.getAnimation() != null) {
                 more |= drawChild(canvas, child, drawingTime);
             }
         }
+        //这里也是绘制暂存view，因为如果没有子view的话，上面的是无法执行的。
         while (transientIndex >= 0) {
             // there may be additional transient views after the normal views
             final View transientChild = mTransientViews.get(transientIndex);
@@ -3424,6 +3434,7 @@ public abstract class ViewGroup extends View implements ViewParent, ViewManager 
         if (preorderedList != null) preorderedList.clear();
 
         // Draw any disappearing views that have animations
+        //用于即将消失的view的动画。也就是remove讴歌View之前如果给这个view添加过动画那么该view会跑到这里来，然后在动画结束前仍然绘制
         if (mDisappearingChildren != null) {
             final ArrayList<View> disappearingChildren = mDisappearingChildren;
             final int disappearingCount = disappearingChildren.size() - 1;
@@ -3443,13 +3454,14 @@ public abstract class ViewGroup extends View implements ViewParent, ViewManager 
             canvas.restoreToCount(clipSaveCount);
         }
 
-        // mGroupFlags might have been updated by drawChild()
+        // mGroupFlags might have been updated by drawChild().
+
         flags = mGroupFlags;
 
         if ((flags & FLAG_INVALIDATE_REQUIRED) == FLAG_INVALIDATE_REQUIRED) {
             invalidate(true);
         }
-
+        //触发mLayoutAnimationController的结束的回调。FLAG_ANIMATION_DONE和FLAG_NOTIFY_ANIMATION_LISTENER进行控制
         if ((flags & FLAG_ANIMATION_DONE) == 0 && (flags & FLAG_NOTIFY_ANIMATION_LISTENER) == 0 &&
                 mLayoutAnimationController.isDone() && !more) {
             // We want to erase the drawing cache and notify the listener after the
