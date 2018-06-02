@@ -2490,7 +2490,7 @@ m
         if (DEBUG_FPS) {
             trackFPS();
         }
-
+        //第一次完整绘制回调
         if (!sFirstDrawComplete) {
             synchronized (sFirstDrawHandlers) {
                 sFirstDrawComplete = true;
@@ -2500,14 +2500,15 @@ m
                 }
             }
         }
-
+        //滚动视图保证焦点的view可见
         scrollToRectOrFocus(null, false);
-
+        //应该是通过mViewScrollChanged标示位确定是否会触发dispatchOnScrollChanged
         if (mAttachInfo.mViewScrollChanged) {
             mAttachInfo.mViewScrollChanged = false;
             mAttachInfo.mTreeObserver.dispatchOnScrollChanged();
         }
-
+        //由于滚动视图采用的是一个动画，所以需要对这个滚动做处理
+        //滚动需要全部重绘
         boolean animating = mScroller != null && mScroller.computeScrollOffset();
         final int curScrollY;
         if (animating) {
@@ -2526,6 +2527,10 @@ m
         final float appScale = mAttachInfo.mApplicationScale;
         final boolean scalingRequired = mAttachInfo.mScalingRequired;
 
+
+        ////如果 存在 一个 ResizeBuffer 动画， 则 计算 此 动画 相关 的 参数 　 　
+        ///如果 需要 进行 完整 重 绘， 则 修改 脏 区域 为整 个 窗口
+        //
         int resizeAlpha = 0;
         if (mResizeBuffer != null) {
             long deltaTime = SystemClock.uptimeMillis() - mResizeBufferStartTime;
@@ -2552,6 +2557,7 @@ m
             return;
         }
 
+        //如果需要全部绘制，重新设置脏区
         if (fullRedrawNeeded) {
             mAttachInfo.mIgnoreDirtyState = true;
             dirty.set(0, 0, (int) (mWidth * appScale + 0.5f), (int) (mHeight * appScale + 0.5f));
@@ -2565,8 +2571,9 @@ m
                     + surface + " surface.isValid()=" + surface.isValid() + ", appScale:" +
                     appScale + ", width=" + mWidth + ", height=" + mHeight);
         }
-
+        //派发全局回调
         mAttachInfo.mTreeObserver.dispatchOnDraw();
+
 
         int xOffset = 0;
         int yOffset = curScrollY;
@@ -2597,6 +2604,7 @@ m
                 mChoreographer.getFrameTimeNanos() / TimeUtils.NANOS_PER_MS;
 
         if (!dirty.isEmpty() || mIsAnimating || accessibilityFocusDirty) {
+            //硬件加速
             if (mAttachInfo.mHardwareRenderer != null && mAttachInfo.mHardwareRenderer.isEnabled()) {
                 // If accessibility focus moved, always invalidate the root.
                 boolean invalidateRoot = accessibilityFocusDirty;
@@ -2650,7 +2658,7 @@ m
                 }
             }
         }
-
+        //正在进行动画，需要重新完整绘制
         if (animating) {
             mFullRedrawNeeded = true;
             scheduleTraversals();
@@ -2836,6 +2844,12 @@ m
         }
     }
 
+    /**
+     * 绘制的时候为了保证焦点的view可见，则需要根据焦点的view，通过一个scroller把整个view进行滚动
+     * @param rectangle
+     * @param immediate
+     * @return
+     */
     boolean scrollToRectOrFocus(Rect rectangle, boolean immediate) {
         final Rect ci = mAttachInfo.mContentInsets;
         final Rect vi = mAttachInfo.mVisibleInsets;
