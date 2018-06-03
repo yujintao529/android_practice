@@ -15873,7 +15873,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
                 && hardwareAcceleratedCanvas;
 
         boolean more = false;
-        //
+        //是否是单位矩阵
         final boolean childHasIdentityMatrix = hasIdentityMatrix();
         final int parentFlags = parent.mGroupFlags;
 
@@ -15881,7 +15881,23 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
             parent.getChildTransformation().clear();
             parent.mGroupFlags &= ~ViewGroup.FLAG_CLEAR_TRANSFORMATION;
         }
-
+        /**
+         *
+         * 矩阵变换
+         * 因为软件绘制和应减速混合在一起，所以这些代码很难理解。因为有些操作是在updateDisplayListIfDirty处理的。
+         * 但是思想是这样的
+         * 1。 首先应用自己在parent的left和top的情况
+         * 2。 如果view存在动画获取当前animation的变换信息，存在transformToApply中。
+         * 3。 如果自身有矩阵变化，例如setScale等，存储到存在transformToApply中
+         * 4。 最后处理滚动scrollx和scrolly
+         *
+         * 有几点说明：
+         *  1。animation中alpha的动画不会影响矩阵。
+         *  2。Transformation有个不同类型，单位矩阵，透明度变化， 矩阵变化。同上一样透明度变化不会影响矩阵变换
+         *  3。硬件加速部分矩阵是在updateDisplayListIfDirty处理的
+         *  4。RenderNode是渲染节点，应该是存储了渲染的信息。
+         *  5。viewGroup可以通过重写getChildStaticTransformation和setStaticTransformationsEnabled来喂绘制的子view添加全局的动画
+         */
         Transformation transformToApply = null;
         boolean concatMatrix = false;
         final boolean scalingRequired = mAttachInfo != null && mAttachInfo.mScalingRequired;
@@ -15972,6 +15988,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
         final boolean offsetForScroll = cache == null && !drawingWithRenderNode;
 
         int restoreTo = -1;
+        //one step：应用自身mleft和mtop
         if (!drawingWithRenderNode || transformToApply != null) {
             restoreTo = canvas.save();
         }
@@ -15991,12 +16008,13 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
                 canvas.scale(scale, scale);
             }
         }
-
+        //判断是否需要alpha和matrix进行处理。可能提高效率吧
         float alpha = drawingWithRenderNode ? 1 : (getAlpha() * getTransitionAlpha());
         if (transformToApply != null
                 || alpha < 1
                 || !hasIdentityMatrix()
                 || (mPrivateFlags3 & PFLAG3_VIEW_IS_ANIMATING_ALPHA) != 0) {
+
             if (transformToApply != null || !childHasIdentityMatrix) {
                 int transX = 0;
                 int transY = 0;
@@ -16005,7 +16023,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
                     transX = -sx;
                     transY = -sy;
                 }
-
+                //two step应用动画
                 if (transformToApply != null) {
                     if (concatMatrix) {
                         if (drawingWithRenderNode) {
@@ -16026,14 +16044,14 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
                         parent.mGroupFlags |= ViewGroup.FLAG_CLEAR_TRANSFORMATION;
                     }
                 }
-
+                //three steop处理自身变换矩阵
                 if (!childHasIdentityMatrix && !drawingWithRenderNode) {
                     canvas.translate(-transX, -transY);
                     canvas.concat(getMatrix());
                     canvas.translate(transX, transY);
                 }
             }
-
+            //处理alpha变换
             // Deal with alpha if it is or used to be <1
             if (alpha < 1 || (mPrivateFlags3 & PFLAG3_VIEW_IS_ANIMATING_ALPHA) != 0) {
                 if (alpha < 1) {
@@ -16155,6 +16173,8 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
     @CallSuper
     public void draw(Canvas canvas) {
         final int privateFlags = mPrivateFlags;
+
+        //
         final boolean dirtyOpaque = (privateFlags & PFLAG_DIRTY_MASK) == PFLAG_DIRTY_OPAQUE &&
                 (mAttachInfo == null || !mAttachInfo.mIgnoreDirtyState);
         mPrivateFlags = (privateFlags & ~PFLAG_DIRTY_MASK) | PFLAG_DRAWN;
