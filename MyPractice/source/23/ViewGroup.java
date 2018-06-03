@@ -3461,7 +3461,8 @@ public abstract class ViewGroup extends View implements ViewParent, ViewManager 
         if ((flags & FLAG_INVALIDATE_REQUIRED) == FLAG_INVALIDATE_REQUIRED) {
             invalidate(true);
         }
-        //触发mLayoutAnimationController的结束的回调。FLAG_ANIMATION_DONE和FLAG_NOTIFY_ANIMATION_LISTENER进行控制
+        //触发mLayoutAnimationController的结束的回调。FLAG_ANIMATION_DONE和FLAG_NOTIFY_ANIMATION_LISTENER进行控制，而且执行回掉
+        //的时候需要对是否进行动画进行判定，只有动画结束才需要触发
         if ((flags & FLAG_ANIMATION_DONE) == 0 && (flags & FLAG_NOTIFY_ANIMATION_LISTENER) == 0 &&
                 mLayoutAnimationController.isDone() && !more) {
             // We want to erase the drawing cache and notify the listener after the
