@@ -80,6 +80,9 @@ class BottomSkin() : Skin("底部导航栏") {
         _mineSkin?.config()
     }
 
+    operator fun invoke() {
+
+    }
 
     override fun build() {
         println("BottomSkin config")
@@ -97,7 +100,7 @@ abstract class Skin(val name: String) {
 
 fun themes(config: ThemeConfig.() -> Unit) {
     var themeConfig = ThemeConfig()
-    themeConfig.config()
+    config(themeConfig)
     themeConfig.build()
 }
 
