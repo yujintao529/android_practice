@@ -42,6 +42,23 @@ class StatusBinding(trueView: Lazy<View>, falseView: Lazy<View>) : ReadWriteProp
     override fun getValue(thisRef: Any?, property: KProperty<*>): Boolean {
         return tView.visibility == View.VISIBLE
     }
+}
+
+fun Activity.visibility(id: Int): VisiableBinding {
+    return VisiableBinding(lazy { findViewById(id) })
+}
+
+class VisiableBinding(viewLazy: Lazy<View>) : ReadWriteProperty<View, Int> {
+
+    private val view by viewLazy
+
+    override fun getValue(thisRef: View, property: KProperty<*>): Int {
+        return view.visibility
+    }
+
+    override fun setValue(thisRef: View, property: KProperty<*>, value: Int) {
+        view.visibility = value
+    }
 
 }
 
