@@ -2,6 +2,8 @@ package com.example.mypractice.kotlin
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.view.View
+import android.widget.TextView
 import com.example.mypractice.R
 import kotlinx.android.synthetic.main.activity_kotlin_delegate.*
 

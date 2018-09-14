@@ -5,6 +5,8 @@ import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.example.mypractice.R;
 

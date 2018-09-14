@@ -77,11 +77,12 @@ dependencies {
     implementation rootProject.ext.rxAndroidDependency
     implementation rootProject.ext.autoService
     implementation rootProject.ext.debugdb
-    kapt 'com.jakewharton:butterknife-compiler:8.4.0'
-    kapt files("libs/processor.jar")
-    implementation rootProject.ext.kotlinstdlib
+    implementation rootProject.ext.kotlinstdjdk7
     implementation rootProject.ext.kotlinreflect
+    kapt files("libs/processor.jar")
+    //逐步废弃
     implementation 'com.jakewharton:butterknife:8.4.0'
+    kapt 'com.jakewharton:butterknife-compiler:8.4.0'
 //    annotationProcessor project(":processor")
 
 }
