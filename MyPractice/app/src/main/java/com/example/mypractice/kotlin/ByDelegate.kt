@@ -16,12 +16,12 @@ fun Activity.bindToTextView(textView: TextView): ReadWriteProperty<Any?, String?
 }
 
 fun Activity.bindToTextView(textViewID: Int): ReadWriteProperty<Any?, String?> {
-    return TextViewBinding(lazy { findViewById(textViewID) as TextView })
+    return TextViewBinding(lazy { findViewById<TextView>(textViewID) })
 }
 
 
 fun Activity.bindToVisiable(tViewID: Int, fViewID: Int): ReadWriteProperty<Any?, Boolean> {
-    return StatusBinding(lazy { findViewById(tViewID) }, lazy { findViewById(fViewID) })
+    return StatusBinding(lazy { findViewById<View>(tViewID) }, lazy { findViewById<View>(fViewID) })
 }
 
 class StatusBinding(trueView: Lazy<View>, falseView: Lazy<View>) : ReadWriteProperty<Any?, Boolean> {
@@ -45,7 +45,7 @@ class StatusBinding(trueView: Lazy<View>, falseView: Lazy<View>) : ReadWriteProp
 }
 
 fun Activity.visibility(id: Int): VisiableBinding {
-    return VisiableBinding(lazy { findViewById(id) })
+    return VisiableBinding(lazy { findViewById<View>(id) })
 }
 
 class VisiableBinding(viewLazy: Lazy<View>) : ReadWriteProperty<View, Int> {
