@@ -1,9 +1,7 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 //这个是整个项目的构建文件，他的作用阀是通过setttings.gradle来控制的。
 buildscript {
-    ext{
-        kotlin_version='1.2.61'
-    }
+    ext.kotlin_version = '1.2.61'
     repositories {
         jcenter()
         mavenCentral()
