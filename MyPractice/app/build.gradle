@@ -13,7 +13,16 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         multiDexEnabled true
     }
-
+    signingConfigs {
+        def keystoreProperties = new Properties()
+        keystoreProperties.load(new FileInputStream(rootProject.file("release-jks.properties")))
+        release {
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+            storeFile file(keystoreProperties['storeFile'])
+            storePassword keystoreProperties['storePassword']
+        }
+    }
     splits {
         abi {
             enable false
@@ -37,9 +46,17 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled true
+            minifyEnabled false
             proguardFiles 'proguard-project.txt'
+            signingConfig signingConfigs.release
         }
+        debug {
+            shrinkResources false
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_7
@@ -79,6 +96,7 @@ dependencies {
     implementation rootProject.ext.debugdb
     implementation rootProject.ext.kotlinstdjdk7
     implementation rootProject.ext.kotlinreflect
+    implementation 'com.tencent.mm.opensdk:wechat-sdk-android-without-mta:+'
     kapt files("libs/processor.jar")
     //逐步废弃
     implementation 'com.jakewharton:butterknife:8.4.0'
