@@ -105,3 +105,50 @@ dependencies {
 //    annotationProcessor project(":processor")
 
 }
+
+task printlnAllConfiguration {
+    doLast {
+        printlnAllConfiguration(project)
+    }
+}
+task printlnConfiguration {
+    doLast {
+        def con = project.configurations.findByName(project.ext.properties["configuration"])
+        if (con == null) {
+            println "sorry,no configuration with name ${project.ext.properties["configuration"]}"
+        } else {
+            println toString(con)
+        }
+    }
+}
+
+
+private void printlnConfiguration(Project project) {
+    project.getConfigurations().forEach { configuration ->
+        println(toString(configuration))
+    }
+}
+
+private static String toString(Configuration configuration) {
+    StringBuilder stringBuilder = new StringBuilder()
+    stringBuilder.append("configuration[")
+    stringBuilder.append(configuration.getName())
+    stringBuilder.append("-" + configuration.getUploadTaskName()).append("]");
+    stringBuilder.append("\n")
+    stringBuilder.append("\tartifacts-")
+    stringBuilder.append("\n")
+    configuration.getArtifacts().getFiles().forEach { file ->
+        stringBuilder.append("\t\t" + file.getName())
+        stringBuilder.append("\n")
+    }
+    stringBuilder.append("\n")
+    if (configuration.isCanBeResolved()) {
+        stringBuilder.append("\tdependencies-")
+        stringBuilder.append("\n")
+        configuration.resolve().forEach { file ->
+            stringBuilder.append("\t\t" + file.getName())
+            stringBuilder.append("\n")
+        }
+    }
+    return stringBuilder.toString()
+}
