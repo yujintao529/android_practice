@@ -6,9 +6,6 @@
     android:versionName="1.0"
     tools:node="replace">
 
-    <uses-sdk
-        android:minSdkVersion="14"
-        android:targetSdkVersion="14" />
 
     <permission android:name="com.example.practice.RECEIVE_PRO" />
     <permission android:name="com.example.practice.SEND_PRO" />
