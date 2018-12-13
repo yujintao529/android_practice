@@ -97,7 +97,7 @@ dependencies {
     implementation rootProject.ext.kotlinstdjdk7
     implementation rootProject.ext.kotlinreflect
     implementation 'com.tencent.mm.opensdk:wechat-sdk-android-without-mta:+'
-    kapt files("libs/processor.jar")
+//    kapt files("libs/processor.jar")
     //逐步废弃
     implementation 'com.jakewharton:butterknife:8.4.0'
     kapt 'com.jakewharton:butterknife-compiler:8.4.0'
