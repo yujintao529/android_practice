@@ -20,7 +20,6 @@ import com.example.mypractice.R;
  * 1. 所有的donw事件都返回false的话，那么不会接收到move和up等时间。如果touch都返回false的话也不会在继续接收和intercept没有关系
  * 2. p intercept和touch 都返回false，c intercept 返回false，touch返回true的话，那么p的intercept仍然会接收到move和up事件。
  * 3. p intercept和touch 都返回true后，那么无论c返回什么，后续事件只会发送到p 的touch里。如果p的touch返回的false，那么后续事件就不会继续接收了，p的intercept也接收不到了
- *
  */
 public class TouchEventAct extends Activity {
     public static final String TAG = "TouchEventAct";
