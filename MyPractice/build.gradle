@@ -27,9 +27,9 @@ allprojects {
 }
 
 ext {
-    compileSdkVersion = 26
+    compileSdkVersion = 28
     minSdkVersion = 16
-    targetSdkVersion = 26
+    targetSdkVersion = 28
     rxJavaDependency = "io.reactivex:rxjava:1.1.6"
     buildToolsVersion = "28.0.3"
     rxAndroidDependency="io.reactivex:rxandroid:1.2.1"
