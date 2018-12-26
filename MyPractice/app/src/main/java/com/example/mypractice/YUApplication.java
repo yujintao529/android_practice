@@ -5,6 +5,7 @@ import android.support.multidex.MultiDexApplication;
 import android.util.DisplayMetrics;
 
 import com.example.mypractice.common.Common;
+import com.squareup.leakcanary.LeakCanary;
 
 /**
  * Created by jintao on 2015/10/10.

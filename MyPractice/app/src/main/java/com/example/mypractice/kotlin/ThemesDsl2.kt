@@ -12,7 +12,7 @@ class Gradle {
         _android.block()
     }
 
-    //invoke约束杉树
+    //invoke约束函数
     operator fun invoke(block: Gradle.() -> Unit) {
         block()
     }
