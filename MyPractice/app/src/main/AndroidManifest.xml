@@ -405,8 +405,8 @@
         </activity>
         <activity
             android:name="com.demon.yu.ui.OverDrawActivity"
-            android:theme="@style/AppBaseTheme"
-            android:label="ui/OverDrawActivity">
+            android:label="ui/OverDrawActivity"
+            android:theme="@style/AppBaseTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="com.example.apidemons.CATEGORY_SAMPLES" />
@@ -414,8 +414,17 @@
         </activity>
         <activity
             android:name=".resource.drawable.DrawableAct2"
-            android:theme="@style/AppTheme"
-            android:label="resource/drawable/DrawableAct2">
+            android:label="resource/drawable/DrawableAct2"
+            android:theme="@style/AppTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="com.example.apidemons.CATEGORY_SAMPLES" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.demon.yu.view.NextScrollViewAct"
+            android:label="view/NextScrollViewAct"
+            android:theme="@style/AppTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="com.example.apidemons.CATEGORY_SAMPLES" />
