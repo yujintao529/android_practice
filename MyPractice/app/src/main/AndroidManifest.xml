@@ -11,7 +11,7 @@
     <permission android:name="com.example.practice.SEND_PRO" />
 
     <uses-permission android:name="com.example.practice.RECEIVE_PRO" />
-
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="com.example.practice.SEND_PRO" />
 
     <application
@@ -424,6 +424,15 @@
         <activity
             android:name="com.demon.yu.view.NextScrollViewAct"
             android:label="view/NextScrollViewAct"
+            android:theme="@style/AppTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="com.example.apidemons.CATEGORY_SAMPLES" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.demon.yu.window.OverlayWindowActivity"
+            android:label="win/OverlayWindowActivity"
             android:theme="@style/AppTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

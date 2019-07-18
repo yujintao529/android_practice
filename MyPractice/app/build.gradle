@@ -12,6 +12,8 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         multiDexEnabled true
+        multiDexKeepProguard rootProject.file('multiDexKeep.pro')
+        multiDexKeepFile rootProject.file('maindexlist.txt') // keep specific classes
     }
     signingConfigs {
         def keystoreProperties = new Properties()

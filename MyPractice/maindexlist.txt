@@ -1,0 +1,2 @@
+-keep class com.example.** { *; }
+-keep class com.demon.yu.** { *; }

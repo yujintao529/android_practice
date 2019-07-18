@@ -11,6 +11,8 @@ import com.squareup.leakcanary.LeakCanary;
  * Created by jintao on 2015/10/10.
  */
 public class YUApplication extends MultiDexApplication {
+
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -18,5 +20,6 @@ public class YUApplication extends MultiDexApplication {
         DisplayMetrics displayMetrics = resources.getDisplayMetrics();
         Common.screenHeight = displayMetrics.heightPixels;
         Common.screenWidth = displayMetrics.widthPixels;
+        Common.application = this;
     }
 }
