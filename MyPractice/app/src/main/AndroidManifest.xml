@@ -433,6 +433,17 @@
         <activity
             android:name="com.demon.yu.window.OverlayWindowActivity"
             android:label="win/OverlayWindowActivity"
+            android:launchMode="singleTop"
+            android:theme="@style/AppTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="com.example.apidemons.CATEGORY_SAMPLES" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".view.GradientViewActivity"
+            android:label="view/GradientViewActivity"
             android:theme="@style/AppTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

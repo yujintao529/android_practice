@@ -47,4 +47,96 @@
         <attr name="mfwtab_indicator_drawable" format="reference" />
         <attr name="mfwtab_title_icon_padding" format="dimension|reference" />
     </declare-styleable>
+
+
+    <!--gradientDrawable使用的属性，自定义一次，不用系统的名字-->
+    <attr name="gradientShape" format="enum">
+        <enum name="RECTANGLE" value="0" />
+        <enum name="OVAL" value="1" />
+        <!--<enum value="2" name="LINE"></enum>-->
+        <!--<enum value="3" name="RING"></enum>-->
+    </attr>
+    <attr name="gradientSizeWidth" format="dimension|reference" />
+    <attr name="gradientSizeHeight" format="dimension|reference" />
+    <attr name="gradientSolidColor" format="color" />
+    <attr name="gradientStartColor" format="color|reference" />
+    <attr name="gradientCenterColor" format="color|reference" />
+    <attr name="gradientEndColor" format="color|reference" />
+    <attr name="gradientAngle" format="enum">
+        <enum name="a0" value="0" />
+        <enum name="a45" value="45" />
+        <enum name="a90" value="90" />
+        <enum name="a135" value="135" />
+        <enum name="a180" value="180" />
+        <enum name="a225" value="225" />
+        <enum name="a270" value="270" />
+        <enum name="a315" value="315" />
+    </attr>
+    <attr name="gradientCenterX" format="float" />
+    <attr name="gradientCenterY" format="float" />
+    <attr name="gradientCornerRadius" format="dimension|reference" />
+    <attr name="gradientCornerTopLeftRadius" format="dimension|reference" />
+    <attr name="gradientCornerTopRightRadius" format="dimension|reference" />
+    <attr name="gradientCornerBottomLeftRadius" format="dimension|reference" />
+    <attr name="gradientCornerBottomRightRadius" format="dimension|reference" />
+    <attr name="gradientStrokeColor" format="color" />
+    <attr name="gradientStrokeWidth" format="dimension|reference" />
+
+
+
+
+    <!--
+         //一定严格按照这个顺序
+            //size
+            R.attr.gradientShape,//0
+            R.attr.gradientSizeWidth,
+            R.attr.gradientSizeHeight,
+//            //solid
+            R.attr.gradientSolidColor,//solid color
+//            //gradient
+            R.attr.gradientStartColor,
+            R.attr.gradientCenterColor,
+            R.attr.gradientEndColor,
+            R.attr.gradientAngle,
+            R.attr.gradientCenterX,
+            R.attr.gradientCenterY,
+//            //corner
+            R.attr.gradientCornerRadius,
+            R.attr.gradientCornerTopLeftRadius,
+            R.attr.gradientCornerTopRightRadius,
+            R.attr.gradientCornerBottomLeftRadius,
+            R.attr.gradientCornerBottomRightRadius,
+
+//            //stroke
+            R.attr.gradientStrokeColor,
+            R.attr.gradientStrokeWidth
+
+    -->
+
+    <!-- View 用于背景制作-->
+    <declare-styleable name="MayaGradientView">
+        <!--size-->
+        <attr name="gradientShape"/>
+        <attr name="gradientSizeWidth" />
+        <attr name="gradientSizeHeight" />
+        <!--solid-->
+        <attr name="gradientSolidColor" />
+        <!--gradientColor-->
+        <attr name="gradientStartColor" />
+        <attr name="gradientCenterColor" />
+        <attr name="gradientEndColor" />
+        <attr name="gradientAngle" />
+        <attr name="gradientCenterX" />
+        <attr name="gradientCenterY" />
+        <!--corner-->
+        <attr name="gradientCornerRadius" />
+        <attr name="gradientCornerTopLeftRadius" />
+        <attr name="gradientCornerTopRightRadius" />
+        <attr name="gradientCornerBottomLeftRadius" />
+        <attr name="gradientCornerBottomRightRadius" />
+        <!--stroke-->
+        <attr name="gradientStrokeColor" />
+        <attr name="gradientStrokeWidth" />
+
+    </declare-styleable>
 </resources>

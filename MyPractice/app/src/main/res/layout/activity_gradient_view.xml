@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+
+    <com.example.mypractice.view.MayaGradientView
+        android:layout_width="200dp"
+        android:layout_height="100dp"
+        app:gradientSolidColor="@color/color_C8"
+        app:gradientStrokeColor="@color/color_C7"
+        app:gradientStrokeWidth="10dp" />
+
+    <com.example.mypractice.view.MayaGradientView
+        android:layout_width="200dp"
+        android:layout_height="100dp"
+        app:gradientAngle="a90"
+        app:gradientCornerBottomLeftRadius="20dp"
+        app:gradientCornerRadius="10dp"
+        app:gradientEndColor="@color/color_C8"
+        app:gradientStartColor="@color/color_C7" />
+
+    <com.example.mypractice.view.MayaGradientView
+        android:layout_width="200dp"
+        android:layout_height="100dp"
+        app:gradientAngle="a180"
+        app:gradientCenterColor="@color/color_C9"
+        app:gradientCenterX="100"
+        app:gradientCenterY="100"
+        app:gradientEndColor="@color/color_C8"
+        app:gradientStartColor="@color/color_C7" />
+</LinearLayout>

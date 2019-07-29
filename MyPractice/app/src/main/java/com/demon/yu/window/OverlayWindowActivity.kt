@@ -21,8 +21,8 @@ import kotlinx.android.synthetic.main.activity_overlay_window.*
 class OverlayWindowActivity : AppCompatActivity() {
 
 
-    private val overlayWindow: OverlayWindow by lazy {
-        val windowManager = OverlayWindow(baseContext.getSystemService(Context.WINDOW_SERVICE) as WindowManager)
+    private val overlayWindow: OverlayWindow? by lazy {
+        val windowManager = OverlayWindow.getInstance(baseContext.getSystemService(Context.WINDOW_SERVICE) as WindowManager)
         windowManager
     }
 
@@ -39,7 +39,6 @@ class OverlayWindowActivity : AppCompatActivity() {
             builder.setPositiveButton("开启", DialogInterface.OnClickListener { dialog, int ->
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION)
-                    intent.setPackage(application.packageName)
                     startActivity(intent)
                     finish()
                 } else {
@@ -62,10 +61,10 @@ class OverlayWindowActivity : AppCompatActivity() {
             }
             Logger.d("selected $type")
 
-            overlayWindow.updateType(Integer.parseInt(type.toString()))
+            overlayWindow?.updateType(Integer.parseInt(type.toString()))
         }
         dismiss.setOnClickListener {
-            overlayWindow.hide()
+            overlayWindow?.hide()
         }
     }
 
