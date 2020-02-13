@@ -30,8 +30,8 @@ ext {
     compileSdkVersion = 28
     minSdkVersion = 16
     targetSdkVersion = 28
-    rxJavaDependency = "io.reactivex:rxjava:1.1.6"
     buildToolsVersion = "28.0.3"
+    rxJavaDependency = "io.reactivex:rxjava:1.1.6"
     rxAndroidDependency="io.reactivex:rxandroid:1.2.1"
     autoService= "com.google.auto.service:auto-service:1.0-rc2"
     javapoet= 'com.squareup:javapoet:1.7.0'
