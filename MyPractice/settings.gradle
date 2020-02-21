@@ -1,1 +1,1 @@
-include ':app' //':processor', ':processor-annotation'
+include ':app', ':libgaussia' //':processor', ':processor-annotation'

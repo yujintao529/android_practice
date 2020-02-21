@@ -1,0 +1,19 @@
+apply from : rootProject.file("gradle/library.gradle")
+
+android {
+    defaultConfig {
+        versionCode 1
+        versionName "1.0"
+        consumerProguardFiles 'consumer-rules.pro'
+        ndk {
+            abiFilters 'armeabi-v7a'
+        }
+    }
+    externalNativeBuild {
+        cmake {
+            path file('CMakeLists.txt')
+        }
+    }
+
+}
+

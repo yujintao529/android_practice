@@ -1,16 +1,15 @@
 package com.example.mypractice;
 
+import android.app.Application;
 import android.content.res.Resources;
-import android.support.multidex.MultiDexApplication;
 import android.util.DisplayMetrics;
 
 import com.example.mypractice.common.Common;
-import com.squareup.leakcanary.LeakCanary;
 
 /**
  * Created by jintao on 2015/10/10.
  */
-public class YUApplication extends MultiDexApplication {
+public class YUApplication extends Application {
 
 
     @Override

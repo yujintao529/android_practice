@@ -2,15 +2,17 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
+apply from: rootProject.file("gradle/configuration.gradle")
+apply from: rootProject.file("gradle/deps.gradle.kts")
 android {
 
-    compileSdkVersion rootProject.ext.compileSdkVersion
-    buildToolsVersion rootProject.ext.buildToolsVersion
+    buildToolsVersion Versions.buildToolsVersion
 
     defaultConfig {
         applicationId "com.example.mypractice"
-        minSdkVersion rootProject.ext.minSdkVersion
-        targetSdkVersion rootProject.ext.targetSdkVersion
+        minSdkVersion Versions.minSdkVersion
+        compileSdkVersion Versions.compileSdkVersion
+        targetSdkVersion Versions.targetSdkVersion
         multiDexEnabled true
         multiDexKeepProguard rootProject.file('maindexlist.txt') // keep specific classes
     }
@@ -24,21 +26,13 @@ android {
             storePassword keystoreProperties['storePassword']
         }
     }
-    splits {
-        abi {
-            enable false
-            reset()
-            include 'x86', 'armeabi'
-            exclude 'armeabi-v7a', "arm64-v8a"
-            universalApk false
-        }
 
-    }
+
     sourceSets {
         main {
             jniLibs.srcDir 'libs'
             resources.srcDirs 'src/main/res'
-            java.srcDirs 'src/main/java'
+            java.srcDirs 'src/main/java', 'src/main/kotlin'
             res.srcDirs = ['src/main/res']
             assets.srcDirs = ['src/main/assets']
             jniLibs.srcDir 'libs'
@@ -60,100 +54,44 @@ android {
 
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_7
-        targetCompatibility JavaVersion.VERSION_1_7
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
     packagingOptions {
-        exclude 'lib/armeabi-v7a/*'
         exclude 'lib/arm64-v8a/*'
+        exclude 'lib/armeabi/*'
         exclude 'lib/x86_64/*'
         exclude 'lib/mips/*'
         exclude 'META-INF/LICENSE.txt'
         exclude 'META-INF/NOTICE.txt'
     }
-    configurations.all {
-        resolutionStrategy.force rootProject.ext.annotation
-    }
+
 }
 
-//task processorTask(type:Exec){
-//    println "执行copy annotation processor"
-//    commandLine "cp","../processor/build/libs/processor.jar","libs/"
-//}
-//processorTask.dependsOn(":processor:build")
-//preBuild.dependsOn(processorTask)
 android.defaultConfig.javaCompileOptions.annotationProcessorOptions.includeCompileClasspath = true
 
 dependencies {
     implementation fileTree(includes: ['*.jar'], dir: 'libs')
-    implementation rootProject.ext.supportv4
-    implementation rootProject.ext.recyclerview
-    implementation rootProject.ext.cardview
-    implementation rootProject.ext.design
-    implementation rootProject.ext.lifecycleExtensions
-    implementation rootProject.ext.rxJavaDependency
-    implementation rootProject.ext.rxAndroidDependency
-    implementation rootProject.ext.autoService
-    implementation rootProject.ext.debugdb
-    implementation group: 'com.github.bumptech.glide', name: 'glide', version: '4.8.0'
-    debugImplementation 'com.squareup.leakcanary:leakcanary-android:1.5.4'
-    releaseImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.4'
-    implementation rootProject.ext.kotlinstdjdk7
-    implementation rootProject.ext.kotlinreflect
-    implementation 'com.tencent.mm.opensdk:wechat-sdk-android-without-mta:+'
-
-//    kapt files("libs/processor.jar")
-    //逐步废弃
-    implementation 'com.jakewharton:butterknife:8.4.0'
-    kapt 'com.jakewharton:butterknife-compiler:8.4.0'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-//    annotationProcessor project(":processor")
+    implementation Deps.supportv4
+    implementation Deps.recyclerview
+    implementation Deps.cardview
+    implementation Deps.design
+    implementation Deps.lifecycleExtensions
+    implementation Deps.rxJavaDependency
+    implementation Deps.rxAndroidDependency
+    implementation Deps.autoService
+    implementation Deps.debugdb
+    implementation Deps.glide
+    debugImplementation Deps.leakcanary
+    releaseImplementation Deps.leakcanary_noop
+    implementation Deps.kotlinstdjdk7
+    implementation Deps.kotlinreflect
+    implementation Deps.wecahtOpenSdk
+    implementation project(":libgaussia")
+    implementation Deps.butterKnife
+    kapt Deps.butterKnifeCompiler
 
 }
 
-task printlnAllConfiguration {
-    doLast {
-        printlnAllConfiguration(project)
-    }
-}
-task printlnConfiguration {
-    doLast {
-        def con = project.configurations.findByName(project.ext.properties["configuration"])
-        if (con == null) {
-            println "sorry,no configuration with name ${project.ext.properties["configuration"]}"
-        } else {
-            println toString(con)
-        }
-    }
-}
 
 
-private void printlnConfiguration(Project project) {
-    project.getConfigurations().forEach { configuration ->
-        println(toString(configuration))
-    }
-}
-
-private static String toString(Configuration configuration) {
-    StringBuilder stringBuilder = new StringBuilder()
-    stringBuilder.append("configuration[")
-    stringBuilder.append(configuration.getName())
-    stringBuilder.append("-" + configuration.getUploadTaskName()).append("]");
-    stringBuilder.append("\n")
-    stringBuilder.append("\tartifacts-")
-    stringBuilder.append("\n")
-    configuration.getArtifacts().getFiles().forEach { file ->
-        stringBuilder.append("\t\t" + file.getName())
-        stringBuilder.append("\n")
-    }
-    stringBuilder.append("\n")
-    if (configuration.isCanBeResolved()) {
-        stringBuilder.append("\tdependencies-")
-        stringBuilder.append("\n")
-        configuration.resolve().forEach { file ->
-            stringBuilder.append("\t\t" + file.getName())
-            stringBuilder.append("\n")
-        }
-    }
-    return stringBuilder.toString()
-}

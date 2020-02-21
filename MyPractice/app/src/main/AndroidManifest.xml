@@ -473,8 +473,6 @@
                 <action android:name="com.example.action.TEST_SNED_BRO" />
             </intent-filter>
         </receiver>
-
-
     </application>
 
 </manifest>

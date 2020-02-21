@@ -8,6 +8,7 @@ import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.demon.yu.lib.gausiia.Guassia;
 import com.example.mypractice.R;
 
 import javax.microedition.khronos.egl.EGLConfig;
@@ -21,6 +22,7 @@ public class EmptyBackActivity extends Activity {
         GLSurfaceView glSurfaceView=new GLSurfaceView(this);
         glSurfaceView.setRenderer(new EmptyBlackRender());
         setContentView(glSurfaceView);
+        Guassia.guassia();
     }
 
     @Override

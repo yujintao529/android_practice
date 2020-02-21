@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
+import com.demon.yu.lib.gausiia.Guassia;
 import com.example.mypractice.R;
 
 public class GlideTestAct extends AppCompatActivity {
