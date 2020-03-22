@@ -1,5 +1,7 @@
 /**
  *  created by yujintao 2020-02-20
+ *
+ *  TODO 非常奇怪，**.gradle可以使用，但是没有提示
  */
 object Deps {
 

@@ -404,8 +404,8 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.demon.yu.ui.OverDrawActivity"
-            android:label="ui/OverDrawActivity"
+            android:name="com.demon.yu.na.GaussianActivity"
+            android:label="na/GaussianActivity"
             android:theme="@style/AppBaseTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

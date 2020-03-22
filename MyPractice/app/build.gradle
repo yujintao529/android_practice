@@ -2,7 +2,6 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
-apply from: rootProject.file("gradle/configuration.gradle")
 apply from: rootProject.file("gradle/deps.gradle.kts")
 android {
 
@@ -15,6 +14,10 @@ android {
         targetSdkVersion Versions.targetSdkVersion
         multiDexEnabled true
         multiDexKeepProguard rootProject.file('maindexlist.txt') // keep specific classes
+        ndk {
+            abiFilters "x86",'armeabi-v7a' //必须要指定一个否则一个没有
+        }
+        resConfigs 'cn','xhdpi'
     }
     signingConfigs {
         def keystoreProperties = new Properties()
@@ -30,7 +33,6 @@ android {
 
     sourceSets {
         main {
-            jniLibs.srcDir 'libs'
             resources.srcDirs 'src/main/res'
             java.srcDirs 'src/main/java', 'src/main/kotlin'
             res.srcDirs = ['src/main/res']
@@ -62,6 +64,7 @@ android {
         exclude 'lib/armeabi/*'
         exclude 'lib/x86_64/*'
         exclude 'lib/mips/*'
+//        exclude 'lib/x86/*'
         exclude 'META-INF/LICENSE.txt'
         exclude 'META-INF/NOTICE.txt'
     }
