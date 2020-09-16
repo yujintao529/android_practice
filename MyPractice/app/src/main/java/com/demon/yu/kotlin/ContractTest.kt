@@ -43,3 +43,8 @@ fun checkIsNotNull(obj: ContractsObject?): Boolean {
 fun accept(contract: ContractsObject) {
 
 }
+
+@ExperimentalContracts
+fun main(args:Array<String>){
+    testString()
+}
