@@ -9,11 +9,11 @@ import android.os.Binder
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
-import android.support.v7.app.AlertDialog
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import android.util.Log
 import android.view.WindowManager
 import android.widget.ArrayAdapter
+import androidx.appcompat.app.AlertDialog
 import com.example.mypractice.Logger
 import com.example.mypractice.R
 import kotlinx.android.synthetic.main.activity_overlay_window.*

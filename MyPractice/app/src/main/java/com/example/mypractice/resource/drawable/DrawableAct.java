@@ -3,14 +3,14 @@ package com.example.mypractice.resource.drawable;
 import android.content.res.ColorStateList;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.graphics.drawable.DrawableCompat;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageView;
 
 import com.example.mypractice.R;
 
+import androidx.core.graphics.drawable.DrawableCompat;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -46,7 +46,7 @@ public class DrawableAct extends AppCompatActivity {
         imageView1.setImageDrawable(origin);
 
         //生成一个新的drawable
-        Drawable drawable=DrawableCompat.wrap(origin.getConstantState().newDrawable().mutate());
+        Drawable drawable= DrawableCompat.wrap(origin.getConstantState().newDrawable().mutate());
         DrawableCompat.setTint(drawable,0xffFFD700);
         imageView2.setImageDrawable(drawable);
         //使用colorStateList

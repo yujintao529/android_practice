@@ -1,15 +1,16 @@
 package com.example.mypractice.v7;
 
 import android.content.Context;
-import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 
 import com.example.mypractice.Logger;
 
+import androidx.recyclerview.widget.RecyclerView;
+
 /**
  * Created by jintao on 2015/9/1.
  */
-public class RecyclerViewPager extends RecyclerView{
+public class RecyclerViewPager extends RecyclerView {
 
     public RecyclerViewPager(Context context) {
         super(context);
