@@ -5,7 +5,7 @@ apply plugin: 'kotlin-kapt'
 apply from: rootProject.file("gradle/deps.gradle.kts")
 android {
 
-    buildToolsVersion Versions.buildToolsVersion
+    buildToolsVersion '29.0.3'
 
     defaultConfig {
         applicationId "com.example.mypractice"
