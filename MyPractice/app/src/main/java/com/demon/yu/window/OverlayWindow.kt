@@ -9,8 +9,6 @@ import android.graphics.Color
 import android.graphics.PixelFormat
 import android.os.Bundle
 import android.os.Handler
-import android.support.v4.view.ViewConfigurationCompat
-import android.support.v7.app.AppCompatActivity
 import android.view.*
 import android.widget.TextView
 import android.widget.Toast

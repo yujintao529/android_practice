@@ -1,13 +1,14 @@
 package com.example.mypractice.v4;
 
 import android.content.Context;
-import android.support.v4.widget.ViewDragHelper;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.mypractice.Logger;
+
+import androidx.customview.widget.ViewDragHelper;
 
 /**
  * Created by jintao on 2015/9/16.

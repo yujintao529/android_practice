@@ -12,7 +12,6 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.Xfermode;
 import android.graphics.drawable.BitmapDrawable;
-import android.support.v4.view.MotionEventCompat;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -21,6 +20,8 @@ import android.view.View;
 import com.example.mypractice.R;
 
 import java.util.ArrayList;
+
+import androidx.core.view.MotionEventCompat;
 
 /**
  * Created by yujintao on 2017/4/5.
@@ -149,7 +150,7 @@ public class MfwDoubleSeekBar extends View {
             MfwLog.d(TAG, "onTouchEvent per = " + per);
         }
         //先不考虑多点触控
-        switch (MotionEventCompat.getActionMasked(event)) {
+        switch (event.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:
                 //消除animator
                 if (mode == MODE_MUL && (x <= mCurrentStartP.x || ((x < mCurrentEndP.x) && Math.abs(x - mCurrentStartP.x) < Math.abs(x - mCurrentEndP.x)))) {

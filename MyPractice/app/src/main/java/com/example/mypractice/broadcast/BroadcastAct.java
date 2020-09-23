@@ -2,17 +2,13 @@ package com.example.mypractice.broadcast;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
 
 import com.example.mypractice.R;
 
 /**
- * <p>Copyright: Copyright (c) 2016</p>
- * <p/>
- * <p>Company: 浙江齐聚科技有限公司<a href="www.guagua.cn">www.guagua.cn</a></p>
- *
  * @author yujintao
  * @version 1.0.0
  * @description

@@ -75,11 +75,20 @@ android.defaultConfig.javaCompileOptions.annotationProcessorOptions.includeCompi
 
 dependencies {
     implementation fileTree(includes: ['*.jar'], dir: 'libs')
-    implementation Deps.supportv4
+    implementation Deps.appcompat
+    implementation Deps.viewModel
+    implementation Deps.LiveData
+    implementation Deps.lifecycle
+    implementation Deps.fragment
+    implementation Deps.fragment_ktx
+    implementation Deps.annotation
     implementation Deps.recyclerview
     implementation Deps.cardview
-    implementation Deps.design
-    implementation Deps.lifecycleExtensions
+    implementation Deps.gridLayout
+    implementation Deps.constraintlayout
+    implementation Deps.coordinatorlayout
+    implementation Deps.material
+
     implementation Deps.rxJavaDependency
     implementation Deps.rxAndroidDependency
     implementation Deps.autoService

@@ -2,14 +2,16 @@ package com.example.mypractice.v7;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.PagerTitleStrip;
-import android.support.v4.view.ViewPager;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
+
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager.widget.PagerAdapter;
+import androidx.viewpager.widget.PagerTitleStrip;
+import androidx.viewpager.widget.ViewPager;
+
 import android.util.SparseArray;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -258,7 +260,7 @@ public class ToolbarAct extends AppCompatActivity implements View.OnClickListene
     /**
      * myViewPagerAdapter 适配器
      */
-    public static class MyViewPagerAdapter extends PagerAdapter{
+    public static class MyViewPagerAdapter extends PagerAdapter {
         private Context mContext;
         private PictureBean[] mDrawabls;
         private SparseArray<View> mLists;
