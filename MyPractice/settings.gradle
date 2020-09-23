@@ -1,1 +1,2 @@
+include ':libavd'
 include ':app', ':libgaussia' //':processor', ':processor-annotation'

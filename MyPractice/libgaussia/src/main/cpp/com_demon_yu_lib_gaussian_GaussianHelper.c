@@ -8,4 +8,5 @@ static const char* TAG="GaussianHelper";
 JNIEXPORT void JNICALL Java_com_demon_yu_lib_gaussian_GaussianHelper_blur
   (JNIEnv * env, jclass jclass, jobject jobject){
     __x_debug_log(TAG,"call blur from java");
+
 }

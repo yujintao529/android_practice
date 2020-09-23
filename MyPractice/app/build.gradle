@@ -91,6 +91,7 @@ dependencies {
     implementation Deps.kotlinreflect
     implementation Deps.wecahtOpenSdk
     implementation project(":libgaussia")
+    implementation project(":libavd")
     implementation Deps.butterKnife
     kapt Deps.butterKnifeCompiler
 
