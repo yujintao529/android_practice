@@ -5,22 +5,56 @@
  */
 object Deps {
 
-    const val lifecycle_version = "1.1.1"
-    const val supportLibVersion = "27.1.1"
     const val kotlin_version = "1.3.61"
-    // ViewModel and LiveData
-    const val lifecycleExtensions = "android.arch.lifecycle:extensions:$lifecycle_version"
-    // 官方支持库
-    const val appcompatv7 = "com.android.support:appcompat-v7:${supportLibVersion}"
-    const val supportv4 = "com.android.support:support-v4:${supportLibVersion}"
-    const val design = "com.android.support:design:${supportLibVersion}"
-    const val cardview = "com.android.support:cardview-v7:${supportLibVersion}"
-    const val recyclerview = "com.android.support:recyclerview-v7:${supportLibVersion}"
-    const val palette = "com.android.support:palette-v7:${supportLibVersion}"
-    const val annotation = "com.android.support:support-annotations:${supportLibVersion}"
-    const val multidex = "com.android.support:multidex:1.0.1"
+    //lifecycle and  ViewModel and LiveData
+    private const val lifecycle_version = "2.2.0"
+    // ViewModel
+    private const val viewModel="androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
+    // LiveData
+    private const val LiveData = "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version"
+    // Lifecycles only (without ViewModel or LiveData)
+    private const val lifecycle = "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version"
+    // Saved state module for ViewModel
+    private const val savedstate="androidx.lifecycle:lifecycle-viewmodel-savedstate:$lifecycle_version"
+    // Annotation processor
+    private const val lifecycle_compiler = "androidx.lifecycle:lifecycle-compiler:$lifecycle_version"
+    // alternately - if using Java8, use the following instead of lifecycle-compiler
+    private const val lifecycle_common_java8="androidx.lifecycle:lifecycle-common-java8:$lifecycle_version"
+    // optional - helpers for implementing LifecycleOwner in a Service
+    private const val lifecycle_service = "androidx.lifecycle:lifecycle-service:$lifecycle_version"
+    // optional - ProcessLifecycleOwner provides a lifecycle for the whole application process
+    private const val lifecycle_process = "androidx.lifecycle:lifecycle-process:$lifecycle_version"
+    // optional - ReactiveStreams support for LiveData
+    private const val lifecycle_reactivestreams_ktx="androidx.lifecycle:lifecycle-reactivestreams-ktx:$lifecycle_version"
+
+    //androidx
+    private const val appcompat_version = "1.2.0"
+    const val appcompat = "androidx.appcompat:appcompat:$appcompat_version"
+    // For loading and tinting drawables on older versions of the platform
+    const val appcompat_resources = "androidx.appcompat:appcompat-resources:$appcompat_version"
+
+    private const val fragment_version = "1.2.5"
+
+    // Java language implementation
+    const val fragment= "androidx.fragment:fragment:$fragment_version"
+    // Kotlin
+    const val fragment_ktx= "androidx.fragment:fragment-ktx:$fragment_version"
+    //annotation
+    const val annotation = "androidx.annotation:annotation:1.1.0"
 
 
+    const val recyclerview ="androidx.recyclerview:recyclerview:1.1.0"
+
+    // For control over item selection of both touch and mouse driven selection
+    const val recyclerview_selection_x= "androidx.recyclerview:recyclerview-selection:1.1.0-rc03"
+
+    const val cardview= "androidx.cardview:cardview:1.0.0"
+    const val gridLayout= "androidx.gridlayout:gridlayout:1.0.0"
+
+    const val constraintlayout = "androidx.constraintlayout:constraintlayout:2.0.0"
+    const val coordinatorlayout = "androidx.coordinatorlayout:coordinatorlayout:1.1.0"
+    const val swiperefreshlayout = "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
+    const val material = "com.google.android.material:material:1.2.1"
 
     // 知名项目
     const val frescoVersion = "0.11.0"
@@ -51,8 +85,8 @@ object Deps {
 
     const val glide="com.github.bumptech.glide:glide:4.8.0"
     const val wecahtOpenSdk="com.tencent.mm.opensdk:wechat-sdk-android-without-mta:+"
-    const val butterKnife="com.jakewharton:butterknife:8.4.0"
-    const val butterKnifeCompiler="com.jakewharton:butterknife-compiler:8.4.0"
+    const val butterKnife="com.jakewharton:butterknife:10.2.0"
+    const val butterKnifeCompiler="com.jakewharton:butterknife-compiler:10.2.0"
 
     // Other
     const val swipelayout = "com.daimajia.swipelayout:library:1.2.0@aar"

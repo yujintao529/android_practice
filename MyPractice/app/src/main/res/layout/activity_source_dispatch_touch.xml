@@ -6,7 +6,7 @@
     android:background="@color/c_75_white"
     android:clickable="true"
     android:orientation="vertical"
-    tools:context="${relativePackage}.${activityClass}">
+    >
 
     <com.example.mypractice.source.LogFrameLayout
         android:id="@+id/one"

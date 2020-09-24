@@ -4,14 +4,14 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <android.support.v7.widget.Toolbar
+    <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:background="?attr/colorPrimary"></android.support.v7.widget.Toolbar>
+        android:background="?attr/colorPrimary"></androidx.appcompat.widget.Toolbar>
 
-    <android.support.v4.widget.DrawerLayout
+    <androidx.drawerlayout.widget.DrawerLayout
         android:id="@+id/drawer"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -22,16 +22,16 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <android.support.v4.view.ViewPager
+            <androidx.viewpager.widget.ViewPager
                 android:id="@+id/viewPager"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-                <android.support.v4.view.PagerTitleStrip
+                <androidx.viewpager.widget.PagerTitleStrip
                     android:id="@+id/pagerTitleStrip"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"></android.support.v4.view.PagerTitleStrip>
-            </android.support.v4.view.ViewPager>
+                    android:layout_height="wrap_content"></androidx.viewpager.widget.PagerTitleStrip>
+            </androidx.viewpager.widget.ViewPager>
 
         </LinearLayout>
         <!--<ScrollView
@@ -78,5 +78,5 @@
             android:layout_height="match_parent">
 
         </android.support.v7.widget.RecyclerView>-->
-    </android.support.v4.widget.DrawerLayout>
+    </androidx.drawerlayout.widget.DrawerLayout>
 </LinearLayout>
