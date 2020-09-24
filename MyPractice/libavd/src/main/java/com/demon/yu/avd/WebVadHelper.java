@@ -24,7 +24,7 @@ public class WebVadHelper {
         nativeSetModel(webVadNative, mode);
     }
 
-    public int process(int hz, float[] audio_frame,int length) {
+    public int process(int hz, short[] audio_frame,int length) {
         return nativeProcess(webVadNative, hz, audio_frame,length);
     }
 
@@ -39,7 +39,7 @@ public class WebVadHelper {
 
     private native int nativeSetModel(long p, int mode);
 
-    private native int nativeProcess(long p, int hz, float[] audio_frame, long frame_size);
+    private native int nativeProcess(long p, int hz, short[] audio_frame, long frame_size);
 
     private native int nativeRelease(long p);
 

@@ -55,7 +55,7 @@ JNIEXPORT jint JNICALL Java_com_demon_yu_avd_WebVadHelper_nativeSetModel
  * Signature: (JI[FJ)I
  */
 JNIEXPORT jint JNICALL Java_com_demon_yu_avd_WebVadHelper_nativeProcess
-        (JNIEnv * env, jobject jobject , jlong p , jint hz , jfloatArray data, jlong length)
+        (JNIEnv * env, jobject jobject , jlong p , jint hz , jshortArray data, jlong length)
 {
     struct WebRtcVadInst* inst = (struct WebRtcVadInst *) p;
     int result=WebRtcVad_Process(inst,hz,data,length);
