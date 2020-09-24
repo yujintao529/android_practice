@@ -25,6 +25,9 @@ class GaussianActivity : Activity() {
             GaussianHelper.blur(bitmap)
             destBitmap.setImageBitmap(bitmap)
         }
+        testJni.setOnClickListener {
+            GaussianHelper.createStudent()
+        }
     }
 
     fun drawableToBitmap(drawable: Drawable): Bitmap? {

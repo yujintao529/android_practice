@@ -11,10 +11,14 @@
         android:layout_height="wrap_content">
         <Button
             android:id="@+id/blur"
-            android:text="测试"
+            android:text="测试Blue"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
-
+        <Button
+            android:id="@+id/testJni"
+            android:text="测试返回c指针"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
     </LinearLayout>
 
     <ImageView

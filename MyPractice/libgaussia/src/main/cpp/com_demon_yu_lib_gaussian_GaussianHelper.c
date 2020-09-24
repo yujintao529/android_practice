@@ -6,35 +6,35 @@
 #include <android/bitmap.h>
 #include <math.h>
 #include <malloc.h>
+#include "student.h"
 #include <string.h>
+#include <android/log.h>
 #include "AndroidBlurInfo.h"
 
-static const char* TAG="GaussianHelper";
+static const char *TAG = "GaussianHelper";
 
-extern void gaussBlur(int* pix, int w, int h, int radius);
+extern void gaussBlur(int *pix, int w, int h, int radius);
 
 JNIEXPORT void JNICALL Java_com_demon_yu_lib_gaussian_GaussianHelper_blur
-  (JNIEnv * env, jclass jclass, jobject jobject){
-    __x_debug_log(TAG,"call blur from java");
-    AndroidBitmapInfo info={0};
+        (JNIEnv *env, jclass jclass, jobject jobject) {
+    __x_debug_log(TAG, "call blur from java");
+    AndroidBitmapInfo info = {0};
 //    int *data=NULL;
-    StructBlurInfo blurInfo={&info,NULL};
-    AndroidBitmap_getInfo(env,jobject,blurInfo.info);
+    StructBlurInfo blurInfo = {&info, NULL};
+    AndroidBitmap_getInfo(env, jobject, blurInfo.info);
     AndroidBitmap_lockPixels(env, jobject, (void **) &blurInfo.data);
-    gaussBlur(blurInfo.data,(*(blurInfo.info)).width,(*(blurInfo.info)).height,80);
-    AndroidBitmap_unlockPixels(env,jobject);
+    gaussBlur(blurInfo.data, (*(blurInfo.info)).width, (*(blurInfo.info)).height, 80);
+    AndroidBitmap_unlockPixels(env, jobject);
 
 }
 
-void  gaussBlur(int* pix, int w, int h, int radius)
-{
+void gaussBlur(int *pix, int w, int h, int radius) {
     float sigma = (float) (1.0 * radius / 2.57);
-    float deno  = (float) (1.0 / (sigma * sqrt(2.0 * M_PI)));
-    float nume  = (float) (-1.0 / (2.0 * sigma * sigma));
-    float* gaussMatrix = (float*)malloc(sizeof(float)* (radius + radius + 1));
+    float deno = (float) (1.0 / (sigma * sqrt(2.0 * M_PI)));
+    float nume = (float) (-1.0 / (2.0 * sigma * sigma));
+    float *gaussMatrix = (float *) malloc(sizeof(float) * (radius + radius + 1));
     float gaussSum = 0.0;
-    for (int i = 0, x = -radius; x <= radius; ++x, ++i)
-    {
+    for (int i = 0, x = -radius; x <= radius; ++x, ++i) {
         float g = (float) (deno * exp(1.0 * nume * x * x));
         gaussMatrix[i] = g;
         gaussSum += g;
@@ -42,20 +42,16 @@ void  gaussBlur(int* pix, int w, int h, int radius)
     int len = radius + radius + 1;
     for (int i = 0; i < len; ++i)
         gaussMatrix[i] /= gaussSum;
-    int* rowData  = (int*)malloc(w * sizeof(int));
-    int* listData = (int*)malloc(h * sizeof(int));
-    for (int y = 0; y < h; ++y)
-    {
+    int *rowData = (int *) malloc(w * sizeof(int));
+    int *listData = (int *) malloc(h * sizeof(int));
+    for (int y = 0; y < h; ++y) {
         memcpy(rowData, pix + y * w, sizeof(int) * w);
-        for (int x = 0; x < w; ++x)
-        {
+        for (int x = 0; x < w; ++x) {
             float r = 0, g = 0, b = 0;
             gaussSum = 0;
-            for (int i = -radius; i <= radius; ++i)
-            {
+            for (int i = -radius; i <= radius; ++i) {
                 int k = x + i;
-                if (0 <= k && k <= w)
-                {
+                if (0 <= k && k <= w) {
                     //得到像素点的rgb值
                     int color = rowData[k];
                     int cr = (color & 0x00ff0000) >> 16;
@@ -67,25 +63,21 @@ void  gaussBlur(int* pix, int w, int h, int radius)
                     gaussSum += gaussMatrix[i + radius];
                 }
             }
-            int cr = (int)(r / gaussSum);
-            int cg = (int)(g / gaussSum);
-            int cb = (int)(b / gaussSum);
+            int cr = (int) (r / gaussSum);
+            int cg = (int) (g / gaussSum);
+            int cb = (int) (b / gaussSum);
             pix[y * w + x] = cr << 16 | cg << 8 | cb | 0xff000000;
         }
     }
-    for (int x = 0; x < w; ++x)
-    {
+    for (int x = 0; x < w; ++x) {
         for (int y = 0; y < h; ++y)
             listData[y] = pix[y * w + x];
-        for (int y = 0; y < h; ++y)
-        {
+        for (int y = 0; y < h; ++y) {
             float r = 0, g = 0, b = 0;
             gaussSum = 0;
-            for (int j = -radius; j <= radius; ++j)
-            {
+            for (int j = -radius; j <= radius; ++j) {
                 int k = y + j;
-                if (0 <= k && k <= h)
-                {
+                if (0 <= k && k <= h) {
                     int color = listData[k];
                     int cr = (color & 0x00ff0000) >> 16;
                     int cg = (color & 0x0000ff00) >> 8;
@@ -96,9 +88,9 @@ void  gaussBlur(int* pix, int w, int h, int radius)
                     gaussSum += gaussMatrix[j + radius];
                 }
             }
-            int cr = (int)(r / gaussSum);
-            int cg = (int)(g / gaussSum);
-            int cb = (int)(b / gaussSum);
+            int cr = (int) (r / gaussSum);
+            int cg = (int) (g / gaussSum);
+            int cb = (int) (b / gaussSum);
             pix[y * w + x] = cr << 16 | cg << 8 | cb | 0xff000000;
         }
     }
@@ -106,3 +98,12 @@ void  gaussBlur(int* pix, int w, int h, int radius)
     free(rowData);
     free(listData);
 }
+
+JNIEXPORT jlong JNICALL
+Java_com_demon_yu_lib_gaussian_GaussianHelper_createStudent(JNIEnv *env, jclass jclass) {
+    Student *stu = create(32);
+    stu->age = 3;
+    __android_log_print(ANDROID_LOG_INFO, "gaussian", "student age = %d", stu->age);
+    return stu;
+}
+
