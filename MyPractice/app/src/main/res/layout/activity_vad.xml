@@ -12,7 +12,7 @@
         android:layout_gravity="bottom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-        <android.support.v7.widget.AppCompatButton
+        <androidx.appcompat.widget.AppCompatButton
             android:text="开始录音"
             android:id="@+id/startRecord"
             style="@style/common_btn"

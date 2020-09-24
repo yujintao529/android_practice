@@ -58,8 +58,8 @@ JNIEXPORT jint JNICALL Java_com_demon_yu_avd_WebVadHelper_nativeProcess
         (JNIEnv * env, jobject jobject , jlong p , jint hz , jfloatArray data, jlong length)
 {
     struct WebRtcVadInst* inst = (struct WebRtcVadInst *) p;
-    LOGD("webvadHelper nativeProcess %p %d %p %llu",inst,hz,data,length);
     int result=WebRtcVad_Process(inst,hz,data,length);
+    LOGD("webvadHelper nativeProcess %p %d %p %llu result=%d",inst,hz,data,length,result);
     return result;
 }
 
