@@ -12,7 +12,7 @@ import com.example.mypractice.R
 import kotlinx.android.synthetic.main.activity_gaussian.*
 
 
-class GaussianActivity : Activity() {
+class CStandardActivity : Activity() {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
