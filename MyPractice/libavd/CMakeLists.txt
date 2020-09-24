@@ -28,15 +28,6 @@ add_definitions(-DANDROID -DWEBRTC_POSIX -DDCHECK_ALWAYS_ON)
 set(SIGNAL_PROCESSING ${VAD_SRC}/common_audio/signal_processing/include)
 set(SYSTEM ${VAD_SRC}/system/system_wrappers/include)
 
-set(WEBRTC_VAD_SRC
-        ${VAD_SRC}/vad_core.c
-        ${VAD_SRC}/vad_filterbank.c
-        ${VAD_SRC}/vad_gmm.c
-        ${VAD_SRC}/vad_sp.c
-        ${VAD_SRC}/webrtc_vad.c
-        ${VAD_SRC}/spl_sqrt_floor/spl_sqrt_floor.c
-        ${VAD_SRC}/rtc_base/checks.cc)
-
 include_directories(${VAD_SRC} ${VAD_SRC}/include ${SIGNAL_PROCESSING} ${SYSTEM})
 
 

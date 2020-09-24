@@ -10,7 +10,7 @@ import androidx.annotation.RequiresApi;
 
 import com.demon.yu.avd.WebVadHelper;
 
-import java.nio.FloatBuffer;
+import java.nio.ShortBuffer;
 
 public class AudioRecordManager {
     private AudioRecord audioRecord;
@@ -20,11 +20,12 @@ public class AudioRecordManager {
     private static final int STATE_RECODING_STOP = 2;
     private static final int STATE_DEAD = 3;
     private static final int mChannelConfig = AudioFormat.CHANNEL_CONFIGURATION_MONO;
-    private static final int mAudioFormat = AudioFormat.ENCODING_PCM_FLOAT;
+    private static final int mAudioFormat = AudioFormat.ENCODING_PCM_16BIT;
     private int mBufferSizeInBytes;
     private RecordThread recordThread = new RecordThread("recordThread");
-    private FloatBuffer floatBuffer;
-    private float[] floatWriter;
+    private ShortBuffer shortBuffer;
+    private short[] shortArr;
+    private short[] shortArrTemp;
     private volatile int state = STATE_IDLE;
 
     private OnRecordingListener onRecordingListener;
@@ -33,12 +34,14 @@ public class AudioRecordManager {
     private WebVadHelper webVadHelper;
     private int validateSize;
 
+
     public AudioRecordManager() {
         mBufferSizeInBytes = AudioRecord.getMinBufferSize(mSampleRateInHz, mChannelConfig, mAudioFormat);
         audioRecord = new AudioRecord(MediaRecorder.AudioSource.DEFAULT, mSampleRateInHz, mChannelConfig, mAudioFormat, mBufferSizeInBytes);
         validateSize = calculate(mSampleRateInHz, 10);
-        floatBuffer = FloatBuffer.allocate(validateSize);
-        floatWriter = new float[validateSize];
+        shortBuffer = ShortBuffer.allocate(validateSize);
+        shortArr = new short[validateSize];
+        shortArrTemp = new short[validateSize];
         webVadHelper = new WebVadHelper();
         webVadHelper.setMode(WebVadHelper.MODEL_2);
 
@@ -78,11 +81,12 @@ public class AudioRecordManager {
         }
     }
 
-    private void onReadFloatBuffer(float[] floats, int length) {
+
+    private void onReadFloatBuffer(short[] floats, int length) {
         if (onRecordingListener != null) {
             onRecordingListener.onRecording(floats, length);
         }
-        int result = webVadHelper.process(mSampleRateInHz, floats, length);
+        int result = webVadHelper.process(mSampleRateInHz, shortArrTemp, length);
         if (onPersonDetectListener != null) {
             onPersonDetectListener.onDetect(result == WebVadHelper.ACTIVE_VOICE);
         }
@@ -111,9 +115,9 @@ public class AudioRecordManager {
             }
             while (state == STATE_RECODING) {
                 if (audioRecord.getRecordingState() == AudioRecord.RECORDSTATE_RECORDING) {
-                    int result = audioRecord.read(floatWriter, 0, validateSize, AudioRecord.READ_BLOCKING);
-                    if(result==validateSize) {
-                        onReadFloatBuffer(floatWriter, result);
+                    int result = audioRecord.read(shortArr, 0, validateSize, AudioRecord.READ_BLOCKING);
+                    if (result == validateSize) {
+                        onReadFloatBuffer(shortArr, result);
                     }
                     try {
                         sleep(10);
@@ -133,7 +137,7 @@ public class AudioRecordManager {
     }
 
     public interface OnRecordingListener {
-        public void onRecording(float[] floats, int dataLength);
+        public void onRecording(short[] shorts, int dataLength);
     }
 
     public OnPersonDetectListener getOnPersonDetectListener() {

@@ -44,7 +44,7 @@ JNIEXPORT jint JNICALL Java_com_demon_yu_avd_WebVadHelper_nativeSetModel
  * Signature: (JI[FJ)I
  */
 JNIEXPORT jint JNICALL Java_com_demon_yu_avd_WebVadHelper_nativeProcess
-  (JNIEnv *, jobject, jlong, jint, jfloatArray, jlong);
+  (JNIEnv *, jobject, jlong, jint, jshortArray , jlong);
 
 /*
  * Class:     com_demon_yu_avd_WebVadHelper
