@@ -94,7 +94,8 @@ dependencies {
     implementation project(":libavd")
     implementation Deps.butterKnife
     kapt Deps.butterKnifeCompiler
-
+    kapt Deps.permissionDispatcherProcessor
+    implementation Deps.permissionDispatcher
 }
 
 

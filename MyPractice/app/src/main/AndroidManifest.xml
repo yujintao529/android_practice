@@ -10,6 +10,8 @@
     <permission android:name="com.example.practice.RECEIVE_PRO" />
     <permission android:name="com.example.practice.SEND_PRO" />
 
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="com.example.practice.RECEIVE_PRO" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="com.example.practice.SEND_PRO" />
