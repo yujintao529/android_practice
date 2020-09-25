@@ -11,3 +11,12 @@ Student* create(int32_t age)
     stu->age=age;
     return stu;
 }
+
+void setAge(Student* student,jint age)
+{
+    student->age=age;
+}
+void free(Student* stu)
+{
+    free(stu);
+}

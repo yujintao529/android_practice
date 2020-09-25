@@ -1,6 +1,7 @@
 
 #include "com_demon_yu_lib_gaussian_StudentNative.h"
 #include "jni.h"
+#include "student.h"
 
 /*
  * Class:     com_demon_yu_lib_gaussian_StudentNative
@@ -10,7 +11,7 @@
 JNIEXPORT void JNICALL Java_com_demon_yu_lib_gaussian_StudentNative_setStudentAge
 (JNIEnv * env, jobject jobject, jlong jlong, jint jint)
 {
-
+    Student* student=
 }
 
 /*

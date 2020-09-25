@@ -15,5 +15,7 @@ struct Student{
 typedef struct Student Student;
 
 Student* create(int32_t);
+void setAge(Student*,jint);
+void free(Student*);
 
 #endif //MYPRACTICE_STUDENT_H

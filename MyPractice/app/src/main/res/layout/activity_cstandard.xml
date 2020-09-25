@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/c_60_white"
+    android:orientation="vertical"
+    android:padding="30dp">
+
+    <TextView
+        android:id="@+id/createStudentTV"
+        style="@style/commonTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:text="创建学生" />
+
+    <TextView
+        android:id="@+id/setStudentAgeTV"
+        style="@style/commonTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        tools:text="设置年龄" />
+
+    <TextView
+        android:id="@+id/releaseStudentTV"
+        style="@style/commonTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        tools:text="销毁学生" />
+</LinearLayout>
