@@ -11,5 +11,4 @@ public class GaussianHelper {
     }
 
     public static native void blur(Bitmap bitmap);
-    public static native long createStudent();
 }

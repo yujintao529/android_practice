@@ -4,19 +4,20 @@
 
 #include "student.h"
 #include <jni.h>
+#include <stdlib.h>
 
-Student* create(int32_t age)
+Student* createStu(int32_t age)
 {
     Student* stu=malloc(sizeof(Student));
     stu->age=age;
     return stu;
 }
 
-void setAge(Student* student,jint age)
+void setStuAge(Student* student,jint age)
 {
     student->age=age;
 }
-void free(Student* stu)
+void freeStu(Student* stu)
 {
     free(stu);
 }

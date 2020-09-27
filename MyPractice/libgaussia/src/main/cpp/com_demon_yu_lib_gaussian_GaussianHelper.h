@@ -15,14 +15,6 @@ extern "C" {
 JNIEXPORT void JNICALL Java_com_demon_yu_lib_gaussian_GaussianHelper_blur
   (JNIEnv *, jclass, jobject);
 
-/*
- * Class:     com_demon_yu_lib_gaussian_GaussianHelper
- * Method:    createStudent
- * Signature: ()I
- */
-JNIEXPORT jlong JNICALL Java_com_demon_yu_lib_gaussian_GaussianHelper_createStudent
-  (JNIEnv *, jclass);
-
 #ifdef __cplusplus
 }
 #endif

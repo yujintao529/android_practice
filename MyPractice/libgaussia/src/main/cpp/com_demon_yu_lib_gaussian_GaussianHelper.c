@@ -99,11 +99,4 @@ void gaussBlur(int *pix, int w, int h, int radius) {
     free(listData);
 }
 
-JNIEXPORT jlong JNICALL
-Java_com_demon_yu_lib_gaussian_GaussianHelper_createStudent(JNIEnv *env, jclass jclass) {
-    Student *stu = create(32);
-    stu->age = 3;
-    __android_log_print(ANDROID_LOG_INFO, "gaussian", "student age = %d", stu->age);
-    return stu;
-}
 
