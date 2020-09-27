@@ -11,7 +11,7 @@ android {
         //特别奇葩，必须得像下面配置那样
         externalNativeBuild {
             cmake {
-                arguments '-DANDROID_TOOLCHAIN=clang'
+                arguments '-DANDROID_TOOLCHAIN=clang '
                 cFlags "-std=gnu11"
             }
         }
