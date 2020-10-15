@@ -48,4 +48,13 @@
     <style name="MfwTabDefaultStyle">
         <item name="mfwtab_indicator_drawable">@drawable/tablayout_indicator_bg</item>
     </style>
+
+    <style name="commonTextView" parent="@style/Widget.AppCompat.TextView">
+        <item name="android:textColor">@android:color/black</item>
+        <item name="android:textSize">14dp</item>
+        <item name="android:padding">10dp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:background">@color/color_C2</item>
+    </style>
+
 </resources>
