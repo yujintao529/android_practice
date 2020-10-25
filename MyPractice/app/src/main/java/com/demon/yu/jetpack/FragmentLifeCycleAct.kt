@@ -1,6 +1,5 @@
 package com.demon.yu.jetpack
 
-import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,8 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.commitNow
+import androidx.fragment.app.FragmentPagerAdapter
 import androidx.lifecycle.Lifecycle
 import com.example.mypractice.R
 import kotlinx.android.synthetic.main.activity_fragment_lifecycle.*
@@ -38,7 +36,19 @@ class FragmentLifeCycleAct : AppCompatActivity() {
     }
 
     private fun initViewPager() {
+        val fragments= mutableListOf<Fragment>()
+        fragments.add( newFragment(Color.RED))
+        fragments.add( newFragment(Color.GRAY))
+        fragments.add( newFragment(Color.YELLOW))
+        viewPager.adapter=object: FragmentPagerAdapter(supportFragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT){
+            override fun getItem(position: Int): Fragment {
+                return fragments[position]
+            }
 
+            override fun getCount(): Int {
+                return fragments.size
+            }
+        }
     }
 
     class FragmentColor : Fragment() {
@@ -49,6 +59,10 @@ class FragmentLifeCycleAct : AppCompatActivity() {
             view.setBackgroundColor(color)
             view.layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
             return view
+        }
+
+        override fun toString(): String {
+            return super.toString()
         }
     }
 }
