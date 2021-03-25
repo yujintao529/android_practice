@@ -100,6 +100,8 @@ object Deps {
     const val spanny = "com.binaryfork:spanny:1.0.4"
     const val viewanimator = "com.github.florent37:viewanimator:1.0.4"
 
+    const val stetho = "com.facebook.stetho:stetho:1.5.1"
+
     //new other
     const val debugdb="com.amitshekhar.android:debug-db:1.0.3"
     //kotlin
