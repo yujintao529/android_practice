@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:orientation="vertical">
+
+
+        <com.demon.yu.ui.LogMethodView
+            android:id="@+id/showColor"
+            android:layout_width="23dp"
+            android:background="@color/color_C4"
+            android:layout_height="23dp" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
+            android:onClick="onClickToSecond"
+            android:text="跳转到下一个activity" />
+
+
+    </LinearLayout>
+</FrameLayout>
