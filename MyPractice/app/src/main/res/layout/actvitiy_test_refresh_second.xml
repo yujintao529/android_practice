@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:orientation="vertical">
+
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
+            style="@style/common_btn"
+            android:textColor="@color/color_C1"
+            android:background="@color/color_C4"
+            android:stateListAnimator="@null"
+            android:padding="4dp"
+            android:onClick="onClickChangeFirstActivity"
+            android:text="更改上一个activity的view" />
+
+
+    </LinearLayout>
+</FrameLayout>
