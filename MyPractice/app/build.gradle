@@ -103,6 +103,7 @@ dependencies {
     implementation project(":libavd")
     implementation Deps.butterKnife
     kapt Deps.butterKnifeCompiler
+    implementation Deps.stetho
     kapt Deps.permissionDispatcherProcessor
     implementation Deps.permissionDispatcher
 }
