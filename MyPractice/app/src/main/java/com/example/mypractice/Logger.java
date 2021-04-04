@@ -13,6 +13,7 @@ public class Logger  {
     public static void d(String formate,Object... args){
         d(String.format(formate, args));
     }
+
     public static void debug(String tag,String message){
         Log.d(tag, message);
     }

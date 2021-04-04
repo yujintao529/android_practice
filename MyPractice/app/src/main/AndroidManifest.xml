@@ -15,6 +15,7 @@
     <uses-permission android:name="com.example.practice.RECEIVE_PRO" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="com.example.practice.SEND_PRO" />
+    <uses-permission android:name="android.permission.CAMERA" />
 
     <application
         android:name="com.example.mypractice.YUApplication"
@@ -475,6 +476,15 @@
         <activity
             android:name="com.demon.yu.view.TestRefreshSecondActivity"
             android:label="view/TestRefreshSecondActivity"
+            android:theme="@style/AppTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="com.example.apidemons.CATEGORY_SAMPLES" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.demon.yu.camera.Camera2Act"
+            android:label="camera/Camera2Act"
             android:theme="@style/AppTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
