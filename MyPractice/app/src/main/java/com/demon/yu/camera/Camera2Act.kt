@@ -2,12 +2,10 @@ package com.demon.yu.camera
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.content.pm.PackageManager
+import android.graphics.ImageFormat
 import android.graphics.SurfaceTexture
-import android.hardware.camera2.CameraCaptureSession
-import android.hardware.camera2.CameraCharacteristics
-import android.hardware.camera2.CameraDevice
-import android.hardware.camera2.CameraManager
+import android.hardware.camera2.*
+import android.media.ImageReader
 import android.os.Bundle
 import android.os.Handler
 import android.os.HandlerThread
@@ -15,14 +13,15 @@ import android.os.Message
 import android.util.Size
 import android.view.Surface
 import android.view.TextureView
+import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import com.demon.yu.utils.PermissionsUtil
-import com.demon.yu.utils.ThreadPoolUtils
-import com.demon.yu.utils.ToastUtils
+import com.demo.yu.context.files.FilesManager
+import com.demon.yu.utils.*
 import com.example.mypractice.Logger
 import com.example.mypractice.R
 import kotlinx.android.synthetic.main.activity_camera2.*
+import java.io.File
 import kotlin.math.abs
 
 
@@ -33,6 +32,7 @@ import kotlin.math.abs
  *
  * notes：
  * 1. 相机 Sensor 的宽是长边，而高是短边。所以需要注意相机获取出来的分辨率
+ * 2. CameraDevice创建captureSession需要注意，CameraDevice创建create CameraSession会销毁上一个captureSession
  */
 class Camera2Act : AppCompatActivity() {
 
@@ -42,10 +42,15 @@ class Camera2Act : AppCompatActivity() {
         const val MSG_OPEN_CAMERA = 1
         const val MSG_CLOSE_CAMERA = 2
         const val MSG_START_PREVIEW = 3
-        var aspectRatio: Float = 4f / 3f //width / height
+        private const val RATIO_16_9: Float = 16f / 9f
+        private const val RATIO_4_3: Float = 4f / 3f
+        var aspectRatio: Float = RATIO_4_3
 
         //camera state
         const val STATE_CAMERA_IDLE = 0
+        const val STATE_CAMERA_PREVIEW = 0
+        const val STATE_CAMERA_RECORD = 0
+
     }
 
     private val cameraManager: CameraManager by lazy { getSystemService(CameraManager::class.java) }
@@ -58,11 +63,17 @@ class Camera2Act : AppCompatActivity() {
     private var targetRatio = aspectRatio
     private var cameraCaptureSession: CameraCaptureSession? = null
     private var surface: Surface? = null
+
+
     private var previewSize: Size? = null
 
+    private var pictureSize: Size? = null
+    private var imageReader: ImageReader? = null
 
     private var state: Int = 0
 
+
+    private val takePackageCompose = TakeImageComposeListener()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -72,8 +83,40 @@ class Camera2Act : AppCompatActivity() {
         textureView.surfaceTextureListener = textureViewListener
         resizeTextureView(targetRatio)
         requestCameraPermission()
+        initView()
+    }
+
+
+    private fun getRandomTakePictureFilePath(): String {
+        val parent = FilesManager.getInstance().getSDCardRootFiles("picture")
+        val filePath = "${parent.absolutePath}/picture_%d.jpeg".format(System.currentTimeMillis())
+        FileUtils.createNewFile(File(filePath))
+        return filePath
+    }
+
+    private fun initView() {
+        takePicture.setOnClickListener {
+            takePictureCustom()
+        }
+    }
+
+    private fun takePictureCustom() {
+        if (cameraCaptureSession == null) {
+            Logger.debug(TAG, "cameraCaptureSession not ready,please take picture later")
+            return
+        }
+        cameraCaptureSession?.device?.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE)?.also {
+            imageReader?.surface?.let { surface ->
+                it.addTarget(surface)
+            }
+            surface?.let { surface ->
+                it.addTarget(surface)
+            }
+            cameraCaptureSession?.capture(it.build(), takePackageCompose, cameraHandler)
+        }
 
     }
+
 
     override fun onDestroy() {
         super.onDestroy()
@@ -103,6 +146,7 @@ class Camera2Act : AppCompatActivity() {
         return null
     }
 
+
     /**
      * 判断相机的 Hardware Level 是否大于等于指定的 Level。
      */
@@ -127,13 +171,22 @@ class Camera2Act : AppCompatActivity() {
     }
 
     private fun requestCameraPermission() {
-
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+        val hasCameraPermission = PermissionsUtil.hasPermission(Manifest.permission.CAMERA)
+        val hasStoragePermission = PermissionsUtil.hasPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        val needsPermission = mutableListOf<String>()
+        if (hasCameraPermission.not()) {
+            needsPermission.add(Manifest.permission.CAMERA)
+        }
+        if (hasStoragePermission.not()) {
+            needsPermission.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        }
+        if (needsPermission.isEmpty()) {
             onCameraGranted()
         } else {
             // BEGIN_INCLUDE(camera_permission_request)
             if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                            Manifest.permission.CAMERA)) {
+                            Manifest.permission.CAMERA) || ActivityCompat.shouldShowRequestPermissionRationale(this,
+                            Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
                 // Provide an additional rationale to the user if the permission was not granted
                 // and the user would benefit from additional context for the use of the permission.
                 // For example if the user has previously denied the permission.
@@ -141,7 +194,7 @@ class Camera2Act : AppCompatActivity() {
             } else {
 
                 // Camera permission has not been granted yet. Request it directly.
-                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA),
+                ActivityCompat.requestPermissions(this, needsPermission.toTypedArray(),
                         REQUEST_CAMERA_COD)
             }
         }
@@ -149,17 +202,20 @@ class Camera2Act : AppCompatActivity() {
     }
 
 
-    private fun getOptimalSize(cameraCharacteristics: CameraCharacteristics, clazz: Class<*>, aspectRatio: Float): Size? {
+    private fun getOptimalSize(cameraCharacteristics: CameraCharacteristics, clazz: Class<*>, aspectRatio: Float): Size {
         val streamConfigurationMap = cameraCharacteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)
         val supportedSizes = streamConfigurationMap?.getOutputSizes(clazz)
         if (supportedSizes != null) {
             for (size in supportedSizes) {
-                if (abs(size.width.toFloat() / size.height) - aspectRatio < 0.01f) {
+                if (abs(size.width.toFloat() / size.height - aspectRatio) < 0.01f) {
                     return size
                 }
             }
         }
-        return null
+        if (supportedSizes != null && supportedSizes.isNotEmpty()) {
+            return supportedSizes[0]
+        }
+        throw IllegalStateException("sorry,get no size for class ${clazz.canonicalName},ratio $aspectRatio")
     }
 
 
@@ -175,18 +231,6 @@ class Camera2Act : AppCompatActivity() {
 
     private fun resizeTextureView(targetRatio: Float) {
         textureView.setRatio(targetRatio)
-//        val targetHeight = Common.screenWidth * targetRatio
-//        if (targetHeight > Common.screenHeight) {
-//            val marginLayoutParams = textureView.layoutParams as ViewGroup.MarginLayoutParams
-//            marginLayoutParams.bottomMargin = ((targetHeight - Common.screenHeight) * -1).toInt()
-//            textureView.layoutParams.width = Common.screenWidth
-//            textureView.layoutParams.height = targetHeight.toInt()
-//            textureView.requestLayout()
-//        } else {
-//            textureView.layoutParams.width = Common.screenWidth
-//            textureView.layoutParams.height = targetHeight.toInt()
-//            textureView.requestLayout()
-//        }
     }
 
 
@@ -210,25 +254,17 @@ class Camera2Act : AppCompatActivity() {
                     val pair = msg.obj as Pair<String, CameraCharacteristics>
                     cameraManager.openCamera(pair.first, cameraStateCallbackInner, ThreadPoolUtils.getMainHandler())
                     val size = getOptimalSize(pair.second, SurfaceTexture::class.java, targetRatio)
-                    if (size != null) {
-                        previewSize = size
-                    } else {
-                        val map = pair.second.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)
-                        val supportedSizes = map?.getOutputSizes(TextureView::class.java)
-                        if (supportedSizes != null && supportedSizes.isNotEmpty()) {
-                            val targetSize = supportedSizes[0]
-                            targetRatio = targetSize.width * 1f / targetSize.height
-                            previewSize = size
-                        }
-                        ToastUtils.toast("不能预览，没有合适的分辨率")
+                    targetRatio = size.width * 1f / size.height
+                    previewSize = size
+                    pictureSize = getOptimalSize(pair.second, ImageReader::class.java, targetRatio)
+                    pictureSize?.let {
+                        imageReader = ImageReader.newInstance(it.width, it.height, ImageFormat.JPEG, 2)
+                        imageReader?.setOnImageAvailableListener(takePackageCompose, cameraHandler)
                     }
 
-                }
-                MSG_CLOSE_CAMERA -> {
-
+                    Logger.debug(TAG, "openCamera previewSize=$previewSize,targetRatio=$targetRatio")
 
                 }
-
                 MSG_START_PREVIEW -> {
                     //ignore
                     if (surface == null) {
@@ -244,8 +280,9 @@ class Camera2Act : AppCompatActivity() {
                         cameraCaptureSession?.abortCaptures()
                         cameraCaptureSession?.stopRepeating()
                     }
+
                     cameraHandler.removeMessages(MSG_START_PREVIEW)
-                    val outputs = listOf(surface)
+                    val outputs = listOf(surface, imageReader?.surface)
                     cameraDevice?.createCaptureSession(outputs, object : CameraCaptureSession.StateCallback() {
                         override fun onConfigured(session: CameraCaptureSession) {
                             Logger.debug(TAG, "MSG_START_PREVIEW onConfigured,session=$session")
@@ -294,14 +331,23 @@ class Camera2Act : AppCompatActivity() {
 
     }
 
-
     private inner class TextureViewListener : TextureView.SurfaceTextureListener {
 
 
+        private var width: Int = 0
+        private var height: Int = 0
         private fun onTexture(surfaceTexture: SurfaceTexture, width: Int, height: Int) {
-            surface?.release()
-            surface = Surface(surfaceTexture)
-            cameraHandler.obtainMessage(MSG_START_PREVIEW).sendToTarget()
+            if (this.width != width || this.height != height) {
+                surface?.release()
+                previewSize?.let {
+                    surfaceTexture.setDefaultBufferSize(it.width, it.height)
+                }
+                surface = Surface(surfaceTexture)
+                cameraHandler.obtainMessage(MSG_START_PREVIEW).sendToTarget()
+                this.width = width
+                this.height = height
+            }
+
         }
 
         override fun onSurfaceTextureAvailable(surface: SurfaceTexture, width: Int, height: Int) {
@@ -320,7 +366,7 @@ class Camera2Act : AppCompatActivity() {
         }
 
         override fun onSurfaceTextureUpdated(surface: SurfaceTexture?) {
-            Logger.debug(TAG, "onSurfaceTextureUpdated")
+//            Logger.debug(TAG, "onSurfaceTextureUpdated")
         }
 
     }
@@ -341,5 +387,34 @@ class Camera2Act : AppCompatActivity() {
         }
 
     }
+
+
+    private inner class TakeImageComposeListener : ImageReader.OnImageAvailableListener, CameraCaptureSession.CaptureCallback() {
+
+        override fun onImageAvailable(reader: ImageReader) {
+            val image = reader.acquireNextImage()
+            image.use { //autoClose 类会自动关闭,无论是否发生异常
+                val jpegByteBuffer = it.planes[0].buffer// Jpeg image data only occupy the planes[0].
+                val jpegByteArray = ByteArray(jpegByteBuffer.remaining())
+                jpegByteBuffer.get(jpegByteArray)
+                val filePath = getRandomTakePictureFilePath()
+                FileUtils.writeFile(filePath, jpegByteArray)
+                ToastUtils.toast("图片保存$filePath")
+                Logger.debug(TAG, "TakeImageComposeListener onImageAvailable path = $filePath")
+                val display = (getSystemService(WINDOW_SERVICE) as WindowManager).defaultDisplay
+                val rotation = display.rotation
+
+                uiThread {
+                    Camera2PreviewActivity.startPreviewActivity(this@Camera2Act, filePath)
+                }
+            }
+        }
+
+
+        override fun onCaptureCompleted(session: CameraCaptureSession, request: CaptureRequest, result: TotalCaptureResult) {
+            super.onCaptureCompleted(session, request, result)
+        }
+    }
+
 }
 

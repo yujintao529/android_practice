@@ -15,6 +15,10 @@ public class ThreadPoolUtils {
         }
     });
 
+    public static boolean isMainThread() {
+        return Looper.myLooper() == Looper.getMainLooper();
+    }
+
     public static Handler getMainHandler() {
         return new Handler(Looper.getMainLooper());
     }

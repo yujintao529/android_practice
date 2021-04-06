@@ -2,6 +2,10 @@ package com.demon.yu.utils;
 
 import android.content.pm.PackageManager;
 
+import androidx.core.app.ActivityCompat;
+
+import com.example.mypractice.common.Common;
+
 public class PermissionsUtil {
 
     public static boolean verifyPermissions(int[] grantResults) {
@@ -19,4 +23,7 @@ public class PermissionsUtil {
         return true;
     }
 
+    public static boolean hasPermission(String permission) {
+        return ActivityCompat.checkSelfPermission(Common.application, permission) == PackageManager.PERMISSION_GRANTED;
+    }
 }

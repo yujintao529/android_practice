@@ -9,4 +9,69 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:orientation="vertical"
+        android:layout_marginBottom="20dp">
+
+        <HorizontalScrollView
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    style="@style/commonTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="相机控制" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    style="@style/common_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="暂停预览" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    style="@style/common_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="重新预览" />
+            </LinearLayout>
+
+        </HorizontalScrollView>
+
+        <HorizontalScrollView
+            android:layout_marginTop="20dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    style="@style/commonTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="拍照录制" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    style="@style/common_btn"
+                    android:id="@+id/takePicture"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="拍照" />
+
+            </LinearLayout>
+
+        </HorizontalScrollView>
+    </LinearLayout>
 </FrameLayout>

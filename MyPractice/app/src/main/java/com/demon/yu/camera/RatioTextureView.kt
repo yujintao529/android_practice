@@ -3,6 +3,7 @@ package com.demon.yu.camera
 import android.content.Context
 import android.util.AttributeSet
 import android.view.TextureView
+import com.example.mypractice.Logger
 
 class RatioTextureView(context: Context, attr: AttributeSet? = null) : TextureView(context, attr) {
     private var ratio = -1f
@@ -11,7 +12,13 @@ class RatioTextureView(context: Context, attr: AttributeSet? = null) : TextureVi
         if (ratio != -1f) {
             val width = MeasureSpec.getSize(widthMeasureSpec)
             setMeasuredDimension(width, (ratio * width).toInt())
+            Logger.debug("RatioTextureView", "onMeasure($measuredWidth,$measuredHeight)")
         }
+    }
+
+    override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
+        super.onLayout(changed, left, top, right, bottom)
+        Logger.debug("RatioTextureView", "onLayout($width,$height)")
     }
 
     fun setRatio(ratio: Float) {

@@ -4,6 +4,8 @@ import android.app.Application;
 import android.content.res.Resources;
 import android.util.DisplayMetrics;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.GlideBuilder;
 import com.example.mypractice.common.Common;
 import com.facebook.stetho.Stetho;
 
@@ -22,5 +24,6 @@ public class YUApplication extends Application {
         Common.screenWidth = displayMetrics.widthPixels;
         Common.application = this;
         Stetho.initializeWithDefaults(this);
+        Glide.init(this, new GlideBuilder());
     }
 }
