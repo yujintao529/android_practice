@@ -13,6 +13,7 @@
     <color name="v9">#00FF00</color>
     <color name="v10">#00F5FF</color>
     <color name="v11">#8A2BE2</color>
+    <color name="c_white">#ffffff</color>
     <color name="c_100_white">#ffffffff</color>
     <color name="c_95_white">#f2ffffff</color>
     <color name="c_90_white">#e6ffffff</color>

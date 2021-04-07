@@ -130,6 +130,18 @@ class Camera2Act : AppCompatActivity() {
         switchCamera.setOnClickListener {
             switchCamera()
         }
+        manualFocusView.setListener(object : ManualFocusView.IFocusTouchListener {
+            override fun canPerformTouchEvent(action: Int): Boolean {
+                return true
+            }
+
+            override fun interceptTouchEvent(action: Int, x: Float, y: Float) {
+            }
+
+            override fun performTouchEvent(action: Int, x: Float, y: Float) {
+            }
+
+        })
     }
 
     private fun switchCamera() {
@@ -293,7 +305,7 @@ class Camera2Act : AppCompatActivity() {
     }
 
     private fun resizeTextureView(targetRatio: Float) {
-        textureView.setRatio(targetRatio)
+        cameraContainer.setRatio(targetRatio)
     }
 
 

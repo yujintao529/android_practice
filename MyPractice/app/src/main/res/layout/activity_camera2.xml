@@ -4,10 +4,21 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <com.demon.yu.camera.RatioTextureView
-        android:id="@+id/textureView"
+    <com.demon.yu.camera.CameraFrameLayout
+        android:id="@+id/cameraContainer"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent">
+
+        <com.demon.yu.camera.RatioTextureView
+            android:id="@+id/textureView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <com.demon.yu.camera.ManualFocusView
+            android:id="@+id/manualFocusView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </com.demon.yu.camera.CameraFrameLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
