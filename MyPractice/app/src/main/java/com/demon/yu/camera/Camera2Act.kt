@@ -33,6 +33,11 @@ import kotlin.math.abs
  * notes：
  * 1. 相机 Sensor 的宽是长边，而高是短边。所以需要注意相机获取出来的分辨率
  * 2. CameraDevice创建captureSession需要注意，CameraDevice创建create CameraSession会销毁上一个captureSession
+ *
+ *
+ *
+ * question:
+ * 1. bitmap canvas matrix旋转的效果。
  */
 class Camera2Act : AppCompatActivity() {
 
@@ -42,6 +47,7 @@ class Camera2Act : AppCompatActivity() {
         const val MSG_OPEN_CAMERA = 1
         const val MSG_CLOSE_CAMERA = 2
         const val MSG_START_PREVIEW = 3
+        const val MSG_SWITCH_CAMERA = 4
         private const val RATIO_16_9: Float = 16f / 9f
         private const val RATIO_4_3: Float = 4f / 3f
         var aspectRatio: Float = RATIO_4_3
@@ -62,7 +68,6 @@ class Camera2Act : AppCompatActivity() {
     private var cameraDevice: CameraDevice? = null
     private var targetRatio = aspectRatio
     private var cameraCaptureSession: CameraCaptureSession? = null
-    private var surface: Surface? = null
 
 
     private var previewSize: Size? = null
@@ -72,18 +77,42 @@ class Camera2Act : AppCompatActivity() {
 
     private var state: Int = 0
 
+    //surfaceTexture
+    private var surface: Surface? = null
+    private var surfaceTexture: SurfaceTexture? = null
 
-    private val takePackageCompose = TakeImageComposeListener()
+    //相机配置
+    private var currentCameraCharacteristicsEntry: CameraCharacteristicsEntry? = null
+    private val cameraCharacteristicsMap = mutableMapOf<String, CameraCharacteristicsEntry>() //camera_id-> CameraCharacteristicsEntry
+    private val cameraMap = mutableMapOf<Int, CameraCharacteristicsEntry>() //len_face -> CameraCharacteristicsEntry
+
+    private var takePackageComposeListener: TakeImageComposeListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_camera2)
+        initCameraConfig()
         cameraThread.start()
         cameraHandler = Handler(cameraThread.looper, CameraHandlerCallback())
         textureView.surfaceTextureListener = textureViewListener
         resizeTextureView(targetRatio)
         requestCameraPermission()
         initView()
+    }
+
+    private fun initCameraConfig() {
+        val front = getFrontCamera()
+        if (front != null) {
+            val entry = buildCameraCharaEntry(front.first, front.second)
+            cameraCharacteristicsMap[front.first] = entry
+            cameraMap[entry.lensFacing] = entry
+        }
+        val back = getBackCamera()
+        if (back != null) {
+            val entry = buildCameraCharaEntry(back.first, back.second)
+            cameraCharacteristicsMap[back.first] = entry
+            cameraMap[entry.lensFacing] = entry
+        }
     }
 
 
@@ -98,6 +127,13 @@ class Camera2Act : AppCompatActivity() {
         takePicture.setOnClickListener {
             takePictureCustom()
         }
+        switchCamera.setOnClickListener {
+            switchCamera()
+        }
+    }
+
+    private fun switchCamera() {
+        cameraHandler.obtainMessage(MSG_SWITCH_CAMERA).sendToTarget()
     }
 
     private fun takePictureCustom() {
@@ -112,7 +148,8 @@ class Camera2Act : AppCompatActivity() {
             surface?.let { surface ->
                 it.addTarget(surface)
             }
-            cameraCaptureSession?.capture(it.build(), takePackageCompose, cameraHandler)
+            imageReader?.setOnImageAvailableListener(takePackageComposeListener, cameraHandler)
+            cameraCaptureSession?.capture(it.build(), takePackageComposeListener, cameraHandler)
         }
 
     }
@@ -128,17 +165,43 @@ class Camera2Act : AppCompatActivity() {
 
 
     private fun onCameraGranted() {
-        val pair = getFrontCamera() ?: return
-        cameraHandler.obtainMessage(MSG_OPEN_CAMERA, pair).sendToTarget()
+        val cameraEntry = cameraMap.filter { it.value.isFrontCamera() }.values.firstOrNull()
+        if (cameraEntry != null) {
+            cameraHandler.obtainMessage(MSG_OPEN_CAMERA, cameraEntry).sendToTarget()
+        } else {
+            val cameraEntry = cameraMap.filter { it.value.isFrontCamera().not() }.values.firstOrNull()
+            if (cameraEntry != null) {
+                cameraHandler.obtainMessage(MSG_OPEN_CAMERA, cameraEntry).sendToTarget()
+            }
+        }
     }
 
     private fun getFrontCamera(): Pair<String, CameraCharacteristics>? {
         // 遍历所有可用的摄像头 ID，只取出其中的前置和后置摄像头信息。
+        return takeCameraInterval(CameraCharacteristics.LENS_FACING_FRONT)
+    }
+
+    private fun getBackCamera(): Pair<String, CameraCharacteristics>? {
+        // 遍历所有可用的摄像头 ID，只取出其中的前置和后置摄像头信息。
+        return takeCameraInterval(CameraCharacteristics.LENS_FACING_BACK)
+    }
+
+    private fun takeCameraInterval(lensFacing: Int): Pair<String, CameraCharacteristics>? {
         val cameraIdList = cameraManager.cameraIdList
         cameraIdList.forEach { cameraId ->
             val cameraCharacteristics = cameraManager.getCameraCharacteristics(cameraId)
             if (cameraCharacteristics.isHardwareLevelSupported(CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_FULL)) {
-                if (cameraCharacteristics[CameraCharacteristics.LENS_FACING] == CameraCharacteristics.LENS_FACING_FRONT) {
+                if (cameraCharacteristics[CameraCharacteristics.LENS_FACING] == lensFacing) {
+                    return cameraId to cameraCharacteristics
+                }
+            }
+            if (cameraCharacteristics.isHardwareLevelSupported(CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED)) {
+                if (cameraCharacteristics[CameraCharacteristics.LENS_FACING] == lensFacing) {
+                    return cameraId to cameraCharacteristics
+                }
+            }
+            if (cameraCharacteristics.isHardwareLevelSupported(CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LEGACY)) {
+                if (cameraCharacteristics[CameraCharacteristics.LENS_FACING] == lensFacing) {
                     return cameraId to cameraCharacteristics
                 }
             }
@@ -250,19 +313,29 @@ class Camera2Act : AppCompatActivity() {
         override fun handleMessage(msg: Message): Boolean {
             Logger.debug(TAG, "handleMessage $msg")
             when (msg.what) {
+                MSG_SWITCH_CAMERA -> {
+                    val destCameraCharacteristicsEntry = cameraMap.filter { it.value != currentCameraCharacteristicsEntry }.values.firstOrNull()
+                    cameraHandler.obtainMessage(MSG_OPEN_CAMERA, destCameraCharacteristicsEntry).sendToTarget()
+                }
                 MSG_OPEN_CAMERA -> {
-                    val pair = msg.obj as Pair<String, CameraCharacteristics>
-                    cameraManager.openCamera(pair.first, cameraStateCallbackInner, ThreadPoolUtils.getMainHandler())
-                    val size = getOptimalSize(pair.second, SurfaceTexture::class.java, targetRatio)
+                    val cameraCharacteristicsEntry = msg.obj as CameraCharacteristicsEntry
+                    if (cameraCharacteristicsEntry == currentCameraCharacteristicsEntry) {
+                        Logger.debug(TAG, "openCamera cancel,cameraCharacteristicsEntry same ")
+                        return true
+                    }
+                    cameraDevice?.close()
+                    cameraManager.openCamera(cameraCharacteristicsEntry.cameraID, cameraStateCallbackInner, ThreadPoolUtils.getMainHandler())
+                    val size = getOptimalSize(cameraCharacteristicsEntry.cameraCharacteristics, SurfaceTexture::class.java, targetRatio)
                     targetRatio = size.width * 1f / size.height
                     previewSize = size
-                    pictureSize = getOptimalSize(pair.second, ImageReader::class.java, targetRatio)
+                    pictureSize = getOptimalSize(cameraCharacteristicsEntry.cameraCharacteristics, ImageReader::class.java, targetRatio)
                     pictureSize?.let {
                         imageReader = ImageReader.newInstance(it.width, it.height, ImageFormat.JPEG, 2)
-                        imageReader?.setOnImageAvailableListener(takePackageCompose, cameraHandler)
+                        surfaceTexture?.setDefaultBufferSize(it.width, it.height)
                     }
-
-                    Logger.debug(TAG, "openCamera previewSize=$previewSize,targetRatio=$targetRatio")
+                    takePackageComposeListener = TakeImageComposeListener(cameraCharacteristicsEntry.cameraCharacteristics)
+                    currentCameraCharacteristicsEntry = cameraCharacteristicsEntry
+                    Logger.debug(TAG, "openCamera previewSize=$previewSize,targetRatio=$targetRatio,camera=$currentCameraCharacteristicsEntry")
 
                 }
                 MSG_START_PREVIEW -> {
@@ -277,8 +350,8 @@ class Camera2Act : AppCompatActivity() {
                     }
                     if (cameraCaptureSession != null) {
                         //处理上一个cameraCaptureSession
-                        cameraCaptureSession?.abortCaptures()
-                        cameraCaptureSession?.stopRepeating()
+                        cameraCaptureSession?.close()
+                        cameraCaptureSession = null
                     }
 
                     cameraHandler.removeMessages(MSG_START_PREVIEW)
@@ -339,14 +412,13 @@ class Camera2Act : AppCompatActivity() {
         private fun onTexture(surfaceTexture: SurfaceTexture, width: Int, height: Int) {
             if (this.width != width || this.height != height) {
                 surface?.release()
-                previewSize?.let {
-                    surfaceTexture.setDefaultBufferSize(it.width, it.height)
-                }
+                this@Camera2Act.surfaceTexture = surfaceTexture
                 surface = Surface(surfaceTexture)
                 cameraHandler.obtainMessage(MSG_START_PREVIEW).sendToTarget()
                 this.width = width
                 this.height = height
             }
+            Logger.debug(TAG, "onTexture width=$width,height=$height,previewSize=$previewSize")
 
         }
 
@@ -368,8 +440,8 @@ class Camera2Act : AppCompatActivity() {
         override fun onSurfaceTextureUpdated(surface: SurfaceTexture?) {
 //            Logger.debug(TAG, "onSurfaceTextureUpdated")
         }
-
     }
+
 
     private inner class CameraStateCallbackInner : CameraDevice.StateCallback() {
 
@@ -380,16 +452,34 @@ class Camera2Act : AppCompatActivity() {
 
         override fun onDisconnected(camera: CameraDevice) {
             cameraDevice = null
-
+            Logger.debug(TAG, "CameraStateCallbackInner onDisconnected")
         }
 
         override fun onError(camera: CameraDevice, error: Int) {
+            Logger.error(TAG, "CameraStateCallbackInner onError $error", null);
         }
 
     }
 
 
-    private inner class TakeImageComposeListener : ImageReader.OnImageAvailableListener, CameraCaptureSession.CaptureCallback() {
+    /**
+     * 根据传入的characteristics及jpeg图片，生成正确的jpeg图片
+     */
+    private fun modifyJpegOrientation(characteristics: CameraCharacteristics, inputJpegFilePath: String): String {
+        val display = (getSystemService(WINDOW_SERVICE) as WindowManager).defaultDisplay
+        val needRotate = CameraUtils.getJpegOrientation(cameraCharacteristics = characteristics, deviceOrientation = display.rotation)
+        if (needRotate == 0) {
+            return inputJpegFilePath
+        }
+        val originBitmap = BitmapUtils.loadFileToBitmap(this, inputJpegFilePath)
+        val newBitmap = BitmapUtils.rotate(originBitmap, needRotate)
+        val newPath = getRandomTakePictureFilePath()
+        BitmapUtils.saveBitmapToFile(newBitmap, newPath)
+        return newPath
+    }
+
+
+    private inner class TakeImageComposeListener(private val cameraCharacteristics: CameraCharacteristics) : ImageReader.OnImageAvailableListener, CameraCaptureSession.CaptureCallback() {
 
         override fun onImageAvailable(reader: ImageReader) {
             val image = reader.acquireNextImage()
@@ -401,11 +491,9 @@ class Camera2Act : AppCompatActivity() {
                 FileUtils.writeFile(filePath, jpegByteArray)
                 ToastUtils.toast("图片保存$filePath")
                 Logger.debug(TAG, "TakeImageComposeListener onImageAvailable path = $filePath")
-                val display = (getSystemService(WINDOW_SERVICE) as WindowManager).defaultDisplay
-                val rotation = display.rotation
-
+                val newFilePath = modifyJpegOrientation(cameraCharacteristics, filePath)
                 uiThread {
-                    Camera2PreviewActivity.startPreviewActivity(this@Camera2Act, filePath)
+                    Camera2PreviewActivity.startPreviewActivity(this@Camera2Act, newFilePath, filePath)
                 }
             }
         }
@@ -414,6 +502,40 @@ class Camera2Act : AppCompatActivity() {
         override fun onCaptureCompleted(session: CameraCaptureSession, request: CaptureRequest, result: TotalCaptureResult) {
             super.onCaptureCompleted(session, request, result)
         }
+    }
+
+    private fun buildCameraCharaEntry(cameraID: String, cameraCharacteristics: CameraCharacteristics): CameraCharacteristicsEntry {
+        return CameraCharacteristicsEntry(cameraID, cameraCharacteristics)
+    }
+
+    class CameraCharacteristicsEntry(val cameraID: String, val cameraCharacteristics: CameraCharacteristics) {
+
+
+        val lensFacing: Int
+            get() = cameraCharacteristics[CameraCharacteristics.LENS_FACING] ?: -1
+
+        fun isFrontCamera() = lensFacing == CameraCharacteristics.LENS_FACING_FRONT
+
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+
+            other as CameraCharacteristicsEntry
+
+            if (cameraID != other.cameraID) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            return cameraID.hashCode()
+        }
+
+        override fun toString(): String {
+            return "CameraCharacteristicsEntry(cameraID='$cameraID', cameraCharacteristics=$cameraCharacteristics, lensFacing=$lensFacing)"
+        }
+
     }
 
 }

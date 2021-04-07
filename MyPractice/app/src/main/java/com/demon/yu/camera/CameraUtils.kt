@@ -4,7 +4,7 @@ import android.hardware.camera2.CameraCharacteristics
 
 object CameraUtils {
 
-    private fun getJpegOrientation(cameraCharacteristics: CameraCharacteristics, deviceOrientation: Int): Int {
+    fun getJpegOrientation(cameraCharacteristics: CameraCharacteristics, deviceOrientation: Int): Int {
         var myDeviceOrientation = deviceOrientation
         if (myDeviceOrientation == android.view.OrientationEventListener.ORIENTATION_UNKNOWN) {
             return 0
@@ -24,6 +24,5 @@ object CameraUtils {
         // the image upright relative to the device orientation
         return (sensorOrientation + myDeviceOrientation + 360) % 360
     }
-
 
 }

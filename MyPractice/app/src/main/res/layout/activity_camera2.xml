@@ -13,8 +13,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:orientation="vertical"
-        android:layout_marginBottom="20dp">
+        android:layout_marginBottom="20dp"
+        android:orientation="vertical">
 
         <HorizontalScrollView
 
@@ -33,10 +33,11 @@
                     android:text="相机控制" />
 
                 <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/switchCamera"
                     style="@style/common_btn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="暂停预览" />
+                    android:text="切换摄像头(前后switch)" />
 
                 <androidx.appcompat.widget.AppCompatButton
                     style="@style/common_btn"
@@ -48,9 +49,9 @@
         </HorizontalScrollView>
 
         <HorizontalScrollView
-            android:layout_marginTop="20dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -64,8 +65,8 @@
                     android:text="拍照录制" />
 
                 <androidx.appcompat.widget.AppCompatButton
-                    style="@style/common_btn"
                     android:id="@+id/takePicture"
+                    style="@style/common_btn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="拍照" />

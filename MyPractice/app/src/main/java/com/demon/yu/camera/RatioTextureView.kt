@@ -12,7 +12,7 @@ class RatioTextureView(context: Context, attr: AttributeSet? = null) : TextureVi
         if (ratio != -1f) {
             val width = MeasureSpec.getSize(widthMeasureSpec)
             setMeasuredDimension(width, (ratio * width).toInt())
-            Logger.debug("RatioTextureView", "onMeasure($measuredWidth,$measuredHeight)")
+            Logger.debug("RatioTextureView", "onMeasure($measuredWidth,$measuredHeight),ratio=$ratio")
         }
     }
 
