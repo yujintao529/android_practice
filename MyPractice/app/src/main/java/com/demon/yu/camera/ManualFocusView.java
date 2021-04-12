@@ -179,6 +179,30 @@ public class ManualFocusView extends View {
         mListener = null;
     }
 
+    public void resetToDefaultPosition() {
+
+    }
+
+    public void moveToPosition(float x, float y) {
+
+    }
+
+    public void startFocus() {
+
+    }
+
+    public void focusSuccess() {
+
+    }
+
+    public void focusFailed() {
+
+    }
+
+    public void hideFocusView() {
+
+    }
+
     public interface IFocusTouchListener {
         /**
          * 是否显示手动对焦动画

@@ -2,14 +2,10 @@ package com.demon.yu.camera
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.graphics.ImageFormat
 import android.graphics.SurfaceTexture
 import android.hardware.camera2.*
 import android.media.ImageReader
-import android.os.Bundle
-import android.os.Handler
-import android.os.HandlerThread
-import android.os.Message
+import android.os.*
 import android.util.Size
 import android.view.Surface
 import android.view.TextureView
@@ -18,11 +14,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.demo.yu.context.files.FilesManager
 import com.demon.yu.utils.*
+import com.demon.yu.utils.FileUtils
 import com.example.mypractice.Logger
 import com.example.mypractice.R
 import kotlinx.android.synthetic.main.activity_camera2.*
+import kotlinx.coroutines.android.asCoroutineDispatcher
 import java.io.File
-import kotlin.math.abs
 
 
 /**
@@ -33,6 +30,7 @@ import kotlin.math.abs
  * notes：
  * 1. 相机 Sensor 的宽是长边，而高是短边。所以需要注意相机获取出来的分辨率
  * 2. CameraDevice创建captureSession需要注意，CameraDevice创建create CameraSession会销毁上一个captureSession
+ * 3. 每一个captureRequest必须要有个Target
  *
  *
  *
@@ -70,8 +68,13 @@ class Camera2Act : AppCompatActivity() {
     private var cameraCaptureSession: CameraCaptureSession? = null
 
 
+    private var focusManager: FocusManager? = null
     private var previewSize: Size? = null
 
+    private var cameraSession: CameraSession? = null
+    private var cameraDeviceManager: CameraDeviceManager? = null
+
+    //拍照
     private var pictureSize: Size? = null
     private var imageReader: ImageReader? = null
 
@@ -79,10 +82,10 @@ class Camera2Act : AppCompatActivity() {
 
     //surfaceTexture
     private var surface: Surface? = null
-    private var surfaceTexture: SurfaceTexture? = null
 
     //相机配置
     private var currentCameraCharacteristicsEntry: CameraCharacteristicsEntry? = null
+
     private val cameraCharacteristicsMap = mutableMapOf<String, CameraCharacteristicsEntry>() //camera_id-> CameraCharacteristicsEntry
     private val cameraMap = mutableMapOf<Int, CameraCharacteristicsEntry>() //len_face -> CameraCharacteristicsEntry
 
@@ -94,10 +97,21 @@ class Camera2Act : AppCompatActivity() {
         initCameraConfig()
         cameraThread.start()
         cameraHandler = Handler(cameraThread.looper, CameraHandlerCallback())
+        cameraHandler.asCoroutineDispatcher()
         textureView.surfaceTextureListener = textureViewListener
         resizeTextureView(targetRatio)
         requestCameraPermission()
         initView()
+        initManager()
+    }
+
+    private fun initManager() {
+        focusManager = FocusManager(manualFocusView, Looper.getMainLooper())
+        cameraSession = CameraSessionImpl(context = this, cameraConfig = CameraConfig(), cameraHandler = cameraHandler)
+        cameraSession?.cameraSessionCb = CameraSessionCbImpl()
+        cameraDeviceManager = CameraDeviceManager(cameraManager, cameraHandler)
+        cameraDeviceManager?.cameraDeviceCb = cameraSession
+
     }
 
     private fun initCameraConfig() {
@@ -139,6 +153,12 @@ class Camera2Act : AppCompatActivity() {
             }
 
             override fun performTouchEvent(action: Int, x: Float, y: Float) {
+                focusManager?.startFocus(x, y)
+                val meteringRectangleAF = focusManager?.getFocusArea(x, y, true)
+                val meteringRectangleAE = focusManager?.getFocusArea(x, y, false)
+                if (meteringRectangleAE != null && meteringRectangleAF != null) {
+                    cameraSession?.applyTouchFocusRequest(meteringRectangleAF, meteringRectangleAE)
+                }
             }
 
         })
@@ -222,29 +242,6 @@ class Camera2Act : AppCompatActivity() {
     }
 
 
-    /**
-     * 判断相机的 Hardware Level 是否大于等于指定的 Level。
-     */
-    private fun CameraCharacteristics.isHardwareLevelSupported(requiredLevel: Int): Boolean {
-        val sortedLevels = intArrayOf(
-                CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LEGACY,
-                CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED,
-                CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_FULL
-        )
-        val deviceLevel = this[CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL]
-        if (requiredLevel == deviceLevel) {
-            return true
-        }
-        for (sortedLevel in sortedLevels) {
-            if (requiredLevel == sortedLevel) {
-                return true
-            } else if (deviceLevel == sortedLevel) {
-                return false
-            }
-        }
-        return false
-    }
-
     private fun requestCameraPermission() {
         val hasCameraPermission = PermissionsUtil.hasPermission(Manifest.permission.CAMERA)
         val hasStoragePermission = PermissionsUtil.hasPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
@@ -277,23 +274,6 @@ class Camera2Act : AppCompatActivity() {
     }
 
 
-    private fun getOptimalSize(cameraCharacteristics: CameraCharacteristics, clazz: Class<*>, aspectRatio: Float): Size {
-        val streamConfigurationMap = cameraCharacteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)
-        val supportedSizes = streamConfigurationMap?.getOutputSizes(clazz)
-        if (supportedSizes != null) {
-            for (size in supportedSizes) {
-                if (abs(size.width.toFloat() / size.height - aspectRatio) < 0.01f) {
-                    return size
-                }
-            }
-        }
-        if (supportedSizes != null && supportedSizes.isNotEmpty()) {
-            return supportedSizes[0]
-        }
-        throw IllegalStateException("sorry,get no size for class ${clazz.canonicalName},ratio $aspectRatio")
-    }
-
-
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == REQUEST_CAMERA_COD) {
@@ -316,9 +296,6 @@ class Camera2Act : AppCompatActivity() {
         cameraCaptureSession.setRepeatingRequest(builder.build(), null, cameraHandler)
     }
 
-    private fun stopPreviewInterval(cameraCaptureSession: CameraCaptureSession) {
-        cameraCaptureSession.stopRepeating()
-    }
 
     private inner class CameraHandlerCallback : Handler.Callback {
         @SuppressLint("MissingPermission")
@@ -335,44 +312,44 @@ class Camera2Act : AppCompatActivity() {
                         Logger.debug(TAG, "openCamera cancel,cameraCharacteristicsEntry same ")
                         return true
                     }
-                    cameraDevice?.close()
-                    cameraManager.openCamera(cameraCharacteristicsEntry.cameraID, cameraStateCallbackInner, ThreadPoolUtils.getMainHandler())
-                    val size = getOptimalSize(cameraCharacteristicsEntry.cameraCharacteristics, SurfaceTexture::class.java, targetRatio)
-                    targetRatio = size.width * 1f / size.height
-                    previewSize = size
-                    pictureSize = getOptimalSize(cameraCharacteristicsEntry.cameraCharacteristics, ImageReader::class.java, targetRatio)
-                    pictureSize?.let {
-                        imageReader = ImageReader.newInstance(it.width, it.height, ImageFormat.JPEG, 2)
-                        surfaceTexture?.setDefaultBufferSize(it.width, it.height)
-                    }
+                    cameraDeviceManager?.openCamera(cameraCharacteristicsEntry)
+                    cameraSession?.setCharacteristics(cameraCharacteristicsEntry.cameraCharacteristics)
+
                     takePackageComposeListener = TakeImageComposeListener(cameraCharacteristicsEntry.cameraCharacteristics)
+
                     currentCameraCharacteristicsEntry = cameraCharacteristicsEntry
+
                     Logger.debug(TAG, "openCamera previewSize=$previewSize,targetRatio=$targetRatio,camera=$currentCameraCharacteristicsEntry")
 
                 }
                 MSG_START_PREVIEW -> {
                     //ignore
-                    if (surface == null) {
-                        Logger.debug(TAG, "start preview unable,surface not ready ")
-                        return true
-                    }
-                    if (cameraDevice == null) {
-                        Logger.debug(TAG, "start preview unable,cameraDevice not ready ")
-                        return true
-                    }
-                    if (cameraCaptureSession != null) {
-                        //处理上一个cameraCaptureSession
-                        cameraCaptureSession?.close()
-                        cameraCaptureSession = null
-                    }
+//                    if (surface == null) {
+//                        Logger.debug(TAG, "start preview unable,surface not ready ")
+//                        return true
+//                    }
+//                    if (cameraDevice == null) {
+//                        Logger.debug(TAG, "start preview unable,cameraDevice not ready ")
+//                        return true
+//                    }
+//                    if (cameraCaptureSession != null) {
+//                        //处理上一个cameraCaptureSession
+//                        cameraCaptureSession?.close()
+//                        cameraCaptureSession = null
+//                    }
+
 
                     cameraHandler.removeMessages(MSG_START_PREVIEW)
+
+                    cameraSession?.buildCameraPreviewSession()
+
                     val outputs = listOf(surface, imageReader?.surface)
                     cameraDevice?.createCaptureSession(outputs, object : CameraCaptureSession.StateCallback() {
                         override fun onConfigured(session: CameraCaptureSession) {
                             Logger.debug(TAG, "MSG_START_PREVIEW onConfigured,session=$session")
                             if (cameraCaptureSession == null) {
                                 cameraCaptureSession = session
+                                cameraSession?.setCameraCaptureSession(session)
                                 surface?.let {
                                     startPreviewInterval(it, session)
                                 }
@@ -418,17 +395,13 @@ class Camera2Act : AppCompatActivity() {
 
     private inner class TextureViewListener : TextureView.SurfaceTextureListener {
 
-
         private var width: Int = 0
         private var height: Int = 0
         private fun onTexture(surfaceTexture: SurfaceTexture, width: Int, height: Int) {
             if (this.width != width || this.height != height) {
-                surface?.release()
-                this@Camera2Act.surfaceTexture = surfaceTexture
-                surface = Surface(surfaceTexture)
-                cameraHandler.obtainMessage(MSG_START_PREVIEW).sendToTarget()
                 this.width = width
                 this.height = height
+                cameraSession?.setSurfaceTexture(surfaceTexture, width, height)
             }
             Logger.debug(TAG, "onTexture width=$width,height=$height,previewSize=$previewSize")
 
@@ -470,7 +443,6 @@ class Camera2Act : AppCompatActivity() {
         override fun onError(camera: CameraDevice, error: Int) {
             Logger.error(TAG, "CameraStateCallbackInner onError $error", null);
         }
-
     }
 
 
@@ -520,6 +492,7 @@ class Camera2Act : AppCompatActivity() {
         return CameraCharacteristicsEntry(cameraID, cameraCharacteristics)
     }
 
+
     class CameraCharacteristicsEntry(val cameraID: String, val cameraCharacteristics: CameraCharacteristics) {
 
 
@@ -548,6 +521,12 @@ class Camera2Act : AppCompatActivity() {
             return "CameraCharacteristicsEntry(cameraID='$cameraID', cameraCharacteristics=$cameraCharacteristics, lensFacing=$lensFacing)"
         }
 
+    }
+
+    private inner class CameraSessionCbImpl : CameraSession.CameraSessionCb {
+        override fun onCameraPreviewSizeChanged(previewSize: Size, cameraCharacteristics: CameraCharacteristics) {
+            focusManager?.onPreviewChanged(previewSize.width, previewSize.height, cameraCharacteristics)
+        }
     }
 
 }

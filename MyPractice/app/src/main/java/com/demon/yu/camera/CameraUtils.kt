@@ -25,4 +25,29 @@ object CameraUtils {
         return (sensorOrientation + myDeviceOrientation + 360) % 360
     }
 
+
+}
+
+
+/**
+ * 判断相机的 Hardware Level 是否大于等于指定的 Level。
+ */
+fun CameraCharacteristics.isHardwareLevelSupported(requiredLevel: Int): Boolean {
+    val sortedLevels = intArrayOf(
+            CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LEGACY,
+            CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED,
+            CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_FULL
+    )
+    val deviceLevel = this[CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL]
+    if (requiredLevel == deviceLevel) {
+        return true
+    }
+    for (sortedLevel in sortedLevels) {
+        if (requiredLevel == sortedLevel) {
+            return true
+        } else if (deviceLevel == sortedLevel) {
+            return false
+        }
+    }
+    return false
 }
