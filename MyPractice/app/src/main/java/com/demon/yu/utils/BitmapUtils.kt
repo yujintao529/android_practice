@@ -75,4 +75,12 @@ object BitmapUtils {
         return true
     }
 
+
+    fun bytes2Bitmap(bytes: ByteArray): Bitmap? {
+        return if (bytes.isNotEmpty()) {
+            BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+        } else {
+            null
+        }
+    }
 }

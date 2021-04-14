@@ -13,12 +13,12 @@ import android.os.Handler
 class CameraDeviceManager(private val cameraManager: CameraManager, private val cameraHandler: Handler) : CameraDevice.StateCallback() {
 
     private var currentCameraDevice: CameraDevice? = null
-    private var currentCameraCharacteristicsEntry: Camera2Act.CameraCharacteristicsEntry? = null
+    private var currentCameraCharacteristicsEntry: CameraCharacteristicsEntry? = null
 
     var cameraDeviceCb: CameraDeviceCb? = null
 
     @SuppressLint("MissingPermission")
-    fun openCamera(cameraCharacteristicsEntry: Camera2Act.CameraCharacteristicsEntry) {
+    fun openCamera(cameraCharacteristicsEntry: CameraCharacteristicsEntry) {
         currentCameraCharacteristicsEntry = cameraCharacteristicsEntry
         currentCameraDevice?.close()
         cameraManager.openCamera(cameraCharacteristicsEntry.cameraID, this, cameraHandler)
@@ -57,11 +57,13 @@ class CameraDeviceManager(private val cameraManager: CameraManager, private val 
     }
 
     override fun onError(camera: CameraDevice, error: Int) {
+        cameraDeviceCb?.onCameraError(camera, error)
     }
 
 
     interface CameraDeviceCb {
-        fun onCameraOpened(camera: CameraDevice, entry: Camera2Act.CameraCharacteristicsEntry)
+        fun onCameraOpened(camera: CameraDevice, entry: CameraCharacteristicsEntry)
         fun onCameraClosed(camera: CameraDevice)
+        fun onCameraError(camera: CameraDevice, error: Int)
     }
 }

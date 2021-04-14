@@ -1,6 +1,12 @@
 package com.demon.yu.camera
 
+import android.content.Context
+import android.graphics.Bitmap
 import android.hardware.camera2.CameraCharacteristics
+import android.hardware.camera2.CameraManager
+import android.view.WindowManager
+import androidx.appcompat.app.AppCompatActivity
+import com.demon.yu.utils.BitmapUtils
 
 object CameraUtils {
 
@@ -23,6 +29,44 @@ object CameraUtils {
         // Calculate desired JPEG orientation relative to camera orientation to make
         // the image upright relative to the device orientation
         return (sensorOrientation + myDeviceOrientation + 360) % 360
+    }
+
+
+    /**
+     * 根据传入的characteristics及jpeg图片，生成正确的jpeg图片
+     */
+    fun modifyJpegOrientation(context: Context, characteristics: CameraCharacteristics, inputJpegBitmap: Bitmap): Bitmap {
+        val display = (context.getSystemService(AppCompatActivity.WINDOW_SERVICE) as WindowManager).defaultDisplay
+        val needRotate = CameraUtils.getJpegOrientation(cameraCharacteristics = characteristics, deviceOrientation = display.rotation)
+        if (needRotate == 0) {
+            return inputJpegBitmap
+        }
+        val result = BitmapUtils.rotate(inputJpegBitmap, needRotate)
+        return result
+    }
+
+
+    fun takeCameraInterval(cameraManager: CameraManager, lensFacing: Int): Pair<String, CameraCharacteristics>? {
+        val cameraIdList = cameraManager.cameraIdList
+        cameraIdList.forEach { cameraId ->
+            val cameraCharacteristics = cameraManager.getCameraCharacteristics(cameraId)
+            if (cameraCharacteristics.isHardwareLevelSupported(CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_FULL)) {
+                if (cameraCharacteristics[CameraCharacteristics.LENS_FACING] == lensFacing) {
+                    return cameraId to cameraCharacteristics
+                }
+            }
+            if (cameraCharacteristics.isHardwareLevelSupported(CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED)) {
+                if (cameraCharacteristics[CameraCharacteristics.LENS_FACING] == lensFacing) {
+                    return cameraId to cameraCharacteristics
+                }
+            }
+            if (cameraCharacteristics.isHardwareLevelSupported(CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LEGACY)) {
+                if (cameraCharacteristics[CameraCharacteristics.LENS_FACING] == lensFacing) {
+                    return cameraId to cameraCharacteristics
+                }
+            }
+        }
+        return null
     }
 
 
