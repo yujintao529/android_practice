@@ -49,7 +49,6 @@ class CameraDeviceManager(private val cameraManager: CameraManager, private val 
         currentCameraCharacteristicsEntry?.let {
             cameraDeviceCb?.onCameraOpened(camera, it)
         }
-
     }
 
     override fun onDisconnected(camera: CameraDevice) {

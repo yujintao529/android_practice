@@ -40,13 +40,9 @@ class Camera2Act : AppCompatActivity() {
     companion object {
         const val TAG = "Camera2Act"
         const val REQUEST_CAMERA_COD = 1
-        const val MSG_OPEN_CAMERA = 1
-        const val MSG_CLOSE_CAMERA = 2
+        const val MSG_CONFIG_CAMERA = 2
         const val MSG_START_PREVIEW = 3
         const val MSG_SWITCH_CAMERA = 4
-        private const val RATIO_16_9: Float = 16f / 9f
-        private const val RATIO_4_3: Float = 4f / 3f
-        var aspectRatio: Float = RATIO_4_3
 
         //camera state
         const val STATE_CAMERA_IDLE = 0
@@ -61,19 +57,14 @@ class Camera2Act : AppCompatActivity() {
     private lateinit var cameraHandler: Handler
     private val textureViewListener = TextureViewListener()
     private var cameraDevice: CameraDevice? = null
-    private var targetRatio = aspectRatio
-    private var cameraCaptureSession: CameraCaptureSession? = null
 
 
     private var focusManager: FocusManager? = null
-    private var previewSize: Size? = null
 
     private var cameraSession: CameraSession? = null
 
-    private var state: Int = 0
-
-
     //相机配置
+    private var cameraPreviewsize: Size? = null
     private var currentCameraCharacteristicsEntry: CameraCharacteristicsEntry? = null
 
     private val cameraCharacteristicsMap = mutableMapOf<String, CameraCharacteristicsEntry>() //camera_id-> CameraCharacteristicsEntry
@@ -87,9 +78,9 @@ class Camera2Act : AppCompatActivity() {
         cameraThread.start()
         cameraHandler = Handler(cameraThread.looper, CameraHandlerCallback())
         textureView.surfaceTextureListener = textureViewListener
-        requestCameraPermission()
         initView()
         initManager()
+        requestCameraPermission()
     }
 
     private fun initManager() {
@@ -178,11 +169,11 @@ class Camera2Act : AppCompatActivity() {
     private fun onCameraGranted() {
         val cameraEntry = cameraMap.filter { it.value.isFrontCamera() }.values.firstOrNull()
         if (cameraEntry != null) {
-            cameraHandler.obtainMessage(MSG_OPEN_CAMERA, cameraEntry).sendToTarget()
+            cameraHandler.obtainMessage(MSG_CONFIG_CAMERA, cameraEntry).sendToTarget()
         } else {
             val cameraEntry = cameraMap.filter { it.value.isFrontCamera().not() }.values.firstOrNull()
             if (cameraEntry != null) {
-                cameraHandler.obtainMessage(MSG_OPEN_CAMERA, cameraEntry).sendToTarget()
+                cameraHandler.obtainMessage(MSG_CONFIG_CAMERA, cameraEntry).sendToTarget()
             }
         }
     }
@@ -260,22 +251,23 @@ class Camera2Act : AppCompatActivity() {
             when (msg.what) {
                 MSG_SWITCH_CAMERA -> {
                     val destCameraCharacteristicsEntry = cameraMap.filter { it.value != currentCameraCharacteristicsEntry }.values.firstOrNull()
-                    cameraHandler.obtainMessage(MSG_OPEN_CAMERA, destCameraCharacteristicsEntry).sendToTarget()
+                    cameraHandler.obtainMessage(MSG_CONFIG_CAMERA, destCameraCharacteristicsEntry).sendToTarget()
                 }
-                MSG_OPEN_CAMERA -> {
+                MSG_CONFIG_CAMERA -> {
                     val cameraCharacteristicsEntry = msg.obj as CameraCharacteristicsEntry
                     if (cameraCharacteristicsEntry == currentCameraCharacteristicsEntry) {
-                        Logger.debug(TAG, "openCamera cancel,cameraCharacteristicsEntry same ")
+                        Logger.debug(TAG, "config camera cancel,cameraCharacteristicsEntry same ")
                         return true
                     }
                     cameraSession?.setCharacteristicsEntry(cameraCharacteristicsEntry)
                     currentCameraCharacteristicsEntry = cameraCharacteristicsEntry
-                    Logger.debug(TAG, "openCamera previewSize=$previewSize,targetRatio=$targetRatio,camera=$currentCameraCharacteristicsEntry")
+                    Logger.debug(TAG, "config camera=$currentCameraCharacteristicsEntry")
 
                 }
                 MSG_START_PREVIEW -> {
                     cameraHandler.removeMessages(MSG_START_PREVIEW)
-
+                    val surfaceTexture = msg.obj as SurfaceTexture
+                    cameraSession?.startPreview(surfaceTexture)
 
                 }
             }
@@ -295,12 +287,11 @@ class Camera2Act : AppCompatActivity() {
                 this.width = width
                 this.height = height
                 this.currentSurfaceTexture = surfaceTexture
-                if (currentCameraCharacteristicsEntry != null) {
-                    cameraSession?.startPreview(surfaceTexture)
+                if (currentCameraCharacteristicsEntry != null && cameraPreviewsize != null) {
+                    cameraHandler.obtainMessage(MSG_START_PREVIEW, surfaceTexture).sendToTarget()
                 }
-
             }
-            Logger.debug(TAG, "onTexture width=$width,height=$height,previewSize=$previewSize")
+            Logger.debug(TAG, "onTexture width=$width,height=$height")
 
         }
 
@@ -333,7 +324,10 @@ class Camera2Act : AppCompatActivity() {
     private inner class CameraSessionCbImpl : CameraSession.CameraSessionCb {
         override fun onCameraPreviewSizeChanged(previewSize: Size, cameraCharacteristics: CameraCharacteristics) {
             focusManager?.onPreviewChanged(previewSize.width, previewSize.height, cameraCharacteristics)
-            resizeTextureView(previewSize.height * 1f / previewSize.width)
+            cameraPreviewsize = previewSize
+            uiThread {
+                resizeTextureView(previewSize.height * 1f / previewSize.width)
+            }
         }
     }
 

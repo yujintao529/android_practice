@@ -23,6 +23,7 @@ open class CameraSession(private val context: Context, private val cameraDeviceM
 
     companion object {
         const val ERROR_CODE = -1//custom
+        const val TAG = "CameraSession"//custom
     }
 
     private val requestManager by lazy { RequestManager() }
@@ -67,7 +68,7 @@ open class CameraSession(private val context: Context, private val cameraDeviceM
     }
 
 
-    private fun setCameraCaptureSession(cameraCaptureSession: CameraCaptureSession) {
+    private fun setCameraCaptureSession(cameraCaptureSession: CameraCaptureSession, preview: Boolean) {
         this.cameraCaptureSession = cameraCaptureSession
     }
 
@@ -151,13 +152,19 @@ open class CameraSession(private val context: Context, private val cameraDeviceM
 
     private inner class CaptureSessionStateCb : CameraCaptureSession.StateCallback() {
         override fun onConfigured(session: CameraCaptureSession) {
-            setCameraCaptureSession(session)
+            Logger.debug(TAG, "onConfigured session=$session")
+            setCameraCaptureSession(session, true)
         }
 
         override fun onConfigureFailed(session: CameraCaptureSession) {
-            ToastUtils.toast("CameraCaptureSession onConfigureFailed")
+            Logger.debug(TAG, "onConfigureFailed session")
+            ToastUtils.toast("CameraCaptureSession onConfigureFailed.session=$session")
         }
 
+        override fun onClosed(session: CameraCaptureSession) {
+            Logger.debug(TAG, "onClosed session=$session")
+
+        }
     }
 
 
@@ -167,29 +174,33 @@ open class CameraSession(private val context: Context, private val cameraDeviceM
      * 3. 开始预览
      */
     fun startPreview(surfaceTexture: SurfaceTexture) {
+
         this.surfaceTexture = surfaceTexture
         if (cameraCharacteristicsEntry == null) {
             throw IllegalStateException(" cameraCharacteristicsEntry is null, please call setCameraCharacteristicsEntry before")
         }
         surfaceTexture.setDefaultBufferSize(cameraConfig.previewSize.width, cameraConfig.previewSize.height)
         cameraCharacteristicsEntry?.let {
+            Logger.debug(TAG, "startPreview previewSize=${cameraConfig.previewSize}")
             cameraDeviceManager.openCamera(it)
         }
     }
 
 
     override fun onCameraOpened(cameraDevice: CameraDevice, entry: CameraCharacteristicsEntry) {
+        Logger.debug(TAG, "onCameraOpened cameraDevice=$cameraDevice")
         surfaceTexture?.let {
             buildCameraPreviewSession(cameraDevice, it)
         }
     }
 
     override fun onCameraClosed(camera: CameraDevice) {
-
+        Logger.debug(TAG, "onCameraClosed cameraDevice=$cameraDevice")
     }
 
     override fun onCameraError(camera: CameraDevice, error: Int) {
         ToastUtils.toast("onCameraError error=$error ")
+        Logger.debug(TAG, "onCameraError cameraDevice=$cameraDevice,error=$error")
     }
 
 
