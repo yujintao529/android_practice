@@ -8,6 +8,8 @@ import android.hardware.camera2.*
 import android.hardware.camera2.params.MeteringRectangle
 import android.media.ImageReader
 import android.os.Handler
+import android.os.HandlerThread
+import android.os.Message
 import android.util.Size
 import android.view.Surface
 import androidx.lifecycle.Lifecycle
@@ -21,16 +23,29 @@ import kotlin.math.abs
 /**
  * 逻辑中有个假设，setSurfaceTexture调用前于camera open
  */
-open class CameraSession(private val context: Context, private val cameraDeviceManager: CameraDeviceManager, private val cameraConfig: CameraConfig, private val cameraHandler: Handler) : CameraDeviceManager.CameraDeviceCb, LifecycleObserver {
+open class CameraSession(private val context: Context, private val cameraConfig: CameraConfig) : CameraDeviceManager.CameraDeviceCb, Handler.Callback, LifecycleObserver {
 
 
     companion object {
         const val ERROR_CODE = -1//custom
         const val TAG = "CameraSession"//custom
+
+        //msg what
+        const val REQUEST_CAMERA_COD = 1
+        const val MSG_CONFIG_CAMERA = 2
+        const val MSG_START_PREVIEW = 3
+        const val MSG_SWITCH_CAMERA = 4
+        const val MSG_TAKE_PICTURE = 5
+        const val MSG_RE_PREVIEW = 6
+
+        //camera state
+        const val STATE_CAMERA_IDLE = 0
+        const val STATE_CAMERA_PREVIEW = 0
+        const val STATE_CAMERA_RECORD = 0
     }
 
     private val requestManager by lazy { RequestManager() }
-
+    private val cameraDeviceManager: CameraDeviceManager
     private var cameraCaptureSession: CameraCaptureSession? = null
 
 
@@ -55,8 +70,13 @@ open class CameraSession(private val context: Context, private val cameraDeviceM
     private var currentCameraFacing: Int = cameraConfig.cameraFacing
 
 
+    private val cameraThread = HandlerThread("camera2-session")
+    private val cameraHandler: Handler
+
     init {
-        cameraDeviceManager.cameraDeviceCb = this
+        cameraThread.start()
+        cameraHandler = Handler(cameraThread.looper, this)
+        cameraDeviceManager = CameraDeviceManager(context.getSystemService(CameraManager::class.java), cameraHandler)
     }
 
 
@@ -64,10 +84,11 @@ open class CameraSession(private val context: Context, private val cameraDeviceM
         val pair = CameraUtils.takeCameraInterval(cameraDeviceManager.cameraManager, currentCameraFacing)
                 ?: throw java.lang.IllegalStateException("initConfig error, no camera found")
         val cameraCharacteristicsEntry = CameraCharacteristicsEntry(pair.first, pair.second)
-        setCharacteristicsEntry(cameraCharacteristicsEntry)
+        cameraHandler.obtainMessage(MSG_CONFIG_CAMERA, cameraCharacteristicsEntry).sendToTarget()
     }
 
 
+    @CameraThread
     private fun setCharacteristicsEntry(cameraCharacteristicsEntry: CameraCharacteristicsEntry): Boolean {
         requestManager.setCharacteristics(cameraCharacteristicsEntry.cameraCharacteristics)
         val size = calculatePreviewSize(cameraCharacteristicsEntry.cameraCharacteristics, cameraConfig.aspectRatio)
@@ -100,13 +121,15 @@ open class CameraSession(private val context: Context, private val cameraDeviceM
         } else {
             CameraCharacteristics.LENS_FACING_FRONT
         }
-        rePreview()
-    }
-
-    private fun rePreview() {
         val pair = CameraUtils.takeCameraInterval(cameraDeviceManager.cameraManager, currentCameraFacing)
                 ?: throw java.lang.IllegalStateException("initConfig error, no camera found")
         val cameraCharacteristicsEntry = CameraCharacteristicsEntry(pair.first, pair.second)
+        cameraHandler.obtainMessage(MSG_RE_PREVIEW, cameraCharacteristicsEntry).sendToTarget()
+    }
+
+
+    @CameraThread
+    private fun rePreviewInterval(cameraCharacteristicsEntry: CameraCharacteristicsEntry) {
         if (setCharacteristicsEntry(cameraCharacteristicsEntry).not()) {
             cameraCaptureSession?.stopRepeating()
             cameraDevice?.close()
@@ -118,6 +141,7 @@ open class CameraSession(private val context: Context, private val cameraDeviceM
     }
 
 
+    @CameraThread
     private fun setCameraCaptureSession(cameraCaptureSession: CameraCaptureSession, preview: Boolean) {
         this.cameraCaptureSession = cameraCaptureSession
         if (preview) {
@@ -136,6 +160,11 @@ open class CameraSession(private val context: Context, private val cameraDeviceM
      * 拍照
      */
     fun takePicture(takePictureCb: TakePictureCb) {
+        cameraHandler.obtainMessage(MSG_TAKE_PICTURE, takePictureCb).sendToTarget()
+    }
+
+    @CameraThread
+    private fun takePictureInterval(takePictureCb: TakePictureCb) {
         if (cameraCaptureSession == null) {
             Logger.debug(Camera2Act.TAG, "cameraCaptureSession not ready,please take picture later")
             takePictureCb.onImageError(ERROR_CODE)
@@ -154,7 +183,6 @@ open class CameraSession(private val context: Context, private val cameraDeviceM
             imageReader?.setOnImageAvailableListener(composeListener, cameraHandler)
             cameraCaptureSession?.capture(it.build(), composeListener, cameraHandler)
         }
-
     }
 
 
@@ -172,10 +200,35 @@ open class CameraSession(private val context: Context, private val cameraDeviceM
     }
 
 
+    override fun handleMessage(msg: Message): Boolean {
+        when (msg.what) {
+            MSG_CONFIG_CAMERA -> {
+                val cameraCharacteristicsEntry = msg.obj as CameraCharacteristicsEntry
+                setCharacteristicsEntry(cameraCharacteristicsEntry)
+            }
+            MSG_START_PREVIEW -> {
+                val surfaceTexture = msg.obj as SurfaceTexture
+                startPreviewInterval(surfaceTexture)
+            }
+            MSG_RE_PREVIEW -> {
+                val cameraCharacteristicsEntry = msg.obj as CameraCharacteristicsEntry
+                setCharacteristicsEntry(cameraCharacteristicsEntry)
+            }
+            MSG_TAKE_PICTURE -> {
+                val cb = msg.obj as TakePictureCb
+                takePictureInterval(cb)
+            }
+        }
+        return true
+    }
+
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
     fun onDestroy() {
         cameraCaptureSession?.stopRepeating()
         cameraDevice?.close()
+        cameraHandler.removeCallbacksAndMessages(null)
+        cameraThread.quit()
+
     }
 
 
@@ -233,12 +286,8 @@ open class CameraSession(private val context: Context, private val cameraDeviceM
     }
 
 
-    /**
-     * 1. 根据配置打开摄像头
-     * 2. 创建session
-     * 3. 开始预览
-     */
-    fun startPreview(surfaceTexture: SurfaceTexture) {
+    @CameraThread
+    private fun startPreviewInterval(surfaceTexture: SurfaceTexture) {
         this.surfaceTexture = surfaceTexture
         if (cameraCharacteristicsEntry == null) {
             throw IllegalStateException(" cameraCharacteristicsEntry is null, please call setCameraCharacteristicsEntry before")
@@ -248,6 +297,11 @@ open class CameraSession(private val context: Context, private val cameraDeviceM
             Logger.debug(TAG, "startPreview previewSize=${cameraConfig.previewSize}")
             cameraDeviceManager.openCamera(it)
         }
+    }
+
+
+    fun startPreview(surfaceTexture: SurfaceTexture) {
+        cameraHandler.obtainMessage(MSG_START_PREVIEW, surfaceTexture).sendToTarget()
     }
 
 
@@ -337,4 +391,6 @@ open class CameraSession(private val context: Context, private val cameraDeviceM
     interface CameraSessionCb {
         fun onCameraPreviewSizeChanged(previewSize: Size, cameraCharacteristics: CameraCharacteristics)
     }
+
+
 }

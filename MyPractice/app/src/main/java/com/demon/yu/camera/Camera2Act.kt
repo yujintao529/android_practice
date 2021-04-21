@@ -42,12 +42,7 @@ class Camera2Act : AppCompatActivity() {
         const val MSG_CONFIG_CAMERA = 2
         const val MSG_START_PREVIEW = 3
         const val MSG_SWITCH_CAMERA = 4
-
-        //camera state
-        const val STATE_CAMERA_IDLE = 0
-        const val STATE_CAMERA_PREVIEW = 0
-        const val STATE_CAMERA_RECORD = 0
-
+        const val MSG_TAKE_PICTURE = 5
     }
 
     private val cameraManager: CameraManager by lazy { getSystemService(CameraManager::class.java) }
@@ -57,23 +52,17 @@ class Camera2Act : AppCompatActivity() {
     private val textureViewListener = TextureViewListener()
     private var cameraDevice: CameraDevice? = null
 
-
     private var focusManager: FocusManager? = null
 
     private var cameraSession: CameraSession? = null
 
     //相机配置
     private var cameraPreviewSize: Size? = null
-//    private var currentCameraCharacteristicsEntry: CameraCharacteristicsEntry? = null
-
-//    private val cameraCharacteristicsMap = mutableMapOf<String, CameraCharacteristicsEntry>() //camera_id-> CameraCharacteristicsEntry
-//    private val cameraMap = mutableMapOf<Int, CameraCharacteristicsEntry>() //len_face -> CameraCharacteristicsEntry
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_camera2)
-//        initCameraConfig()
         cameraThread.start()
         cameraHandler = Handler(cameraThread.looper, CameraHandlerCallback())
         initView()
@@ -83,12 +72,10 @@ class Camera2Act : AppCompatActivity() {
 
     private fun initManager() {
         focusManager = FocusManager(manualFocusView, Looper.getMainLooper())
-        val cameraDeviceManager = CameraDeviceManager(cameraManager, cameraHandler)
-        cameraSession = CameraSession(context = this, cameraConfig = CameraConfig(), cameraDeviceManager = cameraDeviceManager, cameraHandler = cameraHandler).apply {
+        cameraSession = CameraSession(context = this, cameraConfig = CameraConfig()).apply {
             lifecycle.addObserver(this)
         }
         cameraSession?.cameraSessionCb = CameraSessionCbImpl()
-
     }
 //
 //    private fun initCameraConfig() {
@@ -116,19 +103,7 @@ class Camera2Act : AppCompatActivity() {
 
     private fun initView() {
         takePicture.setOnClickListener {
-            cameraSession?.takePicture(object : CameraSession.TakePictureCb {
-                override fun onImageAvailable(bitmap: Bitmap) {
-                    val destFilePath = getRandomTakePictureFilePath()
-                    BitmapUtils.saveBitmapToFile(bitmap, destFilePath)
-                    uiThread {
-                        Camera2PreviewActivity.startPreviewActivity(this@Camera2Act, destFilePath)
-                    }
-                }
-
-                override fun onImageError(code: Int) {
-                    Logger.debug(TAG, "takePicture error $code")
-                }
-            })
+            cameraHandler.obtainMessage(MSG_TAKE_PICTURE).sendToTarget()
         }
         switchCamera.setOnClickListener {
             switchCamera()
@@ -168,15 +143,6 @@ class Camera2Act : AppCompatActivity() {
 
 
     private fun onCameraGranted() {
-//        val cameraEntry = cameraMap.filter { it.value.isFrontCamera() }.values.firstOrNull()
-//        if (cameraEntry != null) {
-//            cameraHandler.obtainMessage(MSG_CONFIG_CAMERA, cameraEntry).sendToTarget()
-//        } else {
-//            val cameraEntry = cameraMap.filter { it.value.isFrontCamera().not() }.values.firstOrNull()
-//            if (cameraEntry != null) {
-//                cameraHandler.obtainMessage(MSG_CONFIG_CAMERA, cameraEntry).sendToTarget()
-//            }
-//        }
         cameraHandler.obtainMessage(MSG_CONFIG_CAMERA).sendToTarget()
     }
 
@@ -244,21 +210,11 @@ class Camera2Act : AppCompatActivity() {
             Logger.debug(TAG, "handleMessage $msg")
             when (msg.what) {
                 MSG_SWITCH_CAMERA -> {
-//                    val destCameraCharacteristicsEntry = cameraMap.filter { it.value != currentCameraCharacteristicsEntry }.values.firstOrNull()
-//                    cameraHandler.obtainMessage(MSG_CONFIG_CAMERA, destCameraCharacteristicsEntry).sendToTarget()
                     cameraSession?.switchCamera()
                 }
                 MSG_CONFIG_CAMERA -> {
-//                    val cameraCharacteristicsEntry = msg.obj as CameraCharacteristicsEntry
-//                    if (cameraCharacteristicsEntry == currentCameraCharacteristicsEntry) {
-//                        Logger.debug(TAG, "config camera cancel,cameraCharacteristicsEntry same ")
-//                        return true
-//                    }
-//                    cameraSession?.setCharacteristicsEntry(cameraCharacteristicsEntry)
-//                    currentCameraCharacteristicsEntry = cameraCharacteristicsEntry
                     cameraSession?.initPreviewConfig()
                     Logger.debug(TAG, "config camera initPreviewConfig")
-
                 }
                 MSG_START_PREVIEW -> {
                     if (cameraPreviewSize != null) {
@@ -266,8 +222,21 @@ class Camera2Act : AppCompatActivity() {
                         val surfaceTexture = msg.obj as SurfaceTexture
                         cameraSession?.startPreview(surfaceTexture)
                     }
+                }
+                MSG_TAKE_PICTURE -> {
+                    cameraSession?.takePicture(object : CameraSession.TakePictureCb {
+                        override fun onImageAvailable(bitmap: Bitmap) {
+                            val destFilePath = getRandomTakePictureFilePath()
+                            BitmapUtils.saveBitmapToFile(bitmap, destFilePath)
+                            uiThread {
+                                Camera2PreviewActivity.startPreviewActivity(this@Camera2Act, destFilePath)
+                            }
+                        }
 
-
+                        override fun onImageError(code: Int) {
+                            Logger.debug(TAG, "takePicture error $code")
+                        }
+                    })
                 }
             }
             return true
@@ -311,11 +280,6 @@ class Camera2Act : AppCompatActivity() {
         override fun onSurfaceTextureUpdated(surface: SurfaceTexture?) {
 //            Logger.debug(TAG, "onSurfaceTextureUpdated")
         }
-    }
-
-
-    private fun buildCameraCharaEntry(cameraID: String, cameraCharacteristics: CameraCharacteristics): CameraCharacteristicsEntry {
-        return CameraCharacteristicsEntry(cameraID, cameraCharacteristics)
     }
 
 
