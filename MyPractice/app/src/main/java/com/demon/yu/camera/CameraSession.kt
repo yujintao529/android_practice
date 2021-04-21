@@ -10,6 +10,9 @@ import android.media.ImageReader
 import android.os.Handler
 import android.util.Size
 import android.view.Surface
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.OnLifecycleEvent
 import com.demon.yu.utils.BitmapUtils
 import com.demon.yu.utils.ToastUtils
 import com.example.mypractice.Logger
@@ -18,7 +21,7 @@ import kotlin.math.abs
 /**
  * 逻辑中有个假设，setSurfaceTexture调用前于camera open
  */
-open class CameraSession(private val context: Context, private val cameraDeviceManager: CameraDeviceManager, private val cameraConfig: CameraConfig, private val cameraHandler: Handler) : CameraDeviceManager.CameraDeviceCb {
+open class CameraSession(private val context: Context, private val cameraDeviceManager: CameraDeviceManager, private val cameraConfig: CameraConfig, private val cameraHandler: Handler) : CameraDeviceManager.CameraDeviceCb, LifecycleObserver {
 
 
     companion object {
@@ -49,29 +52,85 @@ open class CameraSession(private val context: Context, private val cameraDeviceM
 
     //摄像头相关配置
     private var cameraCharacteristicsEntry: CameraCharacteristicsEntry? = null
+    private var currentCameraFacing: Int = cameraConfig.cameraFacing
 
 
     init {
         cameraDeviceManager.cameraDeviceCb = this
     }
 
-    fun setCharacteristicsEntry(cameraCharacteristicsEntry: CameraCharacteristicsEntry) {
+
+    fun initPreviewConfig() {
+        val pair = CameraUtils.takeCameraInterval(cameraDeviceManager.cameraManager, currentCameraFacing)
+                ?: throw java.lang.IllegalStateException("initConfig error, no camera found")
+        val cameraCharacteristicsEntry = CameraCharacteristicsEntry(pair.first, pair.second)
+        setCharacteristicsEntry(cameraCharacteristicsEntry)
+    }
+
+
+    private fun setCharacteristicsEntry(cameraCharacteristicsEntry: CameraCharacteristicsEntry): Boolean {
         requestManager.setCharacteristics(cameraCharacteristicsEntry.cameraCharacteristics)
-        val size = getOptimalSize(cameraCharacteristicsEntry.cameraCharacteristics, SurfaceTexture::class.java, cameraConfig.aspectRatio)
-        cameraConfig.aspectRatio = size.width * 1f / size.height
-        cameraConfig.previewSize = size
-        cameraConfig.pictureSize = getOptimalSize(cameraCharacteristicsEntry.cameraCharacteristics, ImageReader::class.java, cameraConfig.aspectRatio)
-        imageReader = ImageReader.newInstance(size.width, size.height, ImageFormat.JPEG, 2)
+        val size = calculatePreviewSize(cameraCharacteristicsEntry.cameraCharacteristics, cameraConfig.aspectRatio)
         this.cameraCharacteristicsEntry = cameraCharacteristicsEntry
-        cameraSessionCb?.onCameraPreviewSizeChanged(size, cameraCharacteristicsEntry.cameraCharacteristics)
+        if (size != cameraConfig.previewSize) {
+            cameraConfig.aspectRatio = size.width * 1f / size.height
+            cameraConfig.previewSize = size
+            cameraConfig.pictureSize = getOptimalSize(cameraCharacteristicsEntry.cameraCharacteristics, ImageReader::class.java, cameraConfig.aspectRatio)
+            imageReader?.close()
+            imageReader = ImageReader.newInstance(size.width, size.height, ImageFormat.JPEG, 2)
+            cameraSessionCb?.onCameraPreviewSizeChanged(size, cameraCharacteristicsEntry.cameraCharacteristics)
+            return true
+        }
+        return false
+    }
+
+
+    private fun calculatePreviewSize(cameraCharacteristics: CameraCharacteristics, aspectRatio: Float): Size {
+        return getOptimalSize(cameraCharacteristics, SurfaceTexture::class.java, aspectRatio)
+    }
+
+
+    /**
+     * 切换摄像头,不考虑切换摄像头导致的分辨率不支持的问题
+     */
+    fun switchCamera() {
+        Logger.d(TAG, "switchCamera currentCameraFacing = $currentCameraFacing")
+        currentCameraFacing = if (currentCameraFacing == CameraCharacteristics.LENS_FACING_FRONT) {
+            CameraCharacteristics.LENS_FACING_BACK
+        } else {
+            CameraCharacteristics.LENS_FACING_FRONT
+        }
+        rePreview()
+    }
+
+    private fun rePreview() {
+        val pair = CameraUtils.takeCameraInterval(cameraDeviceManager.cameraManager, currentCameraFacing)
+                ?: throw java.lang.IllegalStateException("initConfig error, no camera found")
+        val cameraCharacteristicsEntry = CameraCharacteristicsEntry(pair.first, pair.second)
+        if (setCharacteristicsEntry(cameraCharacteristicsEntry).not()) {
+            cameraCaptureSession?.stopRepeating()
+            cameraDevice?.close()
+            surfaceTexture?.let {
+                startPreview(it)
+            }
+        }
 
     }
 
 
     private fun setCameraCaptureSession(cameraCaptureSession: CameraCaptureSession, preview: Boolean) {
         this.cameraCaptureSession = cameraCaptureSession
+        if (preview) {
+            cameraDevice?.let {
+                val builder = requestManager.createPreviewRequestBuilder(it)
+                surface?.let { surface ->
+                    builder.addTarget(surface)
+                }
+                val request = requestManager.getPreviewRequest(builder)
+                cameraCaptureSession.setRepeatingRequest(request, PreviewCaptureListener(), cameraHandler)
+            }
+        }
     }
-
 
     /**
      * 拍照
@@ -113,9 +172,15 @@ open class CameraSession(private val context: Context, private val cameraDeviceM
     }
 
 
+    @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+    fun onDestroy() {
+        cameraCaptureSession?.stopRepeating()
+        cameraDevice?.close()
+    }
+
+
     private fun buildCameraPreviewSession(cameraDevice: CameraDevice, surfaceTexture: SurfaceTexture) {
         this.cameraDevice = cameraDevice
-        this.surfaceTexture = surfaceTexture
         this.surface = Surface(surfaceTexture)
         val list = mutableListOf<Surface>()
         this.surface?.let {
@@ -174,7 +239,6 @@ open class CameraSession(private val context: Context, private val cameraDeviceM
      * 3. 开始预览
      */
     fun startPreview(surfaceTexture: SurfaceTexture) {
-
         this.surfaceTexture = surfaceTexture
         if (cameraCharacteristicsEntry == null) {
             throw IllegalStateException(" cameraCharacteristicsEntry is null, please call setCameraCharacteristicsEntry before")
@@ -201,6 +265,43 @@ open class CameraSession(private val context: Context, private val cameraDeviceM
     override fun onCameraError(camera: CameraDevice, error: Int) {
         ToastUtils.toast("onCameraError error=$error ")
         Logger.debug(TAG, "onCameraError cameraDevice=$cameraDevice,error=$error")
+    }
+
+    private inner class PreviewCaptureListener : CameraCaptureSession.CaptureCallback() {
+        override fun onCaptureStarted(session: CameraCaptureSession, request: CaptureRequest, timestamp: Long, frameNumber: Long) {
+            super.onCaptureStarted(session, request, timestamp, frameNumber)
+//            Logger.debug(TAG, "onCaptureStarted session=$session")
+        }
+
+        override fun onCaptureProgressed(session: CameraCaptureSession, request: CaptureRequest, partialResult: CaptureResult) {
+            super.onCaptureProgressed(session, request, partialResult)
+            Logger.debug(TAG, "onCaptureProgressed session=$session")
+        }
+
+        override fun onCaptureCompleted(session: CameraCaptureSession, request: CaptureRequest, result: TotalCaptureResult) {
+            super.onCaptureCompleted(session, request, result)
+//            Logger.debug(TAG, "onCaptureCompleted session=$session")
+        }
+
+        override fun onCaptureFailed(session: CameraCaptureSession, request: CaptureRequest, failure: CaptureFailure) {
+            super.onCaptureFailed(session, request, failure)
+            Logger.debug(TAG, "onCaptureFailed session=$session")
+        }
+
+        override fun onCaptureSequenceCompleted(session: CameraCaptureSession, sequenceId: Int, frameNumber: Long) {
+            super.onCaptureSequenceCompleted(session, sequenceId, frameNumber)
+            Logger.debug(TAG, "onCaptureSequenceCompleted session=$session")
+        }
+
+        override fun onCaptureSequenceAborted(session: CameraCaptureSession, sequenceId: Int) {
+            super.onCaptureSequenceAborted(session, sequenceId)
+            Logger.debug(TAG, "onCaptureSequenceAborted session=$session")
+        }
+
+        override fun onCaptureBufferLost(session: CameraCaptureSession, request: CaptureRequest, target: Surface, frameNumber: Long) {
+            super.onCaptureBufferLost(session, request, target, frameNumber)
+            Logger.debug(TAG, "onCaptureBufferLost session=$session")
+        }
     }
 
 

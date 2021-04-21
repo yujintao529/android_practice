@@ -1,6 +1,8 @@
 package com.demon.yu.camera;
 
+import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCharacteristics;
+import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.params.MeteringRectangle;
 import android.util.Log;
@@ -29,6 +31,18 @@ public class RequestManager {
         builder.set(CaptureRequest.CONTROL_MODE, CaptureRequest.CONTROL_MODE_AUTO);
         builder.set(CaptureRequest.CONTROL_AF_TRIGGER, CaptureRequest.CONTROL_AF_TRIGGER_IDLE);
         return builder.build();
+    }
+
+
+    public CaptureRequest.Builder createPreviewRequestBuilder(CameraDevice cameraDevice) {
+        CaptureRequest.Builder builder = null;
+        try {
+            builder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+            return builder;
+        } catch (CameraAccessException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public CaptureRequest getTouch2FocusRequest(CaptureRequest.Builder builder,

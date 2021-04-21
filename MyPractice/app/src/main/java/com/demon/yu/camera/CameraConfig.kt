@@ -1,5 +1,6 @@
 package com.demon.yu.camera
 
+import android.hardware.camera2.CameraCharacteristics
 import android.util.Size
 
 class CameraConfig {
@@ -10,7 +11,8 @@ class CameraConfig {
 
     var previewSize: Size = Size(0, 0)
     var pictureSize: Size = Size(0, 0)
-    var aspectRatio: Float = RATIO_4_3
+    var aspectRatio: Float = RATIO_16_9
+    var cameraFacing: Int = CameraCharacteristics.LENS_FACING_FRONT
 
 
 }

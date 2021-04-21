@@ -10,7 +10,7 @@ import android.os.Handler
 /**
  * 负责控制camera打开关闭
  */
-class CameraDeviceManager(private val cameraManager: CameraManager, private val cameraHandler: Handler) : CameraDevice.StateCallback() {
+class CameraDeviceManager(val cameraManager: CameraManager, private val cameraHandler: Handler) : CameraDevice.StateCallback() {
 
     private var currentCameraDevice: CameraDevice? = null
     private var currentCameraCharacteristicsEntry: CameraCharacteristicsEntry? = null
