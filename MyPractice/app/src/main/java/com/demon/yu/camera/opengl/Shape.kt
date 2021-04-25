@@ -1,6 +1,7 @@
 package com.demon.yu.camera.opengl
 
-import android.opengl.GLES31
+import android.opengl.GLES30
+import com.example.mypractice.Logger
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.FloatBuffer
@@ -22,33 +23,51 @@ var squareCoords = floatArrayOf(
 
 fun loadShader(type: Int, shaderCode: String): Int {
 
-    // create a vertex shader type (GLES31.GL_VERTEX_SHADER)
-    // or a fragment shader type (GLES31.GL_FRAGMENT_SHADER)
-    return GLES31.glCreateShader(type).also { shader ->
+    // create a vertex shader type (GLES30.GL_VERTEX_SHADER)
+    // or a fragment shader type (GLES30.GL_FRAGMENT_SHADER)
+    return GLES30.glCreateShader(type).also { shader ->
 
         // add the source code to the shader and compile it
-        GLES31.glShaderSource(shader, shaderCode)
-        GLES31.glCompileShader(shader)
+        GLES30.glShaderSource(shader, shaderCode)
+        GLES30.glCompileShader(shader)
+        val status = IntArray(1)
+        GLES30.glGetShaderiv(shader, GLES30.GL_COMPILE_STATUS, status, 0)
+        if (status[0] == GLES30.GL_FALSE) {
+            Logger.debug("shape", "compile shader: " + type + ", error: " + GLES30.glGetShaderInfoLog(shader));
+            GLES30.glDeleteShader(shader);
+        }
+
     }
 }
 
+/**
+ * 着色器脚本的基本流程
+ * 1. 创建着色器脚本
+ * 2. gl.glCreateShader（GL_VERTEX_SHADER｜GL_FRAGMENT_SHADER） 创建一个类型的shader
+ * 3. gl.glShaderSource(shader,shaderCode) 绑定shader code
+ * 4. gl.glCompileShader(shader) 编译shader
+ * 5. gl.glCreateProgram 创建program
+ * 6. gl.glAttachShader(program,shader) 添加shader
+ * 7. gl.glLinkProgram(program) 链接程序，等待执行
+ * 8. gl.glUseProgram(program) 使用program
+ */
 class Triangle {
 
     private val vertexShaderCode =
-            "attribute vec4 vPosition;" +
-                    "void main() {" +
-                    "  gl_Position = vPosition;" +
+            "attribute vec4 vPosition;\n" +
+                    "void main() {\n" +
+                    "  gl_Position = vPosition;\n" +
                     "}"
 
     private val fragmentShaderCode =
-            "precision mediump float;" +
-                    "uniform vec4 vColor;" +
-                    "void main() {" +
-                    "  gl_FragColor = vColor;" +
+            "precision mediump float;\n" +
+                    "uniform vec4 vColor;\n" +
+                    "void main() {\n" +
+                    "  gl_FragColor = vColor;\n" +
                     "}"
 
     // Set color with red, green, blue and alpha (opacity) values
-    val color = floatArrayOf(0.63671875f, 0.76953125f, 0.22265625f, 1.0f)
+    val color = floatArrayOf(0.63671875f, 0.76953125f, 0.22265625f, 0f)
 
     private var vertexBuffer: FloatBuffer =
             // (number of coordinate values * 4 bytes per float)
@@ -72,55 +91,65 @@ class Triangle {
     private val vertexStride: Int = COORDS_PER_VERTEX * 4 // 4 bytes per vertex
 
     init {
-        val vertexShader: Int = loadShader(GLES31.GL_VERTEX_SHADER, vertexShaderCode)
-        val fragmentShader: Int = loadShader(GLES31.GL_FRAGMENT_SHADER, fragmentShaderCode)
+        val vertexShader: Int = loadShader(GLES30.GL_VERTEX_SHADER, vertexShaderCode)
+        val fragmentShader: Int = loadShader(GLES30.GL_FRAGMENT_SHADER, fragmentShaderCode)
 
         // create empty OpenGL ES Program
-        mProgram = GLES31.glCreateProgram().also {
+        mProgram = GLES30.glCreateProgram().also {
 
             // add the vertex shader to program
-            GLES31.glAttachShader(it, vertexShader)
+            GLES30.glAttachShader(it, vertexShader)
 
             // add the fragment shader to program
-            GLES31.glAttachShader(it, fragmentShader)
+            GLES30.glAttachShader(it, fragmentShader)
 
             // creates OpenGL ES program executables
-            GLES31.glLinkProgram(it)
+            GLES30.glLinkProgram(it)
+
+            GLES30.glValidateProgram(it)  // 让OpenGL来验证一下我们的shader program，并获取验证的状态
+
+            val status = IntArray(1)
+
+            GLES30.glGetProgramiv(it, GLES30.GL_VALIDATE_STATUS, status, 0)
+
+            Logger.debug("shape", "mProgram status status=${GLES30.GL_TRUE == status[0]} infoLog  ${GLES30.glGetProgramInfoLog(it)}")
         }
     }
 
     fun draw() {
         // Add program to OpenGL ES environment
-        GLES31.glUseProgram(mProgram)
+
+
+        GLES30.glUseProgram(mProgram)
 
         // get handle to vertex shader's vPosition member
-        positionHandle = GLES31.glGetAttribLocation(mProgram, "vPosition").also {
+        positionHandle = GLES30.glGetAttribLocation(mProgram, "vPosition").also {
 
             // Enable a handle to the triangle vertices
-            GLES31.glEnableVertexAttribArray(it)
+            GLES30.glEnableVertexAttribArray(it)
 
             // Prepare the triangle coordinate data
-            GLES31.glVertexAttribPointer(
+            GLES30.glVertexAttribPointer(
                     it,
                     COORDS_PER_VERTEX,
-                    GLES31.GL_FLOAT,
+                    GLES30.GL_FLOAT,
                     false,
                     vertexStride,
                     vertexBuffer
             )
 
             // get handle to fragment shader's vColor member
-            mColorHandle = GLES31.glGetUniformLocation(mProgram, "vColor").also { colorHandle ->
+            mColorHandle = GLES30.glGetUniformLocation(mProgram, "vColor").also { colorHandle ->
 
                 // Set color for drawing the triangle
-                GLES31.glUniform4fv(colorHandle, 1, color, 0)
+                GLES30.glUniform4fv(colorHandle, 1, color, 0)
             }
 
             // Draw the triangle
-            GLES31.glDrawArrays(GLES31.GL_TRIANGLES, 0, vertexCount)
+            GLES30.glDrawArrays(GLES30.GL_TRIANGLES, 0, vertexCount)
 
             // Disable vertex array
-            GLES31.glDisableVertexAttribArray(it)
+            GLES30.glDisableVertexAttribArray(it)
         }
     }
 }
