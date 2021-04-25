@@ -508,6 +508,7 @@
         <activity
             android:name="com.demon.yu.camera.opengl.OpenGLBaseActivity"
             android:label="camera/OpenGLBaseActivity"
+            android:screenOrientation="sensor"
             android:theme="@style/AppTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

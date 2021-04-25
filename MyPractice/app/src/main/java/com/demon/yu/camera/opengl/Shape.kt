@@ -9,9 +9,9 @@ import java.nio.ShortBuffer
 
 const val COORDS_PER_VERTEX = 3
 var triangleCoords = floatArrayOf(     // in counterclockwise order:
-        0.0f, 0.622008459f, 0.0f,      // top
-        -0.5f, -0.311004243f, 0.0f,    // bottom left
-        0.5f, -0.311004243f, 0.0f      // bottom right
+        0.0f, 1f, 0.0f,      // top
+        -1f, -1f, 0.0f,    // bottom left
+        1f, -1f, 0.0f      // bottom right
 )
 var squareCoords = floatArrayOf(
         -0.5f, 0.5f, 0.0f,      // top left
@@ -54,9 +54,10 @@ fun loadShader(type: Int, shaderCode: String): Int {
 class Triangle {
 
     private val vertexShaderCode =
-            "attribute vec4 vPosition;\n" +
+            "uniform mat4 uMVPMatrix;\n" +
+                    "attribute vec4 vPosition;\n" +
                     "void main() {\n" +
-                    "  gl_Position = vPosition;\n" +
+                    "  gl_Position = uMVPMatrix * vPosition;\n" +
                     "}"
 
     private val fragmentShaderCode =
@@ -87,6 +88,7 @@ class Triangle {
     private var mProgram: Int
     private var positionHandle: Int = 0
     private var mColorHandle: Int = 0
+    private var uMVPMatrixHandle: Int = 0
     private val vertexCount: Int = triangleCoords.size / COORDS_PER_VERTEX
     private val vertexStride: Int = COORDS_PER_VERTEX * 4 // 4 bytes per vertex
 
@@ -116,7 +118,7 @@ class Triangle {
         }
     }
 
-    fun draw() {
+    fun draw(mvpMatrix: FloatArray) {
         // Add program to OpenGL ES environment
 
 
@@ -127,6 +129,12 @@ class Triangle {
 
             // Enable a handle to the triangle vertices
             GLES30.glEnableVertexAttribArray(it)
+
+
+            uMVPMatrixHandle = GLES30.glGetUniformLocation(mProgram, "uMVPMatrix")
+
+            // Pass the projection and view transformation to the shader
+            GLES30.glUniformMatrix4fv(uMVPMatrixHandle, 1, false, mvpMatrix, 0)
 
             // Prepare the triangle coordinate data
             GLES30.glVertexAttribPointer(
