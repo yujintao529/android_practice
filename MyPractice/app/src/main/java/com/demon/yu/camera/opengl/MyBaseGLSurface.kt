@@ -24,6 +24,7 @@ import javax.microedition.khronos.opengles.GL10
  *
  * opengl坐标系：
  *
+ *
  * 应用投影和相机矩阵的流程及含义
  * 1.
  */
@@ -36,7 +37,6 @@ class MyBaseGLSurface(context: Context) : GLSurfaceView(context) {
         setEGLContextClientVersion(3)
         setRenderer(myRenderer)
     }
-
 
     private inner class MyBaseRender : Renderer {
         private var triangle: Triangle? = null
@@ -54,7 +54,6 @@ class MyBaseGLSurface(context: Context) : GLSurfaceView(context) {
             val ratio: Float = width.toFloat() / height.toFloat()
             GLES30.glViewport(0, 0, width, height)
             // create a projection matrix from device screen geometry
-            Matrix.perspectiveM()
             Matrix.frustumM(projectionMatrix, 0, -ratio, ratio, -1f, 1f, 3f, 7f) //透视函数
 
 
@@ -63,7 +62,7 @@ class MyBaseGLSurface(context: Context) : GLSurfaceView(context) {
         override fun onDrawFrame(gl: GL10?) {
             GLES30.glClear(GLES30.GL_COLOR_BUFFER_BIT)//根据指定的指执行清楚操作
             // Set the camera position (View matrix)
-            Matrix.setLookAtM(viewMatrix, 0, 0f, 0f, 3f, 0f, 0f, 0f, 0f, 1.0f, 0.0f)
+            Matrix.setLookAtM(viewMatrix, 0, 0f, 0f, 7f, 0f, 0f, 0f, 0f, 1.0f, 0.0f)
             // Combine the projection and camera view matrices
             Matrix.multiplyMM(vPMatrix, 0, projectionMatrix, 0, viewMatrix, 0)
             triangle?.draw(vPMatrix)
