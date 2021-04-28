@@ -76,7 +76,9 @@ open class CameraSession(private val context: Context, private val cameraConfig:
     init {
         cameraThread.start()
         cameraHandler = Handler(cameraThread.looper, this)
-        cameraDeviceManager = CameraDeviceManager(context.getSystemService(CameraManager::class.java), cameraHandler)
+        cameraDeviceManager = CameraDeviceManager(context.getSystemService(CameraManager::class.java), cameraHandler).also {
+            it.cameraDeviceCb = this
+        }
     }
 
 
