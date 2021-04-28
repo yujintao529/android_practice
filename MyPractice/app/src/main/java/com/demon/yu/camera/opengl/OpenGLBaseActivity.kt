@@ -76,7 +76,7 @@ class OpenGLBaseActivity : AppCompatActivity() {
                 myBaseGLSurface?.myRenderer?.lookAtEyeZ = value
             }
         }
-        seekView?.initValueRange(3.2f, 3.1f, 9.9f)
+        seekView?.initValueRange(6f, 3.1f, 9.9f)
 
     }
 

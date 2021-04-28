@@ -43,6 +43,7 @@ class MyBaseGLSurface(context: Context) : GLSurfaceView(context) {
         myRenderer = MyBaseTriangleLookAtRender()
         setEGLContextClientVersion(3)
         setRenderer(myRenderer)
+//        renderMode = GLSurfaceView.RENDERMODE_WHEN_DIRTY
     }
 
 
@@ -99,6 +100,9 @@ class MyBaseGLSurface(context: Context) : GLSurfaceView(context) {
 
     }
 
+    /**
+     * 可以进行调节的三角形
+     */
     inner class MyBaseTriangleLookAtRender : Renderer {
         private var triangle: Triangle? = null
         private val vPMatrix = FloatArray(16)
@@ -148,6 +152,10 @@ class MyBaseGLSurface(context: Context) : GLSurfaceView(context) {
             GLES30.glClear(GLES30.GL_COLOR_BUFFER_BIT)//根据指定的指执行清楚操作
             // Set the camera position (View matrix)
             Matrix.setLookAtM(viewMatrix, 0, lookAtEyeX, lookAtEyeY, lookAtEyeZ, 0f, 0f, 0f, lookAtX, lookAtY, lookAtZ)
+            // Create a rotation transformation for the triangle
+//            val time = SystemClock.uptimeMillis() % 4000L
+//            val angle = 0.090f * time.toInt()
+//            Matrix.setRotateM(viewMatrix, 0, angle, 0f, 0f, -1.0f)
             // Combine the projection and camera view matrices
             Matrix.multiplyMM(vPMatrix, 0, projectionMatrix, 0, viewMatrix, 0)
             triangle?.draw(vPMatrix)
