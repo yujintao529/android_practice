@@ -23,7 +23,7 @@ import kotlin.math.abs
 /**
  * 逻辑中有个假设，setSurfaceTexture调用前于camera open
  */
-open class CameraSession(private val context: Context, private val cameraConfig: CameraConfig) : CameraDeviceManager.CameraDeviceCb, Handler.Callback, LifecycleObserver {
+class CameraSession(private val context: Context, private val cameraConfig: CameraConfig) : CameraDeviceManager.CameraDeviceCb, Handler.Callback, LifecycleObserver {
 
 
     companion object {
@@ -76,7 +76,10 @@ open class CameraSession(private val context: Context, private val cameraConfig:
     init {
         cameraThread.start()
         cameraHandler = Handler(cameraThread.looper, this)
-        cameraDeviceManager = CameraDeviceManager(context.getSystemService(CameraManager::class.java), cameraHandler)
+        cameraDeviceManager = CameraDeviceManager(context.getSystemService(CameraManager::class.java), cameraHandler).also {
+            it.cameraDeviceCb = this
+        }
+
     }
 
 
@@ -212,7 +215,7 @@ open class CameraSession(private val context: Context, private val cameraConfig:
             }
             MSG_RE_PREVIEW -> {
                 val cameraCharacteristicsEntry = msg.obj as CameraCharacteristicsEntry
-                setCharacteristicsEntry(cameraCharacteristicsEntry)
+                rePreviewInterval(cameraCharacteristicsEntry)
             }
             MSG_TAKE_PICTURE -> {
                 val cb = msg.obj as TakePictureCb
