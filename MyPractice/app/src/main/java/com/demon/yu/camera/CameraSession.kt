@@ -90,6 +90,7 @@ open class CameraSession(private val context: Context, private val cameraConfig:
 
     @CameraThread
     private fun setCharacteristicsEntry(cameraCharacteristicsEntry: CameraCharacteristicsEntry): Boolean {
+        Logger.debug(TAG, "setCharacteristicsEntry =$cameraCharacteristicsEntry")
         requestManager.setCharacteristics(cameraCharacteristicsEntry.cameraCharacteristics)
         val size = calculatePreviewSize(cameraCharacteristicsEntry.cameraCharacteristics, cameraConfig.aspectRatio)
         this.cameraCharacteristicsEntry = cameraCharacteristicsEntry

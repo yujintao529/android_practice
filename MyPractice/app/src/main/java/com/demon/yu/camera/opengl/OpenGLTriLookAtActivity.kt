@@ -9,12 +9,15 @@ import com.demon.yu.view.CommonSeekViewContainer
 import com.example.mypractice.R
 import com.example.mypractice.common.Common
 
-class OpenGLBaseActivity : AppCompatActivity() {
+class OpenGLTriLookAtActivity : AppCompatActivity() {
 
 
     private var rootView: FrameLayout? = null
     private var commonSeekViewContainer: CommonSeekViewContainer? = null
     private var myBaseGLSurface: MyBaseGLSurface? = null
+    private val myBaseTriangleRender by lazy { MyBaseTriangleRender() }
+    private val MyBaseTriangleLookAtRender by lazy { MyBaseTriangleLookAtRender() }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_opengl_es_base)
@@ -22,17 +25,18 @@ class OpenGLBaseActivity : AppCompatActivity() {
         commonSeekViewContainer = findViewById(R.id.commonSeekViewContainer)
         myBaseGLSurface = MyBaseGLSurface(this).also {
             rootView?.addView(it, 0, ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, Common.screenHeight / 2))
+            it.setRenderer(MyBaseTriangleLookAtRender)
         }
         initLookAtParams()
     }
 
-    fun initLookAtParams() {
+    private fun initLookAtParams() {
         var seekView = commonSeekViewContainer?.createSeekView()
         seekView?.setLabel("setLookAt-upX")
         seekView?.initValueRange(0f, -1f, 1f)
         seekView?.valueChangedListener = object : CommonSeekView.ValueChangedListener {
             override fun onValueChanged(value: Float) {
-                myBaseGLSurface?.setLookAtX(value)
+                MyBaseTriangleLookAtRender.lookAtX = value
             }
         }
         seekView = commonSeekViewContainer?.createSeekView()
@@ -40,7 +44,7 @@ class OpenGLBaseActivity : AppCompatActivity() {
         seekView?.initValueRange(1f, -1f, 1f)
         seekView?.valueChangedListener = object : CommonSeekView.ValueChangedListener {
             override fun onValueChanged(value: Float) {
-                myBaseGLSurface?.setLookAtY(value)
+                MyBaseTriangleLookAtRender.lookAtY = value
             }
         }
         seekView = commonSeekViewContainer?.createSeekView()
@@ -48,7 +52,7 @@ class OpenGLBaseActivity : AppCompatActivity() {
         seekView?.initValueRange(0f, -1f, 1f)
         seekView?.valueChangedListener = object : CommonSeekView.ValueChangedListener {
             override fun onValueChanged(value: Float) {
-                myBaseGLSurface?.setLookAtZ(value)
+                MyBaseTriangleLookAtRender.lookAtZ = value
             }
         }
         seekView = commonSeekViewContainer?.createSeekView()
@@ -56,7 +60,7 @@ class OpenGLBaseActivity : AppCompatActivity() {
 
         seekView?.valueChangedListener = object : CommonSeekView.ValueChangedListener {
             override fun onValueChanged(value: Float) {
-                myBaseGLSurface?.myRenderer?.lookAtEyeX = value
+                MyBaseTriangleLookAtRender.lookAtEyeX = value
             }
         }
         seekView?.initValueRange(0f, -5f, 5f)
@@ -65,7 +69,7 @@ class OpenGLBaseActivity : AppCompatActivity() {
 
         seekView?.valueChangedListener = object : CommonSeekView.ValueChangedListener {
             override fun onValueChanged(value: Float) {
-                myBaseGLSurface?.myRenderer?.lookAtEyeY = value
+                MyBaseTriangleLookAtRender.lookAtEyeY = value
             }
         }
         seekView?.initValueRange(0f, -5f, 5f)
@@ -73,7 +77,7 @@ class OpenGLBaseActivity : AppCompatActivity() {
         seekView?.setLabel("setLookAt-eyeZ")
         seekView?.valueChangedListener = object : CommonSeekView.ValueChangedListener {
             override fun onValueChanged(value: Float) {
-                myBaseGLSurface?.myRenderer?.lookAtEyeZ = value
+                MyBaseTriangleLookAtRender.lookAtEyeZ = value
             }
         }
         seekView?.initValueRange(6f, 3.1f, 9.9f)

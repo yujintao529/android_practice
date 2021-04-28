@@ -506,7 +506,7 @@
             android:label="camera/Camera2Act"
             android:theme="@style/AppTheme" />
         <activity
-            android:name="com.demon.yu.camera.opengl.OpenGLBaseActivity"
+            android:name="com.demon.yu.camera.opengl.OpenGLTriLookAtActivity"
             android:label="camera/OpenGLBaseActivity"
             android:theme="@style/AppTheme">
             <intent-filter>
