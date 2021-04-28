@@ -32,12 +32,12 @@ import java.io.File
  *
  *
  * question:
- * 1. bitmap canvas matrix旋转的效果。bitmap.createBitmap相关方法的作用
+ * 1. bitmap canvas matrix旋转的效果。
  */
-class Camera2Act : AppCompatActivity() {
+class Camera2OpenGLAct : AppCompatActivity() {
 
     companion object {
-        const val TAG = "Camera2Act"
+        const val TAG = "Camera2OpenGLAct"
         const val REQUEST_CAMERA_COD = 1
         const val MSG_CONFIG_CAMERA = 2
         const val MSG_START_PREVIEW = 3
@@ -229,7 +229,7 @@ class Camera2Act : AppCompatActivity() {
                             val destFilePath = getRandomTakePictureFilePath()
                             BitmapUtils.saveBitmapToFile(bitmap, destFilePath)
                             uiThread {
-                                Camera2PreviewActivity.startPreviewActivity(this@Camera2Act, destFilePath)
+                                Camera2PreviewActivity.startPreviewActivity(this@Camera2OpenGLAct, destFilePath)
                             }
                         }
 
