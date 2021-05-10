@@ -17,17 +17,12 @@ import javax.microedition.khronos.egl.EGLDisplay
  * 3. opengl坐标系，是将屏幕（无论什么尺寸）都归一化为[-1,1][1,1][-1,-1],[1,-1]的坐标系里。所以为了将图像能够正常现实到屏幕中需要进行投影和相机视图的转变
  * task:
  * 1. 横竖屏都是等边三角形
- * 2. 可以观看3d三角形的界面。
+ * 2. 一个观看平面三角形的界面，可以查看透视投影的参数的含义
  *
  * 透视投影变换：https://blog.csdn.net/popy007/article/details/1797121
  *
 
- * opengl坐标系：
- *
- * 应用投影和相机矩阵的流程及含义
- * * 几个关键函数
- * * 1. gl.frustumM  gl.setLookAtM
- *
+
  *
  *
  *

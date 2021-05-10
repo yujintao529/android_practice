@@ -36,7 +36,7 @@ class OpenGLTriLookAtActivity : AppCompatActivity() {
         seekView?.initValueRange(0f, -1f, 1f)
         seekView?.valueChangedListener = object : CommonSeekView.ValueChangedListener {
             override fun onValueChanged(value: Float) {
-                MyBaseTriangleLookAtRender.lookAtX = value
+                MyBaseTriangleLookAtRender.lookAtUpX = value
             }
         }
         seekView = commonSeekViewContainer?.createSeekView()
@@ -44,7 +44,7 @@ class OpenGLTriLookAtActivity : AppCompatActivity() {
         seekView?.initValueRange(1f, -1f, 1f)
         seekView?.valueChangedListener = object : CommonSeekView.ValueChangedListener {
             override fun onValueChanged(value: Float) {
-                MyBaseTriangleLookAtRender.lookAtY = value
+                MyBaseTriangleLookAtRender.lookAtUpY = value
             }
         }
         seekView = commonSeekViewContainer?.createSeekView()
@@ -52,7 +52,7 @@ class OpenGLTriLookAtActivity : AppCompatActivity() {
         seekView?.initValueRange(0f, -1f, 1f)
         seekView?.valueChangedListener = object : CommonSeekView.ValueChangedListener {
             override fun onValueChanged(value: Float) {
-                MyBaseTriangleLookAtRender.lookAtZ = value
+                MyBaseTriangleLookAtRender.lookAtUpZ = value
             }
         }
         seekView = commonSeekViewContainer?.createSeekView()
@@ -81,6 +81,33 @@ class OpenGLTriLookAtActivity : AppCompatActivity() {
             }
         }
         seekView?.initValueRange(6f, 3.1f, 9.9f)
+
+        seekView = commonSeekViewContainer?.createSeekView()
+        seekView?.setLabel("lookAtCenX")
+        seekView?.valueChangedListener = object : CommonSeekView.ValueChangedListener {
+            override fun onValueChanged(value: Float) {
+                MyBaseTriangleLookAtRender.lootAtCenterX = value
+            }
+        }
+        seekView?.initValueRange(0f, -5f, 5f)
+
+        seekView = commonSeekViewContainer?.createSeekView()
+        seekView?.setLabel("lookAtCenY")
+        seekView?.valueChangedListener = object : CommonSeekView.ValueChangedListener {
+            override fun onValueChanged(value: Float) {
+                MyBaseTriangleLookAtRender.lootAtCenterY = value
+            }
+        }
+        seekView?.initValueRange(0f, -5f, 5f)
+
+        seekView = commonSeekViewContainer?.createSeekView()
+        seekView?.setLabel("lookAtCenZ")
+        seekView?.valueChangedListener = object : CommonSeekView.ValueChangedListener {
+            override fun onValueChanged(value: Float) {
+                MyBaseTriangleLookAtRender.lootAtCenterZ = value
+            }
+        }
+        seekView?.initValueRange(0f, -5f, 5f)
 
     }
 
