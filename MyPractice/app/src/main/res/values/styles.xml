@@ -13,7 +13,7 @@
     </style>
 
     <!-- Application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light">
+    <style name="AppTheme" parent="android:Theme.Light">
         <item name="android:listPreferredItemPaddingLeft">10dp</item>
         <item name="android:listPreferredItemPaddingRight">10dp</item>
         <item name="android:windowActionBar">false</item>
@@ -22,34 +22,33 @@
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
     </style>
 
-    <style name="toolbarTheme" parent="Theme.AppCompat">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
-        <item name="colorPrimary">@color/accent_material_dark</item>
-        <item name="colorPrimaryDark">@color/accent_material_light</item>
+    <style name="toolbarTheme" parent="android:Theme.Light">
+        <!--        <item name="windowActionBar">false</item>-->
+        <!--        <item name="windowNoTitle">true</item>-->
+        <!--        <item name="colorPrimary">@color/accent_material_dark</item>-->
+        <!--        <item name="colorPrimaryDark">@color/accent_material_light</item>-->
         <item name="android:textAppearanceMedium">@dimen/text_size_midium</item>
 
         <!--<item name="android:navigationBarColor">@color/accent_material_light</item>5.0可以使用,其实就是设置导航栏toolbar的背景色，和backgroupdcolor是一样的-->
     </style>
-    <style name="common_btn" parent="Widget.AppCompat.Button">
+
+    <style name="common_btn" parent="android:Widget.Button">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
     </style>
-    <style name="common_material_btn" parent="@style/Widget.AppCompat.Button">
+
+    <style name="common_material_btn" parent="android:Widget.Button">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:minHeight">30dp</item>
         <item name="android:minWidth">80dp</item>
         <item name="android:background">@drawable/ripple_1</item>
     </style>
-    <style name="card_view_style" parent="@style/CardView.Light">
-
-    </style>
     <style name="MfwTabDefaultStyle">
         <item name="mfwtab_indicator_drawable">@drawable/tablayout_indicator_bg</item>
     </style>
 
-    <style name="commonTextView" parent="@style/Widget.AppCompat.TextView">
+    <style name="commonTextView" parent="android:Widget.TextView">
         <item name="android:textColor">@android:color/black</item>
         <item name="android:textSize">14dp</item>
         <item name="android:padding">10dp</item>
