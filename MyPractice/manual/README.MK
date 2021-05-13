@@ -1,5 +1,7 @@
 ## 手动编译指南
 
+###  前沿
+由于本项目很大，不适合进行打包实验，所以用个非常简单，不依赖任何库的项目
 ### 编译资源
 
 ```
@@ -9,7 +11,7 @@ aapt2 compile  --dir app/src/main/res -v -o manual/resource/all_flat.zip
 > 中间产物，二进制flat格式String no
 
 ### 链接资源
-> 遗留TODO：1. gradle执行compile资源的逻辑，是否全部解析aar 2.
+> 遗留TODO：1. gradle执行compile资源的逻辑，是否全部解析aar
 
 ```
 #定义lib变量
@@ -27,3 +29,10 @@ aaptOptions {
 aapt2 link -o manual/build/apk/test.apk manual/resource/all_flat.zip -I $ANDROID_LIB  --manifest app/src/main/AndroidManifest.xml --package-id 0x8A  --java manual/build/compile -v
 ```
 
+### 编译
+```
+javac -d manual/build/classes app/src/main/java/*.java -cp
+```
+
+
+TODO：gradle task里哪个task、是最后aapt compile, link,d8，javac等任务。
