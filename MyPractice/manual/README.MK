@@ -29,9 +29,28 @@ aaptOptions {
 aapt2 link -o manual/build/apk/test.apk manual/resource/all_flat.zip -I $ANDROID_LIB  --manifest app/src/main/AndroidManifest.xml --package-id 0x8A  --java manual/build/compile -v
 ```
 
-### 编译
+### 编译classes 和 dex
+> 把java文件路径全部放到一个文件里进行编译，最方便，
 ```
-javac -d manual/build/classes app/src/main/java/*.java -cp
+
+find app/src/main/java  package/java -type  f  -name "*.java" > package/sources.txt
+
+javac @package/sources.txt -d package/build/classes  -cp $ANDROID_LIB
+
+
+# 为什么第一个通配符不好用？？？
+# d8主要功能转化class变成dex，解析java8语法为android平台语法，r8（混淆）
+# 同时，d8支持增量编译
+# d8 package/build/classes/*/*.class --lib $ANDROID_LIB --output package/apk --debug
+d8 package/build/classes/com/bytedance/frameworks/manualpackage/*.class --lib $ANDROID_LIB --output package/apk --debug
+
+# 打包
+cd apk
+zip -r my.apk ./*
+
+# 签名
+apksigner  sign --ks ~/.android/debug.keystore my.apk
+
 ```
 
 
