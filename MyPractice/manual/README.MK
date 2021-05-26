@@ -53,5 +53,27 @@ apksigner  sign --ks ~/.android/debug.keystore my.apk
 
 ```
 
+v1签名的内容介绍
+```
+1. MANIFEST.MF中的item信息摘要，都是编译后的文件，而不是源文件
+2. 采用sha1信息摘要是160位，20个字节，进行base64的结果
+3. ANDROID.SF中的item信息没有验证成功，但是MANIFEST.MF文件的信息摘要是成功的
+```
 
-TODO：gradle task里哪个task、是最后aapt compile, link,d8，javac等任务。
+v2签名的内容介绍
+```
+zip文件格式，在``ZIP 中央目录块``上面增加了个APK 签名分块，k-v形式
+```
+
+v3签名内容
+```
+在v2签名块里增加了一个属性区，增加了密钥轮换，
+```
+v4签名方案
+```
+Android 11为了适应增量安装，添加了新的V4签名方案。
+基于APK所有字节数据计算出Merkle哈希树，并将Merkle树的根哈希、盐值作为签名数据进行包完整性验证。
+新的签名数据保存在.idsig文件中并且在进行增量安装前必须为APK创建对应的V4签名文件。
+```
+
+TODO：gradle task里哪个task、是最后aapt compile, link,d8，javac等任务，
