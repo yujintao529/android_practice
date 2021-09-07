@@ -47,3 +47,5 @@ captures/
 android23/
 .externalNativeBuild/
 .cxx/
+/manual/resource/*
+/manual/build/*
