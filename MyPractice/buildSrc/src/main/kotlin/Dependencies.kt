@@ -5,7 +5,8 @@
  */
 object Deps {
 
-    const val kotlin_version = "1.3.61"
+    const val kotlin_version = "1.5.0"
+
     //lifecycle and  ViewModel and LiveData
     private const val lifecycle_version = "2.2.0"
     // ViewModel
@@ -106,16 +107,22 @@ object Deps {
     //permission
     const val permissionDispatcher = "org.permissionsdispatcher:permissionsdispatcher:4.8.0"
     const val permissionDispatcherProcessor = "org.permissionsdispatcher:permissionsdispatcher-processor:4.8.0"
+
     //new other
-    const val debugdb="com.amitshekhar.android:debug-db:1.0.3"
+    const val debugdb = "com.amitshekhar.android:debug-db:1.0.3"
+
     //kotlin
-    const val kotlinstdjdk7= "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    const val kotlinreflect= "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+    const val kotlinstdjdk7 = "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    const val kotlinreflect = "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+
+    const val kotlinGradlePlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+
+    const val androidToolsBuildGradle = "com.android.tools.build:gradle:4.1.0"
 }
 
 object Versions {
     const val compileSdkVersion = 29
     const val minSdkVersion = 23
     const val targetSdkVersion = 29
-    const val buildToolsVersion = "29.0.3"
+    const val buildToolsVersion = "29.0.2"
 }
