@@ -1,7 +1,10 @@
 plugins {
     id("com.android.library") apply false
 }
-configure<com.android.build.gradle.LibraryExtension> {
+android { //also work but only for plugins{} not for apply way
+
+}
+configure<com.android.build.gradle.LibraryExtension> { //work well with plugins{} and apply
     compileSdkVersion(Versions.compileSdkVersion)
     defaultConfig {
         minSdkVersion(Versions.minSdkVersion)
