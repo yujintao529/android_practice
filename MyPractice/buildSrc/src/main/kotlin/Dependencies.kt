@@ -8,25 +8,34 @@ object Deps {
     const val kotlin_version = "1.5.0"
 
     //lifecycle and  ViewModel and LiveData
-    private const val lifecycle_version = "2.2.0"
+    const val lifecycle_version = "2.2.0"
+
     // ViewModel
-    private const val viewModel="androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
+    const val viewModel = "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
+
     // LiveData
-    private const val LiveData = "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version"
+    const val LiveData = "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version"
+
     // Lifecycles only (without ViewModel or LiveData)
-    private const val lifecycle = "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version"
+    const val lifecycle = "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version"
+
     // Saved state module for ViewModel
-    private const val savedstate="androidx.lifecycle:lifecycle-viewmodel-savedstate:$lifecycle_version"
+    const val savedstate = "androidx.lifecycle:lifecycle-viewmodel-savedstate:$lifecycle_version"
+
     // Annotation processor
-    private const val lifecycle_compiler = "androidx.lifecycle:lifecycle-compiler:$lifecycle_version"
+    const val lifecycle_compiler = "androidx.lifecycle:lifecycle-compiler:$lifecycle_version"
+
     // alternately - if using Java8, use the following instead of lifecycle-compiler
-    private const val lifecycle_common_java8="androidx.lifecycle:lifecycle-common-java8:$lifecycle_version"
+    const val lifecycle_common_java8 = "androidx.lifecycle:lifecycle-common-java8:$lifecycle_version"
+
     // optional - helpers for implementing LifecycleOwner in a Service
-    private const val lifecycle_service = "androidx.lifecycle:lifecycle-service:$lifecycle_version"
+    const val lifecycle_service = "androidx.lifecycle:lifecycle-service:$lifecycle_version"
+
     // optional - ProcessLifecycleOwner provides a lifecycle for the whole application process
-    private const val lifecycle_process = "androidx.lifecycle:lifecycle-process:$lifecycle_version"
+    const val lifecycle_process = "androidx.lifecycle:lifecycle-process:$lifecycle_version"
+
     // optional - ReactiveStreams support for LiveData
-    private const val lifecycle_reactivestreams_ktx="androidx.lifecycle:lifecycle-reactivestreams-ktx:$lifecycle_version"
+    const val lifecycle_reactivestreams_ktx = "androidx.lifecycle:lifecycle-reactivestreams-ktx:$lifecycle_version"
 
     //androidx
     private const val appcompat_version = "1.2.0"
@@ -112,8 +121,9 @@ object Deps {
     const val debugdb = "com.amitshekhar.android:debug-db:1.0.3"
 
     //kotlin
-    const val kotlinstdjdk7 = "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    const val kotlinstdjdk = "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     const val kotlinreflect = "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+
 
     const val kotlinGradlePlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
 
