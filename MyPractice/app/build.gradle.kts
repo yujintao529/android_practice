@@ -21,6 +21,7 @@ configure<com.android.build.gradle.AppExtension> {
             abiFilters.add("armeabi-v7a")
             resConfigs("cn", "xhdpi")
         }
+
     }
     signingConfigs {
         val properties = Properties()
@@ -71,7 +72,14 @@ configure<com.android.build.gradle.AppExtension> {
         exclude("META-INF/LICENSE.txt")
         exclude("META-INF/NOTICE.txt")
     }
+
 }
+////好像没起作用
+//configure<com.android.build.gradle.internal.dsl.BaseAppModuleExtension> {
+//    kotlinOptions {
+//        jvmTarget = JavaVersion.VERSION_1_8.toString()
+//    }
+//}
 dependencies {
     implementation(fileTree("libs") {
         include("*.jar")
@@ -103,6 +111,10 @@ dependencies {
     implementation(Deps.butterKnife)
     implementation(Deps.stetho)
     implementation(Deps.permissionDispatcher)
+    implementation(Deps.kotlinCoroutines)
+    implementation(Deps.androidKotlinCoroutines)
     kapt(Deps.butterKnifeCompiler)
     kapt(Deps.permissionDispatcherProcessor)
+    testImplementation(Deps.kotlinCoroutinesTest)
+    testImplementation(Deps.junit4)
 }

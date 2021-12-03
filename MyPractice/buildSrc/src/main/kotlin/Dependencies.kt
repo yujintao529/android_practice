@@ -5,7 +5,7 @@
  */
 object Deps {
 
-    const val kotlin_version = "1.5.0"
+    const val kotlin_version = "1.5.30"
 
     //lifecycle and  ViewModel and LiveData
     const val lifecycle_version = "2.2.0"
@@ -57,6 +57,7 @@ object Deps {
 
     // For control over item selection of both touch and mouse driven selection
     const val recyclerview_selection_x= "androidx.recyclerview:recyclerview-selection:1.1.0-rc03"
+
 
     const val cardview= "androidx.cardview:cardview:1.0.0"
     const val gridLayout= "androidx.gridlayout:gridlayout:1.0.0"
@@ -123,11 +124,15 @@ object Deps {
     //kotlin
     const val kotlinstdjdk = "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     const val kotlinreflect = "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
-
+    const val kotlinCoroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2"
+    const val androidKotlinCoroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.2"
+    const val kotlinCoroutinesTest = "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.5.2"
 
     const val kotlinGradlePlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-
     const val androidToolsBuildGradle = "com.android.tools.build:gradle:4.1.0"
+
+    //test
+    const val junit4 = "junit:junit:4.8.2"
 }
 
 object Versions {
