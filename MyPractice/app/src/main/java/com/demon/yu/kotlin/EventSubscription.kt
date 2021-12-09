@@ -1,5 +1,5 @@
 package com.demon.yu.kotlin
 
-interface EventSubscription {
-    fun cancel()
-}
+import java.io.Closeable
+
+interface EventSubscription : Closeable

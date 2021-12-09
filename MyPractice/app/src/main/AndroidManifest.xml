@@ -482,11 +482,31 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name="com.demon.yu.kotlin.Coroutines1Act"
+            android:label="kotlin/Coroutines1Act"
+            android:theme="@style/AppTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="com.example.apidemons.CATEGORY_SAMPLES" />
+            </intent-filter>
+        </activity>
+
+
+        <activity
+            android:name="com.demon.yu.kotlin.Coroutines2Act"
+            android:label="kotlin/Coroutines2Act"
+            android:theme="@style/AppTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="com.example.apidemons.CATEGORY_SAMPLES" />
+            </intent-filter>
+        </activity>
+
 
         <service android:name=".process.BinderService" />
         <service android:name=".process.ProcessService" />
         <service android:name=".process.ProcessService$InnerService" />
-        <service android:name=".process.BinderService" />
 
         <receiver android:name=".process.WakeUpBroadCast" />
         <receiver android:name=".broadcast.StanderBro" />

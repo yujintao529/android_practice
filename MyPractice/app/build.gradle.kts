@@ -8,7 +8,7 @@ plugins {
     kotlin("kapt")
 }
 apply(rootProject.file("gradle/deps.gradle.kts"))
-configure<com.android.build.gradle.AppExtension> {
+configure<com.android.build.gradle.internal.dsl.BaseAppModuleExtension> {
     defaultConfig {
         applicationId("com.example.mypractice")
         minSdkVersion(Versions.minSdkVersion)
@@ -72,14 +72,11 @@ configure<com.android.build.gradle.AppExtension> {
         exclude("META-INF/LICENSE.txt")
         exclude("META-INF/NOTICE.txt")
     }
-
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
 }
-////好像没起作用
-//configure<com.android.build.gradle.internal.dsl.BaseAppModuleExtension> {
-//    kotlinOptions {
-//        jvmTarget = JavaVersion.VERSION_1_8.toString()
-//    }
-//}
+
 dependencies {
     implementation(fileTree("libs") {
         include("*.jar")
@@ -102,8 +99,6 @@ dependencies {
     implementation(Deps.debugdb)
     implementation(Deps.glide)
     implementation(Deps.wecahtOpenSdk)
-    implementation(Deps.kotlinreflect)
-    implementation(Deps.kotlinstdjdk)
     debugImplementation(Deps.leakcanary)
     releaseImplementation(Deps.leakcanary_noop)
     implementation(project(":libgaussia"))
@@ -118,3 +113,4 @@ dependencies {
     testImplementation(Deps.kotlinCoroutinesTest)
     testImplementation(Deps.junit4)
 }
+

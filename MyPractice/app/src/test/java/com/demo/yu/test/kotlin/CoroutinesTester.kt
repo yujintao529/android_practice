@@ -14,7 +14,7 @@ import kotlin.system.measureTimeMillis
  * [runBlocking]: 非suspend函数，可用于普通函数,开启一个BlockingCoroutine新的协程作用域，同时会阻塞当前线程的执行。
  *
  * [coroutineScope]:suspend函数，和runBlocking差不多，启动一个协程，但是不会阻塞调用此函数的线程。
- *
+ * [supervisorScope]
  * [launch]: 在当前协程scope里创建一个新的scope，只能在协程作用域里调用，因为本身是Coroutine的扩展方法，函数本身的参数及安逸可以见其实现，又明确的说明
  *
  * [withContext]: suspend函数。
@@ -28,7 +28,8 @@ import kotlin.system.measureTimeMillis
  * [CoroutineDispatcher]: 决定相关的协程在哪个线程或哪些线程上执行，协程调度器可以将协程限制在一个特定的线程执行，
  *                        或将它分派到一个线程池，亦或是让它不受限地运行。有四个常用的：
  *                        [Dispatchers.Unconfined] ：特殊的一个派发器，似乎是main，但是官方文档也没说明
- *                        [Dispatchers.Main] : 主线程，android对应的就是uithread
+ *                        [Dispatchers.Main] : 主线程，android对应的就是uithread,[Dispatchers.Main.immediate]这个和main差不多，
+ *                                             以android为例：main总是通过post触发，而immediate检测到是mainThread的话，则直接调用
  *                        [Dispatchers.io] : io线程，用于频繁io的线程
  *                        [Dispatchers.default] : 默认调度器,GlobalScope所使用的
  *
@@ -89,7 +90,10 @@ import kotlin.system.measureTimeMillis
  * 关于cancel的英文说明：https://medium.com/androiddevelopers/cancellation-in-coroutines-aa6b90163629
  *
  *
- * Emitter:
+ * Q:这是什么语法？  context[CoroutineExceptionHandler]  = context[CoroutineExceptionHandler.Key]
+ *  通过反编译看，最终都是通过get(CoroutineExceptionHandler.Key)来获取的
+ *
+ *
  */
 
 fun CoroutineScope.log(message: String) {
@@ -634,7 +638,13 @@ class CoroutinesTester {
                 log("onFlowEventTest1 eventSubscriber $t")
             }
         }
-        CoroutinesEventBus.register(FlowEvent::class.java, eventSubscriber)
+        val eventSubscriber2 = object : EventSubscriber<FlowEvent> {
+            override fun onEvent(t: FlowEvent) {
+                log("onFlowEventTest1 eventSubscriber2 $t")
+            }
+        }
+        CoroutinesEventBus.register(FlowEvent::class.java, coroutineDispatcher = Dispatchers.IO, eventSubscriber = eventSubscriber)
+        CoroutinesEventBus.register(FlowEvent::class.java, coroutineDispatcher = Dispatchers.Default, eventSubscriber = eventSubscriber2)
         CoroutinesEventBus.postEvent(FlowEvent("test3"))
 //        delay(1000L)
 //        CoroutinesEventBus.unregister(eventSubscriber)
@@ -664,9 +674,6 @@ class CoroutinesTester {
             }
 
             println("testSuspendCancellableCoroutine GlobalScope async ${threadName()}")
-            it.resume(FlowEvent("GlobalScope")) {
-                println("suspendCancellableCoroutine GlobalScope async onCancel ${it.message}")
-            }
         }
 
 

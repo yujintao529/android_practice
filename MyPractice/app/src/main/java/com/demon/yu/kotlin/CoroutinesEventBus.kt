@@ -1,10 +1,13 @@
 package com.demon.yu.kotlin
 
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.sync.Mutex
 import java.lang.ref.WeakReference
+import kotlin.coroutines.CoroutineContext
 
 /**
  * 协程版的eventBus
@@ -43,33 +46,73 @@ import java.lang.ref.WeakReference
  */
 
 
-private val _defaultValue = Any()
-val eventCoroutineScope = CoroutineScope(newSingleThreadContext("eventBus-thread"))
+internal val eventCoroutineScope = CoroutineScope(newSingleThreadContext("eventBus-thread") + SupervisorJob())
 private const val tag = "CoroutinesEventBus"
 
 
-object CoroutinesEventBus {
+private fun threadName() = Thread.currentThread().name
+fun log(tag: String, message: String) {
+    println("[${threadName()}][$tag]$message")
+}
 
-    @ObsoleteCoroutinesApi
-    val stateFlow = MutableStateFlow(Any())
+object CoroutinesEventBus {
 
 
     private val mutex = Mutex()
-    private val mutableMap = mutableMapOf<String, ObserverObject<*>>()
+    private val mutableMap = mutableMapOf<String, Publisher<*>>()
     private val mutableTypeMap = mutableMapOf<EventSubscriber<*>, Class<*>>()
-    val coroutinesDispatcher = CoroutinesEventBusDispatcher()
+
     var onError: ((throwable: Throwable) -> Unit)? = null
 
-    fun <T> register(type: Class<T>, coroutineDispatcher: CoroutineDispatcher = Dispatchers.Main, eventSubscriber: EventSubscriber<T>): EventSubscription {
-        val observerObject: ObserverObject<T>
-        if (mutableMap.containsKey(type.simpleName)) {
-            observerObject = mutableMap[type.simpleName] as ObserverObject<T>
-        } else {
-            observerObject = ObserverObject(type)
-            mutableMap[type.simpleName] = observerObject
-        }
+
+    fun <T> registerWithSticker(type: Class<T>, coroutineScope: CoroutineScope, eventSubscriber: EventSubscriber<T>): EventSubscription {
+        return registerEventInterval(type, true, coroutineScope, eventSubscriber)
+    }
+
+    fun <T> registerWithSticker(type: Class<T>, lifecycleOwner: LifecycleOwner, eventSubscriber: EventSubscriber<T>): EventSubscription {
+        return register(type, lifecycleOwner, eventSubscriber)
+    }
+
+    fun <T> register(type: Class<T>, coroutineScope: CoroutineScope, eventSubscriber: EventSubscriber<T>): EventSubscription {
+        return registerEventInterval(type, false, coroutineScope, eventSubscriber)
+    }
+
+
+    fun <T> register(type: Class<T>, lifecycleOwner: LifecycleOwner, eventSubscriber: EventSubscriber<T>): EventSubscription {
+        return register(type, lifecycleOwner.lifecycleScope, eventSubscriber)
+    }
+
+
+    fun <T> registerWithSticker(type: Class<T>, context: CoroutineContext, eventSubscriber: EventSubscriber<T>): EventSubscription {
+        return registerEventInterval(type, true, context, eventSubscriber)
+    }
+
+    fun <T> register(type: Class<T>, context: CoroutineContext, eventSubscriber: EventSubscriber<T>): EventSubscription {
+        return registerEventInterval(type, false, context, eventSubscriber)
+    }
+
+
+    private fun <T> registerEventInterval(type: Class<T>, isSticker: Boolean, coroutineScope: CoroutineScope, eventSubscriber: EventSubscriber<T>): EventSubscription {
+        val publisher = getPublisher(type)
         mutableTypeMap[eventSubscriber] = type
-        return observerObject.addEventObserver(eventSubscriber)
+        return publisher.addEventObserver(eventSubscriber, isSticker, coroutineScope)
+    }
+
+    private fun <T> registerEventInterval(type: Class<T>, isSticker: Boolean, context: CoroutineContext, eventSubscriber: EventSubscriber<T>): EventSubscription {
+        val publisher = getPublisher(type)
+        mutableTypeMap[eventSubscriber] = type
+        return publisher.addEventObserver(eventSubscriber, isSticker, context)
+    }
+
+    private fun <T> getPublisher(type: Class<T>): Publisher<T> {
+        val publisher: Publisher<T>
+        if (mutableMap.containsKey(type.simpleName)) {
+            publisher = mutableMap[type.simpleName] as Publisher<T>
+        } else {
+            publisher = Publisher(type)
+            mutableMap[type.simpleName] = publisher
+        }
+        return publisher
     }
 
     fun <T> unregister(eventSubscriber: EventSubscriber<T>) {
@@ -80,7 +123,7 @@ object CoroutinesEventBus {
         }
     }
 
-    private fun reportError(error: Throwable) {
+    internal fun reportError(error: Throwable) {
         eventCoroutineScope.async {
             onError?.invoke(error)
         }
@@ -92,37 +135,31 @@ object CoroutinesEventBus {
         observerObject?.subscribe(any)
     }
 
-    private class ObserverObject<T>(val type: Class<T>) {
 
+    private class Publisher<T>(val type: Class<T>) {
         private val mutableList = mutableListOf<EventSubscriber<*>>()
 
-        //        val stateFlow = MutableStateFlow(_defaultValue)
         val sharedFlow = MutableSharedFlow<T>(0, 0, BufferOverflow.SUSPEND)
+        val stickerSharedFlow = MutableSharedFlow<T>(1, 0, BufferOverflow.SUSPEND)
         val jobCollections = mutableMapOf<EventSubscriber<*>, WeakReferenceJob>()
-        fun addEventObserver(eventSubscriber: EventSubscriber<T>, dispatcher: CoroutineDispatcher): EventSubscription {
+
+        fun addEventObserver(eventSubscriber: EventSubscriber<T>, isSticker: Boolean, context: CoroutineContext): EventSubscription {
             if (mutableList.contains(eventSubscriber)) {
                 throw CoroutinesEventBusException("eventSubscriber($eventSubscriber) has registered,please register once ")
             }
             mutableList.add(eventSubscriber)
+            val coroutinesDispatcher = CoroutinesEventBusDispatcher(eventCoroutineScope, context)
+            val subscription = coroutinesDispatcher.dispatch(if (isSticker) stickerSharedFlow else sharedFlow, eventSubscriber)
+            jobCollections[eventSubscriber] = WeakReferenceJob(subscription)
+            return subscription
+        }
 
-            val job = eventCoroutineScope.launch {
-                try {
-                    sharedFlow.collect {
-                        System.out.println("collect $it")
-                        eventSubscriber.onEvent(it)
-                    }
-                } catch (th: Throwable) {
-                    //ignore
-                    reportError(th)
-                }
+        fun addEventObserver(eventSubscriber: EventSubscriber<T>, isSticker: Boolean, scope: CoroutineScope): EventSubscription {
+            if (mutableList.contains(eventSubscriber)) {
+                throw CoroutinesEventBusException("eventSubscriber($eventSubscriber) has registered,please register once ")
             }
-            try {
-                coroutinesDispatcher.dispatch(sharedFlow, eventSubscriber, dispatcher)
-            } catch (th: Throwable) {
-                reportError(th)
-            }
-
-            val subscription = JobEventSubscription(job)
+            mutableList.add(eventSubscriber)
+            val subscription = CoroutinesEventBusDispatcher(scope).dispatch(if (isSticker) stickerSharedFlow else sharedFlow, eventSubscriber)
             jobCollections[eventSubscriber] = WeakReferenceJob(subscription)
             return subscription
         }
@@ -136,14 +173,17 @@ object CoroutinesEventBus {
             Dispatchers.Default
             eventCoroutineScope.launch {
                 println("subscribe $any")
-                sharedFlow.emit(any as T)
+                if (sharedFlow.subscriptionCount.value > 0) {
+                    sharedFlow.emit(any as T)
+                }
+                stickerSharedFlow.emit(any as T)
             }
 
         }
     }
 
-    private class JobEventSubscription(private val job: Job) : EventSubscription {
-        override fun cancel() {
+    class JobEventSubscription(private val job: Job) : EventSubscription {
+        override fun close() {
             job.cancel()
         }
     }
@@ -155,7 +195,7 @@ object CoroutinesEventBus {
             get()?.also {
                 eventCoroutineScope.launch {
                     println("cancel $it")
-                    it.cancel()
+                    it.close()
                 }
             }
         }
