@@ -1,9 +1,15 @@
 package com.example.mypractice;
 
 import android.app.Application;
+import android.content.Context;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.util.DisplayMetrics;
 
+import androidx.annotation.NonNull;
+
+import com.demon.yu.utils.ProcessUtils;
+import com.demon.yu.utils.ThreadPoolUtils;
 import com.example.mypractice.common.Common;
 import com.facebook.stetho.Stetho;
 
@@ -22,5 +28,20 @@ public class YUApplication extends Application {
         Common.screenWidth = displayMetrics.widthPixels;
         Common.application = this;
         Stetho.initializeWithDefaults(this);
+        Logger.debug("YUApplication", "onCreate process  " + ProcessUtils.getProcessInfo(this));
+    }
+
+    @Override
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        Logger.debug("YUApplication", "onConfigurationChanged " + newConfig);
+    }
+
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+        ThreadPoolUtils.init();
+
+        Logger.debug("YUApplication", "attachBaseContext " + base);
     }
 }

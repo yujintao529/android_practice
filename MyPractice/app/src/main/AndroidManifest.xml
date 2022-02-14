@@ -482,6 +482,18 @@
             </intent-filter>
         </activity>
 
+
+        <activity
+            android:name="com.demon.yu.widget.AppWidgetTargetAct"
+            android:label="widget/AppWidgetTargetAct"
+            android:theme="@style/AppTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="com.example.apidemons.CATEGORY_SAMPLES" />
+            </intent-filter>
+        </activity>
+
+
         <activity
             android:name="com.demon.yu.kotlin.Coroutines1Act"
             android:label="kotlin/Coroutines1Act"
@@ -525,6 +537,27 @@
                 <action android:name="com.example.action.TEST_SNED_BRO" />
             </intent-filter>
         </receiver>
+
+
+        <receiver android:name="com.demon.yu.widget.ExampleAppWidgetProvider">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/example_appwidget_info" />
+        </receiver>
+
+        <receiver android:name="com.demon.yu.widget.ExampleAppWidgetProvider2">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/example_appwidget_info_2" />
+        </receiver>
+
+
     </application>
 
 </manifest>
