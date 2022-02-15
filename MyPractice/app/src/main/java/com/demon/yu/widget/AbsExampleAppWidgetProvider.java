@@ -4,6 +4,7 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
+import android.appwidget.AppWidgetProviderInfo;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -23,8 +24,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 
-public class AbsExampleAppWidgetProvider extends AppWidgetProvider {
+public abstract class AbsExampleAppWidgetProvider extends AppWidgetProvider {
     private static final String TAG = "AbsExampleAppWidgetProvider";
+
 
     public AbsExampleAppWidgetProvider() {
         super();
@@ -33,9 +35,14 @@ public class AbsExampleAppWidgetProvider extends AppWidgetProvider {
     private static int index = 1;
 
 
+    protected int widgetID = -1;
+
     protected String getTag() {
         return TAG;
     }
+
+
+    public abstract int layout();
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -46,7 +53,7 @@ public class AbsExampleAppWidgetProvider extends AppWidgetProvider {
     }
 
     private RemoteViews updateTextInfo(Context context, String info) {
-        RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.appwidget_example_layout);
+        RemoteViews views = new RemoteViews(context.getPackageName(), layout());
         views.setTextViewText(R.id.date, "更新时间:" + TimeUtils.getCurrentTimeWithStyle());
         Gson gson = new Gson();
         BookModel bookModel = gson.fromJson(info, BookModel.class);
@@ -111,6 +118,15 @@ public class AbsExampleAppWidgetProvider extends AppWidgetProvider {
     public void onEnabled(Context context) {
         super.onEnabled(context);
         Logger.debug(getTag(), "onEnabled ");
+
+        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+        int[] ids = AppWidgetManager.getInstance(context).getAppWidgetIds(new ComponentName(context, getClass()));
+        if (ids.length > 0) {
+            widgetID = ids[0];
+        }
+        if (widgetID != -1) {
+            AppWidgetProviderInfo appWidgetProviderInfo = AppWidgetManager.getInstance(context).getAppWidgetInfo(widgetID);
+        }
     }
 
 
@@ -131,6 +147,7 @@ public class AbsExampleAppWidgetProvider extends AppWidgetProvider {
     @Override
     public void onDisabled(Context context) {
         super.onDisabled(context);
+        widgetID = -1;
         Logger.debug(getTag(), "onDisabled ");
         AlarmManager alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
