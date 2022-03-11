@@ -12,15 +12,11 @@ import android.os.Bundle;
 import android.os.SystemClock;
 import android.widget.RemoteViews;
 
-import com.demo.yu.http.HttpManager;
-import com.demo.yu.http.Request;
 import com.demon.yu.utils.ProcessUtils;
 import com.demon.yu.utils.TimeUtils;
 import com.example.mypractice.Logger;
 import com.example.mypractice.R;
 import com.google.gson.Gson;
-
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 
@@ -33,7 +29,6 @@ public abstract class AbsExampleAppWidgetProvider extends AppWidgetProvider {
     }
 
     private static int index = 1;
-
 
     protected int widgetID = -1;
 
@@ -66,23 +61,25 @@ public abstract class AbsExampleAppWidgetProvider extends AppWidgetProvider {
     public void onUpdate(final Context context, final AppWidgetManager appWidgetManager, final int[] appWidgetIds) {
         super.onUpdate(context, appWidgetManager, appWidgetIds);
         Logger.debug(getTag(), "onUpdate " + Arrays.toString(appWidgetIds));
-        HttpManager.INSTANCE.request(new Request("https://jsonplaceholder.typicode.com/posts/" + index), new HttpManager.CallBack() {
-            @Override
-            public void onResult(@NotNull String result) {
-                super.onResult(result);
-                Logger.debug(getTag(), "onResult " + result);
-                RemoteViews remoteViews = updateTextInfo(context, result);
-                appWidgetManager.updateAppWidget(appWidgetIds, remoteViews);
-            }
-        });
-        index++;
 
-//        final int N = appWidgetIds.length;
+//        HttpManager.INSTANCE.request(new Request("https://jsonplaceholder.typicode.com/posts/" + index), new HttpManager.CallBack() {
+//            @Override
+//            public void onResult(@NotNull String result) {
+//                super.onResult(result);
+//                Logger.debug(getTag(), "onResult " + result);
+//                RemoteViews remoteViews = updateTextInfo(context, result);
+//                appWidgetManager.updateAppWidget(appWidgetIds, remoteViews);
+//            }
+//        });
+//        index++;
+        final int N = appWidgetIds.length;
 //
 //        // Perform this loop procedure for each App Widget that belongs to this provider
-//        for (int i = 0; i < N; i++) {
-//            int appWidgetId = appWidgetIds[i];
-//
+        for (int i = 0; i < N; i++) {
+            int appWidgetId = appWidgetIds[i];
+            AppWidgetProviderInfo appWidgetProviderInfo = appWidgetManager.getAppWidgetInfo(appWidgetId);
+            Logger.d("appWidgetProviderInfo minWidth = " + appWidgetProviderInfo.minWidth
+                    + " minHeight=" + appWidgetProviderInfo.minHeight);
 //            // Create an Intent to launch ExampleActivity
 //            Intent intent = new Intent(context, AppWidgetTargetAct.class);
 //            PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
@@ -94,7 +91,7 @@ public abstract class AbsExampleAppWidgetProvider extends AppWidgetProvider {
 //
 //            // Tell the AppWidgetManager to perform an update on the current app widget
 //            appWidgetManager.updateAppWidget(appWidgetId, views);
-//        }
+        }
     }
 
     @Override
@@ -117,16 +114,12 @@ public abstract class AbsExampleAppWidgetProvider extends AppWidgetProvider {
     @Override
     public void onEnabled(Context context) {
         super.onEnabled(context);
-        Logger.debug(getTag(), "onEnabled ");
-
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-        int[] ids = AppWidgetManager.getInstance(context).getAppWidgetIds(new ComponentName(context, getClass()));
+        int[] ids = appWidgetManager.getAppWidgetIds(new ComponentName(context, getClass()));
         if (ids.length > 0) {
             widgetID = ids[0];
         }
-        if (widgetID != -1) {
-            AppWidgetProviderInfo appWidgetProviderInfo = AppWidgetManager.getInstance(context).getAppWidgetInfo(widgetID);
-        }
+        Logger.debug(getTag(), "onEnabled " + Arrays.toString(ids));
     }
 
 

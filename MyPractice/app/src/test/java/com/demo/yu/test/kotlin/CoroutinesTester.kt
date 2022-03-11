@@ -6,6 +6,8 @@ import com.demon.yu.kotlin.eventCoroutineScope
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import org.junit.Test
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 import kotlin.system.measureTimeMillis
 
 
@@ -15,7 +17,7 @@ import kotlin.system.measureTimeMillis
  *
  * [coroutineScope]:suspend函数，和runBlocking差不多，启动一个协程，但是不会阻塞调用此函数的线程。
  * [supervisorScope]
- * [launch]: 在当前协程scope里创建一个新的scope，只能在协程作用域里调用，因为本身是Coroutine的扩展方法，函数本身的参数及安逸可以见其实现，又明确的说明
+ * [launch]: 在当前协程scope里创建一个新的scope，只能在协程作用域里调用，因为本身是Coroutine的扩展方法，函数本身的参数可以见其实现，又明确的说明
  *
  * [withContext]: suspend函数。
  *
@@ -110,8 +112,34 @@ class CoroutinesTester {
 
     @Test
     fun testRunBlock() {
-        mainInner()
+        invokeCanncle()
     }
+
+    fun invokeCanncle() = runBlocking {
+        val job = launch {
+            log("testSuspendCoroutine start")
+            val resultSus = testSuspendCoroutine()
+            log("testSuspendCoroutine end $resultSus")
+            doWord("test")
+
+        }
+
+        val handle = job.invokeOnCompletion {
+            log("invokeOnCompletion call " + it?.message)
+        }
+    }
+
+    suspend fun testSuspendCoroutine() = suspendCoroutine<Int> {
+        Thread {
+            log("testSuspendCoroutine inner start")
+            Thread.sleep(2000L)
+//            it.resumeWith(Result.success(4))
+            it.resumeWithException(RuntimeException("error"))
+            log("testSuspendCoroutine inner end")
+        }.start()
+
+    }
+
 
     fun main() = runBlocking {
         val result = launch {
@@ -120,24 +148,24 @@ class CoroutinesTester {
         }
         doWord2()
         doWord("main")
-        println("Hello $result")
+        log("Hello $result")
     }
 
     // this is your first suspending function
     suspend fun doWord(name: String): String {
         delay(1000L)
-        println("World! $name")
+        log("World! $name")
         return ""
     }
 
     suspend fun doWord2() = coroutineScope {
         delay(2000L)
-        println("World2! $this")
+        log("World2! $this")
     }
 
     @Test
     fun mainInner() = runBlocking {
-        simpleTest()
+        runBlockingTest()
     }
 
 
@@ -643,8 +671,8 @@ class CoroutinesTester {
                 log("onFlowEventTest1 eventSubscriber2 $t")
             }
         }
-        CoroutinesEventBus.register(FlowEvent::class.java, coroutineDispatcher = Dispatchers.IO, eventSubscriber = eventSubscriber)
-        CoroutinesEventBus.register(FlowEvent::class.java, coroutineDispatcher = Dispatchers.Default, eventSubscriber = eventSubscriber2)
+//        CoroutinesEventBus.register(FlowEvent::class.java, coroutineDispatcher = Dispatchers.IO, eventSubscriber = eventSubscriber)
+//        CoroutinesEventBus.register(FlowEvent::class.java, coroutineDispatcher = Dispatchers.Default, eventSubscriber = eventSubscriber2)
         CoroutinesEventBus.postEvent(FlowEvent("test3"))
 //        delay(1000L)
 //        CoroutinesEventBus.unregister(eventSubscriber)

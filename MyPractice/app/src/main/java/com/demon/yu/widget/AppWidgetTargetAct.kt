@@ -9,6 +9,7 @@ import android.view.View
 import android.widget.RemoteViews
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.LifecycleObserver
 import com.demon.yu.utils.ProcessUtils
 import com.example.mypractice.Logger
 import com.example.mypractice.R
@@ -89,17 +90,23 @@ class AppWidgetTargetAct : AppCompatActivity() {
         Toast.makeText(this, "无法安装", Toast.LENGTH_LONG).show()
     }
 
-    class AppWidgetBroadcastReceiver : BroadcastReceiver() {
+    class AppWidgetBroadcastReceiver : BroadcastReceiver(), LifecycleObserver {
 
         override fun onReceive(context: Context, intent: Intent) {
-            Logger.d("AppWidgetBroadcastReceiver", " call fun onReceive action: [${intent.action}], flags: [${intent.flags}]")
-            Toast.makeText(context, "Create Success ID : [${
-                intent.getIntExtra(
+            Logger.d(
+                "AppWidgetBroadcastReceiver",
+                " call fun onReceive action: [${intent.action}], flags: [${intent.flags}]"
+            )
+            Toast.makeText(
+                context, "Create Success ID : [${
+                    intent.getIntExtra(
                         AppWidgetManager.EXTRA_APPWIDGET_ID,
                         AppWidgetManager.INVALID_APPWIDGET_ID
-                )
-            }]", Toast.LENGTH_LONG).show()
+                    )
+                }]", Toast.LENGTH_LONG
+            ).show()
         }
+
 
     }
 }
