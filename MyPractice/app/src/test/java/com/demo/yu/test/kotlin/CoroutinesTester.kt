@@ -1,12 +1,13 @@
-package com.demo.yu.test.kotlin
-
 import com.demon.yu.kotlin.CoroutinesEventBus
 import com.demon.yu.kotlin.EventSubscriber
 import com.demon.yu.kotlin.eventCoroutineScope
+import com.example.mypractice.Logger
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import org.junit.Test
-import kotlin.coroutines.resumeWithException
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 import kotlin.system.measureTimeMillis
 
@@ -15,8 +16,9 @@ import kotlin.system.measureTimeMillis
  *
  * [runBlocking]: 非suspend函数，可用于普通函数,开启一个BlockingCoroutine新的协程作用域，同时会阻塞当前线程的执行。
  *
- * [coroutineScope]:suspend函数，和runBlocking差不多，启动一个协程，但是不会阻塞调用此函数的线程。
+ * [coroutineScope]:suspend函数，和runBlocking差不多，启动一个协程，但是不会阻塞调用此函数的线程。但是内部是一个完整的领域
  * [supervisorScope]
+ *
  * [launch]: 在当前协程scope里创建一个新的scope，只能在协程作用域里调用，因为本身是Coroutine的扩展方法，函数本身的参数可以见其实现，又明确的说明
  *
  * [withContext]: suspend函数。
@@ -99,16 +101,138 @@ import kotlin.system.measureTimeMillis
  */
 
 fun CoroutineScope.log(message: String) {
-    println("${Thread.currentThread().name} : $message")
+    println("${timeStampRead()} : ${Thread.currentThread().name} : $message")
 }
 
 fun threadName() = Thread.currentThread().name
+
+
+private val simpleDateFormat = SimpleDateFormat("YYYY-MM-dd HH-mm-ss.SSS")
+fun timeStampRead(): String {
+    return simpleDateFormat.format(Date())
+}
+
+suspend fun logWrap(name: String, block: suspend () -> Unit) = coroutineScope {
+    println("${timeStampRead()} :$name start")
+    block()
+    println("${timeStampRead()} :$name end")
+}
+
+inline fun logWrap2(name: String, block: () -> Unit) {
+    println("${timeStampRead()} :$name start")
+    block()
+    println("${timeStampRead()} :$name end")
+}
+
 
 class CoroutinesTester {
 
     val scope = MainScope()
 
     private fun log(message: String) = println("${Thread.currentThread().name} : $message")
+
+
+    /**testCoroutineExecutor strat*/
+
+    private val coroutineScope = CoroutineScope(Dispatchers.IO
+            + SupervisorJob() + CoroutineExceptionHandler { coroutineContext, throwable ->
+        Logger.error("CoroutinesTester", "$coroutineContext with error,", throwable)
+    })
+
+    @Test
+    fun testCoroutineExecutor() = runBlocking {
+        val job = coroutineScope.launch {
+//            log("coroutineScope launch start")
+//            testCoroutineScope(5)
+//            testCoroutineScope(6)
+//            log("coroutineScope launch end")
+//            logLine()
+            logWrap2("testAsync") {
+                testAsync(1, 2)
+            }
+//            logLine()
+//            log("testSuspendCoroutine start")
+//            val result = testSuspendCoroutine(4)
+//            log("testSuspendCoroutine end result = $result")
+//            logLine()
+            logWrap2("testInnerLaunch") {
+                testInnerLaunch(2)
+            }
+        }
+        log("testCoroutineExecutor end isCompleted= ${job.isCompleted} wait to join")
+        job.invokeOnCompletion {
+            log("job invokeOnCompletion")
+        }
+        job.join()
+
+
+    }
+
+    private fun logLine() {
+        log("-----------------------")
+    }
+
+
+    suspend fun testCoroutineScope(input: Int) = coroutineScope {
+        log("testCoroutineScope $input, delay ${input * 1000}")
+        delay(input * 1000L)
+    }
+
+    suspend fun testAsync(input: Int, input2: Int) = coroutineScope {
+        log("testAsync $input,$input2 start")
+        val deferred1 = async { //和launch差不多,deferred1是job的子类，增加wait，获取结果的能力。
+            log("testAsync deferred1 delay ${input}s")
+            delay(input * 1000L)
+            log("testAsync deferred1 delay end")
+        }
+        val deferred2 = async {
+            log("testAsync deferred2 delay ${input2}s")
+            delay(input2 * 1000L)
+            log("testAsync deferred2 delay end")
+        }
+        log("testAsync $input $input2,end ")
+//        deferred1.await() && deferred2.await()  //无论是否有这行，这个函数都会等待deferred1，deferred2两个job完成后才结束
+    }
+
+
+    private suspend fun testSuspendCoroutine(input: Int) = suspendCoroutine<Int> {
+        log("testSuspendCoroutine sleep $input s")
+        Thread.sleep(input * 1000L)
+        it.resume(input * 4)
+    }
+
+
+    private suspend fun testInnerLaunch(input: Int) = coroutineScope {  //
+        val subJob =
+            launch { //launch会启动一个新的coroutineScope，是输入的子job，这个子job执行完，这个函数才会结束。
+                delay(input * 1000L)
+                log("testInnerLaunch input $input,delay ${input}s")
+                delay(input * 1000L)
+            }
+        log("testInnerLaunch subjob.isCompleted = ${subJob.isCompleted}")
+        input * 4
+    }
+
+    private suspend fun testInnerLaunchWithContext(input: Int) = coroutineScope {  //
+        val subJob =
+            launch { //launch会启动一个新的coroutineScope，是输入的子job，这个子job执行完，这个函数才会结束。
+                delay(input * 1000L)
+                log("testInnerLaunch input $input,delay ${input}s")
+                delay(input * 1000L)
+                val any: String = withContext(Dispatchers.IO) {
+                    log("send request 1s")
+                    delay(1000L)
+                    "result"
+                }
+                log("withContext io result = $any")
+            }
+        log("testInnerLaunch subjob.isCompleted = ${subJob.isCompleted}")
+        input * 4
+    }
+
+
+    /**testCoroutineExecutor end*/
+
 
     @Test
     fun testRunBlock() {
@@ -118,7 +242,7 @@ class CoroutinesTester {
     fun invokeCanncle() = runBlocking {
         val job = launch {
             log("testSuspendCoroutine start")
-            val resultSus = testSuspendCoroutine()
+            val resultSus = testSuspendCoroutine(2)
             log("testSuspendCoroutine end $resultSus")
             doWord("test")
 
@@ -127,17 +251,6 @@ class CoroutinesTester {
         val handle = job.invokeOnCompletion {
             log("invokeOnCompletion call " + it?.message)
         }
-    }
-
-    suspend fun testSuspendCoroutine() = suspendCoroutine<Int> {
-        Thread {
-            log("testSuspendCoroutine inner start")
-            Thread.sleep(2000L)
-//            it.resumeWith(Result.success(4))
-            it.resumeWithException(RuntimeException("error"))
-            log("testSuspendCoroutine inner end")
-        }.start()
-
     }
 
 
