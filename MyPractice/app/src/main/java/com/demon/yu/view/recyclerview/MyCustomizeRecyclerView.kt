@@ -39,7 +39,7 @@ class MyCustomizeRecyclerView(context: Context, attr: AttributeSet? = null) :
     private val edgeRegionColor = Color.RED
     val edgeRegionRect = Rect()
     var edgeRegionRectF = RectF()
-    private var secondScaleSize = 1.6f
+    private var secondScaleSize = 124f / 60f
     private var maxScaleSize = 2.4f
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG.or(Paint.DITHER_FLAG))
     override fun onMeasure(widthSpec: Int, heightSpec: Int) {
@@ -115,9 +115,6 @@ class MyCustomizeRecyclerView(context: Context, attr: AttributeSet? = null) :
     }
 
 
-    /**
-     *
-     */
     fun getScaleSize(x: Int, y: Int): Float {
         when {
             isInCenterRoundRegion(x, y) -> {
@@ -218,8 +215,8 @@ class MyCustomizeRecyclerView(context: Context, attr: AttributeSet? = null) :
                     return 1f
                 }
             }
-
             else -> {
+
                 return 1f
             }
         }

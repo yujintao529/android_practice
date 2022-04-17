@@ -16,7 +16,7 @@ class MyStaticAdapter : RecyclerView.Adapter<MyStaticViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyStaticViewHolder {
         val view = MyCircleView(parent.context)
-        view.layoutParams = RecyclerView.LayoutParams(50.dp2Px(), 50.dp2Px())
+        view.layoutParams = RecyclerView.LayoutParams(60.dp2Px(), 60.dp2Px())
         return MyStaticViewHolder(view)
     }
 

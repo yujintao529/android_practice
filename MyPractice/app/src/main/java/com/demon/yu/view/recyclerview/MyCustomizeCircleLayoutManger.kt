@@ -10,16 +10,15 @@ import com.demon.yu.extenstion.dp2Px
 import kotlin.math.*
 
 
-
-class MyCustomizeLayoutManger(val context: Context) : RecyclerView.LayoutManager() {
+class MyCustomizeCircleLayoutManger(val context: Context) : RecyclerView.LayoutManager() {
 
 
     private var measureWidth: Int = 0
     private var measureHeight: Int = 0
 
 
+    private var radius: Int = 0
 
-    var radius: Int = 0
     private var maxScaleSize = 1.5f
 
 
