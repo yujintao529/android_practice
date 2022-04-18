@@ -26,11 +26,10 @@ class MyCustomizeCircleRecyclerView(context: Context, attr: AttributeSet? = null
     var centerY: Int = 0
 
 
-    private var outEdgeCircleRadius = 180.dp2Px()
-    private var edgeCircleRadius = 160.dp2Px()
-    private var innerCircleRadius = 20.dp2Px()
+    private var edgeCircleRadius = 180.dp2Px()
+    private var innerCircleRadius = 80.dp2Px()
 
-    private var radiusDouble = 240.dp2Px()
+    private var radiusDouble = 200.dp2Px()
 
     private var dismiss2NormalScaleDistance = 30.dp2Px().toFloat()
 
@@ -52,7 +51,6 @@ class MyCustomizeCircleRecyclerView(context: Context, attr: AttributeSet? = null
         canvas?.drawCircle(centerX.toFloat(), centerY.toFloat(), edgeCircleRadius.toFloat(), paint)
         paint.color = Color.BLUE
         canvas?.drawCircle(centerX.toFloat(), centerY.toFloat(), innerCircleRadius.toFloat(), paint)
-        canvas?.drawCircle(centerX.toFloat(), centerY.toFloat(), 240.dp2Px().toFloat(), paint)
     }
 
     private val decelerateInterpolator = DecelerateInterpolator()

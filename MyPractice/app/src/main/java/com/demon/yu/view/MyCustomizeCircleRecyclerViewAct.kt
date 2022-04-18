@@ -7,20 +7,20 @@ import androidx.recyclerview.widget.RecyclerView
 import com.demon.yu.view.recyclerview.*
 import com.example.mypractice.R
 
-class MyCustomizeCicleRecyclerViewAct : AppCompatActivity() {
+class MyCustomizeCircleRecyclerViewAct : AppCompatActivity() {
 
-    private var circleRecyclerView: MyCustomizeCircleRecyclerView? = null
-    private var layoutManger: MyCustomizeLayoutManger? = null
+    private var recyclerView: MyCustomizeCircleRecyclerView? = null
+    private var layoutManger: MyCustomizeCircleLayoutManger? = null
     private val adapter = MyStaticAdapter()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_my_customize_circle_recycler_act)
-        circleRecyclerView = findViewById(R.id.recyclerView)
+        recyclerView = findViewById(R.id.recyclerView)
         adapter.update(createObj())
-        layoutManger = MyCustomizeLayoutManger(this)
-        circleRecyclerView?.layoutManager = layoutManger
-        circleRecyclerView?.adapter = adapter
-        circleRecyclerView?.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+        layoutManger = MyCustomizeCircleLayoutManger(this)
+        recyclerView?.layoutManager = layoutManger
+        recyclerView?.adapter = adapter
+        recyclerView?.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
                 recyclerView as MyCustomizeCircleRecyclerView
@@ -52,6 +52,6 @@ class MyCustomizeCicleRecyclerViewAct : AppCompatActivity() {
     }
 
     private fun createObj(): List<MyStaticObj> {
-        return (0..100).map { MyStaticObj() }.toList()
+        return (0..50).map { MyStaticObj() }.toList()
     }
 }

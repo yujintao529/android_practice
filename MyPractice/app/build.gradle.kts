@@ -17,7 +17,7 @@ configure<com.android.build.gradle.internal.dsl.BaseAppModuleExtension> {
         multiDexEnabled = true
         multiDexKeepProguard = rootProject.file("maindexlist.txt")
         ndk {
-//            abiFilters.add("x86")
+            abiFilters.add("x86")
             abiFilters.add("armeabi-v7a")
             resConfigs("cn", "xhdpi")
         }
@@ -68,7 +68,7 @@ configure<com.android.build.gradle.internal.dsl.BaseAppModuleExtension> {
         exclude("lib/armeabi/*")
         exclude("lib/x86_64/*")
         exclude("lib/mips/*")
-        exclude("lib/x86/*")
+//        exclude("lib/x86/*")
         exclude("META-INF/LICENSE.txt")
         exclude("META-INF/NOTICE.txt")
     }

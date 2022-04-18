@@ -7,7 +7,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.demon.yu.extenstion.dp2Px
-import kotlin.math.*
+import kotlin.math.PI
+import kotlin.math.cos
+import kotlin.math.pow
+import kotlin.math.sin
 
 
 class MyCustomizeCircleLayoutManger(val context: Context) : RecyclerView.LayoutManager() {
@@ -23,7 +26,7 @@ class MyCustomizeCircleLayoutManger(val context: Context) : RecyclerView.LayoutM
 
 
     init {
-        radius = 120.dp2Px()
+        radius = 110.dp2Px()
     }
 
     //仅支持matchParent及exactly width/height
@@ -150,7 +153,7 @@ class MyCustomizeCircleLayoutManger(val context: Context) : RecyclerView.LayoutM
         }
         val zero = coordinateCache.get(0)
         val dest =
-            calculateCoordinate2(position + 1, radius, zero.x, zero.y).toPoint()
+            calculateCircleCoordinate(position + 1, radius, zero.x, zero.y).toPoint()
         coordinateCache.put(position, dest)
         return dest
     }
@@ -186,49 +189,28 @@ class MyCustomizeCircleLayoutManger(val context: Context) : RecyclerView.LayoutM
      *    centerPoint.x - (level - 1) * cellSize * cos(itemDu * itemGroup),
      *    centerPoint.y - (level - 1) * cellSize * sin(itemDu * itemGroup));
      */
-    private fun calculateCoordinate2(
+    private fun calculateCircleCoordinate(
         index: Int,
         radius: Int,
         centerX: Int,
         centerY: Int
     ): DPoint {
-        val du = PI / 3.0
-        val result = DPoint(0.0, 0.0)
         val hexagonalPoint = calculateHexagonalPoint(index)
         val level = hexagonalPoint.level
-
+        val destRadius = radius * (level - 1)
+        val avgAngle = 2 * PI / (calFormulaCount(level) - calFormulaCount(level - 1))
         if (level == 1) {
             return DPoint(centerX.toDouble(), centerY.toDouble())
-        } else if (level == 2) {
+        } else if (level % 2 == 0) {
+            val destAngle = avgAngle / 2 + (hexagonalPoint.levelNumber - 1) * avgAngle
             return DPoint(
-                centerX - radius * cos(du * hexagonalPoint.levelNumber),
-                centerY - radius * sin(du * hexagonalPoint.levelNumber)
+                centerX + sin(destAngle) * destRadius, centerY - cos(destAngle) * destRadius
             )
         } else {
-            val itemGroup = ceil((hexagonalPoint.levelNumber.toDouble() / (level - 1))).toInt()
-            val itemGroupNum = hexagonalPoint.levelNumber - (itemGroup - 1) * (level - 1)
-            val tempPointX = centerX - (level - 1) * radius * cos((du * itemGroup))
-            val tempPointY = centerY - (level - 1) * radius * sin((du * itemGroup))
-            if (itemGroup == 1) {
-                result.x = tempPointX + radius * (itemGroupNum - 1)
-                result.y = tempPointY
-            } else if (itemGroup == 2) {
-                result.x = tempPointX + radius * cos(du) * (itemGroupNum - 1)
-                result.y = tempPointY + radius * sin(du) * (itemGroupNum - 1)
-            } else if (itemGroup == 3) {
-                result.x = tempPointX - radius * cos(du) * (itemGroupNum - 1)
-                result.y = tempPointY + radius * sin(du) * (itemGroupNum - 1)
-            } else if (itemGroup == 4) {
-                result.x = tempPointX - radius * (itemGroupNum - 1)
-                result.y = tempPointY
-            } else if (itemGroup == 5) {
-                result.x = tempPointX - radius * cos(du) * (itemGroupNum - 1)
-                result.y = tempPointY - radius * sin(du) * (itemGroupNum - 1)
-            } else if (itemGroup == 6) {
-                result.x = tempPointX + radius * cos(du) * (itemGroupNum - 1)
-                result.y = tempPointY - radius * sin(du) * (itemGroupNum - 1)
-            }
-            return result
+            val destAngle = (hexagonalPoint.levelNumber - 1) * avgAngle
+            return DPoint(
+                centerX + sin(destAngle) * destRadius, centerY - cos(destAngle) * destRadius
+            )
         }
 
     }
