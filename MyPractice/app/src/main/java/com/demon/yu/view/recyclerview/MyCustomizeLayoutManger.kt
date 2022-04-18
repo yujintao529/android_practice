@@ -19,13 +19,8 @@ class MyCustomizeLayoutManger(val context: Context) : RecyclerView.LayoutManager
 
 
 
-    var radius: Int = 0
-    private var maxScaleSize = 1.5f
+    var radius: Int = 120.dp2Px()
 
-
-    init {
-        radius = 120.dp2Px()
-    }
 
     //仅支持matchParent及exactly width/height
     override fun onMeasure(

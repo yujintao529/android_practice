@@ -1,8 +1,6 @@
 package com.demon.yu.view.recyclerview
 
 import android.content.Context
-import android.graphics.Canvas
-import android.graphics.Color
 import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.animation.AccelerateInterpolator
@@ -47,16 +45,15 @@ class MyCustomize2RecyclerView(context: Context, attr: AttributeSet? = null) :
     }
 
 
-    override fun dispatchDraw(canvas: Canvas?) {
-        super.dispatchDraw(canvas)
-        paint.color = Color.RED
-        paint.style = Paint.Style.STROKE
-        paint.strokeWidth = 2f.dp2Px().toFloat()
-        canvas?.drawCircle(centerX.toFloat(), centerY.toFloat(), radiusDouble.toFloat(), paint)
-        paint.color = Color.BLUE
-        canvas?.drawCircle(centerX.toFloat(), centerY.toFloat(), innerCircleRadius.toFloat(), paint)
-        canvas?.drawCircle(centerX.toFloat(), centerY.toFloat(), 240.dp2Px().toFloat(), paint)
-    }
+//    override fun dispatchDraw(canvas: Canvas?) {
+//        super.dispatchDraw(canvas)
+//        paint.color = Color.RED
+//        paint.style = Paint.Style.STROKE
+//        paint.strokeWidth = 2f.dp2Px().toFloat()
+//        canvas?.drawCircle(centerX.toFloat(), centerY.toFloat(), radiusDouble.toFloat(), paint)
+//        paint.color = Color.BLUE
+//        canvas?.drawCircle(centerX.toFloat(), centerY.toFloat(), innerCircleRadius.toFloat(), paint)
+//    }
 
     private val decelerateInterpolator = DecelerateInterpolator()
     private val accelerateInterpolator = AccelerateInterpolator()
