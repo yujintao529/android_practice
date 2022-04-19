@@ -219,7 +219,6 @@ class MyCustomize2RecyclerView(context: Context, attr: AttributeSet? = null) :
                 val scale =
                     (radiusDouble - distance) / (radius)
                 return 1 + decelerateInterpolator.getInterpolation(scale) * (secondScaleSize - 1)
-//                return 1 + scale * (secondScaleSize - 1)
             }
 
             distance <= radiusDouble + dismiss2NormalScaleDistance && distance >= radiusDouble -> {
