@@ -35,6 +35,12 @@ class MyCustomize2RecyclerViewAct : AppCompatActivity() {
                             recyclerView.getScaleSize(child.getCenterX(), child.getCenterY())
                         child.scaleX = scale
                         child.scaleY = scale
+                        recyclerView.translateXY(
+                            child,
+                            child.getCenterX(),
+                            child.getCenterY(),
+                            i == 0
+                        )
                         if (i == 0) {
 //                            Log.d("yujintao", "left = ${child.left},top = ${child.top}")
                             /**
@@ -44,6 +50,10 @@ class MyCustomize2RecyclerViewAct : AppCompatActivity() {
                             Log.d(
                                 "yujintao",
                                 "input (${child.getCenterX()},${child.getCenterY()}),scale = $scale"
+                            )
+                            Log.d(
+                                "yujintao",
+                                "input (${child.getCenterX()},${child.getCenterY()}),translatex = ${child.translationX},translateY= ${child.translationY}"
                             )
                         }
                     }

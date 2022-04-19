@@ -2,13 +2,14 @@ package com.demon.yu.view.recyclerview
 
 import android.content.Context
 import android.graphics.Point
+import android.graphics.Rect
 import android.util.SparseArray
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.util.forEach
 import androidx.recyclerview.widget.RecyclerView
 import com.demon.yu.extenstion.dp2Px
 import kotlin.math.*
-
 
 
 class MyCustomizeLayoutManger(val context: Context) : RecyclerView.LayoutManager() {
@@ -16,7 +17,6 @@ class MyCustomizeLayoutManger(val context: Context) : RecyclerView.LayoutManager
 
     private var measureWidth: Int = 0
     private var measureHeight: Int = 0
-
 
 
     var radius: Int = 120.dp2Px()
@@ -63,6 +63,7 @@ class MyCustomizeLayoutManger(val context: Context) : RecyclerView.LayoutManager
         fill(recycler, state)
     }
 
+    private val viewRegion = Rect()
 
     private fun fill(recycler: RecyclerView.Recycler, state: RecyclerView.State) {
 
@@ -91,11 +92,12 @@ class MyCustomizeLayoutManger(val context: Context) : RecyclerView.LayoutManager
                 addView(view)
                 measureChildWithMargins(view, 0, 0)
                 layoutChildInternal(view, i)
+
             } else {
 
             }
-
         }
+        viewRegion.set(find4Coordinate()) //找到四周的范围
 
 
         //删除无用detachView
@@ -148,9 +150,29 @@ class MyCustomizeLayoutManger(val context: Context) : RecyclerView.LayoutManager
         val dest =
             calculateCoordinate2(position + 1, radius, zero.x, zero.y).toPoint()
         coordinateCache.put(position, dest)
+
         return dest
     }
 
+    //先不复用的view的场景下也就是所有的view都添加的情况下，找到最上，最左，最右，最下的坐标，用来辅助是否可以滑动的情况
+    private fun find4Coordinate(): Rect {
+        val rect = Rect()
+        coordinateCache.forEach { key, value ->
+            if (value.x < rect.left) {
+                rect.left = value.x
+            }
+            if (value.x > rect.right) {
+                rect.right = value.x
+            }
+            if (value.y < rect.top) {
+                rect.top = value.y
+            }
+            if (value.y > rect.bottom) {
+                rect.bottom = value.y
+            }
+        }
+        return rect
+    }
 
     /**
      *
@@ -223,6 +245,9 @@ class MyCustomizeLayoutManger(val context: Context) : RecyclerView.LayoutManager
             } else if (itemGroup == 6) {
                 result.x = tempPointX + radius * cos(du) * (itemGroupNum - 1)
                 result.y = tempPointY - radius * sin(du) * (itemGroupNum - 1)
+            }
+            if (itemGroupNum == 1) {
+
             }
             return result
         }
