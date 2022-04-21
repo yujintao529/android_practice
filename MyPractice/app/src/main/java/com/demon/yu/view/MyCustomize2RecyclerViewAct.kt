@@ -3,6 +3,8 @@ package com.demon.yu.view
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.EditText
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.demon.yu.view.recyclerview.*
@@ -18,6 +20,17 @@ class MyCustomize2RecyclerViewAct : AppCompatActivity() {
         setContentView(R.layout.activity_my_customize_2_recycler_act)
         a2RecyclerView = findViewById(R.id.recyclerView)
         adapter.update(createObj())
+        findViewById<View>(R.id.update).setOnClickListener {
+            val number =
+                findViewById<EditText>(R.id.inputNumber).editableText.toString().toIntOrNull()
+            if (number == null) {
+                Toast.makeText(this@MyCustomize2RecyclerViewAct, "输入错误", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            val data = createObj(number)
+            adapter.update(data)
+
+        }
         layoutManger = MyCustomizeLayoutManger(this)
         a2RecyclerView?.layoutManager = layoutManger
         a2RecyclerView?.adapter = adapter
@@ -102,7 +115,8 @@ class MyCustomize2RecyclerViewAct : AppCompatActivity() {
         })
     }
 
-    private fun createObj(): List<MyStaticObj> {
-        return (0..100).map { MyStaticObj() }.toList()
+    private fun createObj(number: Int = 100): List<MyStaticObj> {
+        return (0 until number).map { MyStaticObj() }.toList()
     }
+
 }

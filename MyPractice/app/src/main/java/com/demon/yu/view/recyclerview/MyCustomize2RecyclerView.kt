@@ -15,15 +15,13 @@ import android.view.animation.DecelerateInterpolator
 import androidx.recyclerview.widget.RecyclerView
 import com.demon.yu.extenstion.dp2Px
 import java.lang.StrictMath.abs
-import kotlin.math.PI
-import kotlin.math.pow
-import kotlin.math.sin
-import kotlin.math.sqrt
+import kotlin.math.*
 
 
 class MyCustomize2RecyclerView(context: Context, attr: AttributeSet? = null) :
     RecyclerView(context, attr) {
 
+    private val tag = "MyCustomize2RecyclerView"
 
     private var maxScaleSize = 124f / 60f
 
@@ -36,17 +34,9 @@ class MyCustomize2RecyclerView(context: Context, attr: AttributeSet? = null) :
     var centerY: Int = 0
 
 
-    //    private var edgeCircleRadius = 240.dp2Px()
-    private var innerCircleRadius = 20.dp2Px()
-
-
-    private var secondScaleDistance = 80.dp2Px()
-
     private var radius = 120.dp2Px()
     private var dismiss2NormalScaleDistance = 60.dp2Px().toFloat()
     private var radiusDouble = radius * 2
-
-    private var NormalScaleDistance = 30.dp2Px().toFloat()
 
 
     private val centerRegionWidth = radius * 2
@@ -94,7 +84,7 @@ class MyCustomize2RecyclerView(context: Context, attr: AttributeSet? = null) :
 
     fun scrollToCenter(x: Int, y: Int) {
         val vib = context.getSystemService(Service.VIBRATOR_SERVICE) as Vibrator
-        vib.vibrate(longArrayOf(100, 200), -1)
+        vib.vibrate(longArrayOf(100, 30), -1)
         smoothScrollBy(x - centerX, y - centerY)
     }
     /**
@@ -215,10 +205,26 @@ class MyCustomize2RecyclerView(context: Context, attr: AttributeSet? = null) :
                     (radius - distance) / (radius) * (maxScaleSize - secondScaleSize)
                 return scale + secondScaleSize
             }
+//            distance >= radius && distance < radiusDouble -> {
+//                val scale =
+//                    (radiusDouble - distance) / (radius)
+//                val ratio = abs(cos((centerX - x) / distance))
+////                return 1 + decelerateInterpolator.getInterpolation(scale) * (secondScaleSize - 1)
+//
+//                return 1 + scale * (secondScaleSize - 1) * ratio
+//            }
+
+
             distance >= radius && distance < radiusDouble -> {
+                val ratio = 1f + abs(cos((centerX - x) / distance)) * 0.2f
+
                 val scale =
-                    (radiusDouble - distance) / (radius)
-                return 1 + decelerateInterpolator.getInterpolation(scale) * (secondScaleSize - 1)
+                    (radiusDouble - distance) / (radius) * ratio
+
+                return min(1 + scale * (secondScaleSize - 1), secondScaleSize)
+//                return 1 + decelerateInterpolator.getInterpolation(scale) * (secondScaleSize - 1)
+
+//                return min(secondScaleSize,)
             }
 
             distance <= radiusDouble + dismiss2NormalScaleDistance && distance >= radiusDouble -> {
@@ -233,7 +239,8 @@ class MyCustomize2RecyclerView(context: Context, attr: AttributeSet? = null) :
 
     fun translateXY(view: View, x: Int, y: Int, log: Boolean) {
         val distance = calculateDistance(x, y)
-        if (distance <= radius) {
+        val translateRange = radius
+        if (distance <= translateRange) {
             view.translationX = 0f
             view.translationY = 0f
             return
@@ -246,19 +253,37 @@ class MyCustomize2RecyclerView(context: Context, attr: AttributeSet? = null) :
 //
 //            }
             else -> {
+                val magnitude = (distance - translateRange) / translateRange * 124f
+                val ratio = magnitude / (distance)
 
-                val magnitude = (distance - radius) / radius * 124f
-                val ratio = magnitude / distance
-                val sin =
-                    abs((centerX - x) / distance) * 1.2f + 0.2f
+                val sin = abs((centerX - x) / distance)
+                val cos = abs((centerY - y) / distance)
 //                val sin =accelerateInterpolator.getInterpolation((centerY - y) / distance * 0.5f)
-                view.translationX = (centerX - x) * ratio
-//                view.translationY = (centerY - y) * ratio * (0.5f + sin)
-                view.translationY = (centerY - y) * ratio * sin
+
+//                val scaleXChanged = (view.scaleX - 1) * view.width / 2f
+//                val scaleYChanged = (view.scaleY - 1) * view.scaleY / 2f
+//                view.translationY = (centerY - y) * ratio
+//                view.translationX = (centerX - x) * ratio
+                val minRatio = 0.2f  //处于y轴最小向下移动系数0.2
+                val minRatioMultiple = 1.2f //系数的倍数影线山下的最大幅度
+                val ratioY = minRatio + sin * minRatioMultiple
+
+
+                val tri = PI / 3
+
+
+                val magnitudeX = centerX - (centerX - x) * (distance - magnitude) / distance
+                view.translationX = magnitudeX - x
+                val magnitudeY = centerY - (centerY - y) * (distance - magnitude) / distance
+                view.translationY = ((magnitudeY - y) * ratioY)
                 if (log) {
                     Log.d(
-                        "yujintao2",
-                        "ratio =${ratio},sin=${sin},translationY=${view.translationY}"
+                        tag,
+                        "x = ${x},magnitudeX=$magnitudeX，y=${y},magnitudeY=${magnitudeY}，ratioY=$ratioY"
+                    )
+                    Log.d(
+                        tag,
+                        "ratio =${ratio},sin=${sin},magnitude =${magnitude}, translationY=${view.translationY}，translationX=${view.translationX}"
                     )
                 }
             }
