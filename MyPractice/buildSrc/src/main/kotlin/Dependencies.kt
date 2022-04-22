@@ -68,7 +68,7 @@ object Deps {
     const val material = "com.google.android.material:material:1.2.1"
 
     // 知名项目
-    const val frescoVersion = "0.11.0"
+    const val frescoVersion = "1.13.0"
     const val fresco = "com.facebook.fresco:fresco:${frescoVersion}"
     const val frescogif = "com.facebook.fresco:animated-gif:${frescoVersion}"
     const val frescowebp = "com.facebook.fresco:webpsupport:${frescoVersion}"

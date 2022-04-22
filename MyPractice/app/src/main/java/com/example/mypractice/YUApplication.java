@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import com.demon.yu.utils.ProcessUtils;
 import com.demon.yu.utils.ThreadPoolUtils;
 import com.example.mypractice.common.Common;
+import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.stetho.Stetho;
 
 /**
@@ -28,6 +29,7 @@ public class YUApplication extends Application {
         Common.screenWidth = displayMetrics.widthPixels;
         Common.application = this;
         Stetho.initializeWithDefaults(this);
+        Fresco.initialize(this);
         Logger.debug("YUApplication", "onCreate process  " + ProcessUtils.getProcessInfo(this));
     }
 

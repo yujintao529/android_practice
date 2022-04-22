@@ -130,14 +130,16 @@ class MyCustomizeLayoutManger(val context: Context) : RecyclerView.LayoutManager
         val point = calculateChildCoordinate(position, childCount)
         val childWidth = view.measuredWidth
         val childHeight = view.measuredHeight
+        FakeLayoutCoorExchangeUtils.shiftingLayout(view, point) { left, top ->
+            layoutDecorated(
+                view,
+                left,
+                top,
+                left + childWidth,
+                top + childHeight
+            )
+        }
 
-        layoutDecorated(
-            view,
-            point.x - childWidth / 2,
-            point.y - childHeight / 2,
-            point.x + childWidth / 2,
-            point.y + childHeight / 2
-        )
     }
 
 

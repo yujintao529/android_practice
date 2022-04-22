@@ -26,6 +26,10 @@ fun View.getCenterX(): Int {
     return left + width / 2
 }
 
+fun View.getCenterPoint(): Point {
+    return Point(getCenterX(), getCenterY())
+}
+
 fun View.getCenterY(): Int {
     if (height == 0) {
         return top

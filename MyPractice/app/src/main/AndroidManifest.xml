@@ -25,6 +25,11 @@
         <activity
             android:name=".ApiLaunch"
             android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
         <activity
             android:name=".view.AutoGridLayoutAct"
@@ -421,6 +426,15 @@
         <activity
             android:name="com.demon.yu.view.NextScrollViewAct"
             android:label="view/NextScrollViewAct"
+            android:theme="@style/AppTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="com.example.apidemons.CATEGORY_SAMPLES" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.demon.yu.view.FrescoWebpViewAct"
+            android:label="view/FrescoWebpViewAct"
             android:theme="@style/AppTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

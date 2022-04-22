@@ -39,11 +39,10 @@ class MyCustomize2RecyclerViewAct : AppCompatActivity() {
                 super.onScrolled(recyclerView, dx, dy)
                 recyclerView as MyCustomize2RecyclerView
                 for (i in 0..adapter.itemCount) {
-
                     val child = layoutManger?.findViewByPosition(i)
                     if (child != null) {
-                        child.pivotX = (child.width / 2).toFloat()
-                        child.pivotY = (child.height / 2).toFloat()
+
+                        FakeLayoutCoorExchangeUtils.setCenterPivot(child)
                         val scale =
                             recyclerView.getScaleSize(child.getCenterX(), child.getCenterY())
                         child.scaleX = scale
