@@ -22,12 +22,6 @@
             android:orientation="horizontal" />
     </com.demon.yu.avatar.interact.InteractHorizontalScrollView>
 
-    <View
-        android:id="@+id/circleBg"
-        android:layout_width="76dp"
-        android:layout_height="76dp"
-        android:layout_gravity="center"
-        android:background="@drawable/avatar_light_interact_circle_bg" />
 
     <FrameLayout
         android:id="@+id/featureContainer"
@@ -41,7 +35,7 @@
             android:id="@+id/leftBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="start"
+            android:layout_gravity="start|center_vertical"
             android:drawableTop="@drawable/send_msg"
             android:drawablePadding="6dp"
             android:gravity="center"
@@ -51,11 +45,18 @@
             android:textColor="#ff161823"
             android:textSize="11dp" />
 
+        <View
+            android:id="@+id/circleBg"
+            android:layout_width="76dp"
+            android:layout_height="76dp"
+            android:layout_gravity="center"
+            android:background="@drawable/avatar_light_interact_circle_bg" />
+
         <TextView
             android:id="@+id/rightBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="end"
+            android:layout_gravity="end|center_vertical"
             android:drawableTop="@drawable/teke_to"
             android:drawablePadding="6dp"
             android:gravity="center"

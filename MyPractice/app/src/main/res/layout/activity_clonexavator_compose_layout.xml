@@ -4,12 +4,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <com.demon.yu.avatar.interact.CloneXAvatarComposeLayout
+        android:id="@+id/cloneXAvatarComposeLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="116dp" />
 
     <com.demon.yu.avatar.interact.LightInteractView
         android:id="@+id/lightInteractView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="bottom" />
-
 
 </FrameLayout>

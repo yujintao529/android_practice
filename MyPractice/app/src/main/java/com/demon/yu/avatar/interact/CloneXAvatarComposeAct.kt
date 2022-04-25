@@ -6,6 +6,7 @@ import android.view.View
 import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
 import com.demon.yu.extenstion.dp2Px
+import com.demon.yu.view.recyclerview.MyStaticObj
 import com.example.mypractice.R
 import com.example.mypractice.common.Common
 
@@ -17,6 +18,7 @@ class CloneXAvatarComposeAct : AppCompatActivity() {
         LightInteractComponent.getLightInteractComponent(this)
     }
 
+    private var cloneXAvatarComposeLayout: CloneXAvatarComposeLayout? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_clonexavator_compose_layout)
@@ -30,6 +32,8 @@ class CloneXAvatarComposeAct : AppCompatActivity() {
                 Common.screenHeight / 2 - 100.dp2Px()
             )
         )
+        cloneXAvatarComposeLayout = findViewById(R.id.cloneXAvatarComposeLayout)
+        cloneXAvatarComposeLayout?.updateData(createAvatarObj())
     }
 
 
@@ -37,6 +41,11 @@ class CloneXAvatarComposeAct : AppCompatActivity() {
         val drawableArr =
             arrayListOf(R.drawable.heart, R.drawable.zhuoyizhuo, R.drawable.baba, R.drawable.paozhu)
         return (0..8).map { LightInteractModel(resourceID = drawableArr[it % 4]) }
+    }
+
+
+    private fun createAvatarObj(): List<MyStaticObj> {
+        return (0..50).map { MyStaticObj() }.toList()
     }
 
 }

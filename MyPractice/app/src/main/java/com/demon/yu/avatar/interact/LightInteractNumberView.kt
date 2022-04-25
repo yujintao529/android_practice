@@ -14,10 +14,9 @@ class LightInteractNumberView(context: Context?, attrs: AttributeSet? = null) :
 
 
     init {
-        orientation = LinearLayout.HORIZONTAL
+        orientation = HORIZONTAL
 
     }
-
 
     private var currentNumber = 0
     private val numberDrawable = arrayOf(
@@ -33,9 +32,15 @@ class LightInteractNumberView(context: Context?, attrs: AttributeSet? = null) :
         R.drawable.n9,
     )
 
+
     private val dismissRunnable = Runnable {
         animate().cancel()
         animate().alpha(0f).setDuration(80L).start()
+    }
+
+
+    private fun isReachMax(): Boolean {
+        return currentNumber >= 10
     }
 
     fun setNumber(number: Int) {
@@ -54,7 +59,11 @@ class LightInteractNumberView(context: Context?, attrs: AttributeSet? = null) :
     private var valueAnimator: ValueAnimator? = null
     private fun updateNumber(number: Int) {
         currentNumber = number
-        refreshNumbersView()
+        if (isReachMax()) {
+            showMaxView()
+        } else {
+            refreshNumbersView()
+        }
         post {
             pivotX = (width / 2).toFloat()
             pivotY = (height / 2).toFloat()
@@ -62,7 +71,7 @@ class LightInteractNumberView(context: Context?, attrs: AttributeSet? = null) :
                 valueAnimator?.cancel()
             }
             valueAnimator = ValueAnimator.ofFloat(1f, 0.8f, 1f)
-            valueAnimator?.duration = 80L
+            valueAnimator?.duration = 120L
             valueAnimator?.addUpdateListener {
                 scaleX = it.animatedValue as Float
                 scaleY = it.animatedValue as Float
@@ -71,6 +80,26 @@ class LightInteractNumberView(context: Context?, attrs: AttributeSet? = null) :
         }
     }
 
+    private fun showMaxView() {
+        addOrShowPrefixViewIfNeed()
+        if (childCount >= 2) {
+            for (i in 1 until childCount) {
+                getChildAt(i).visibility = View.VISIBLE
+                if (i == 1) {
+                    (getChildAt(1) as ImageView).let {
+                        it.visibility = View.VISIBLE
+                        it.setImageResource(R.drawable.max)
+                    }
+                }
+            }
+        } else if (childCount == 1) {
+            val imageView = createImageView()
+            imageView.setImageResource(R.drawable.max)
+            addView(imageView, 1)
+        }
+
+
+    }
 
     private fun refreshNumbersView() {
         var destNumber = currentNumber
@@ -94,7 +123,9 @@ class LightInteractNumberView(context: Context?, attrs: AttributeSet? = null) :
             prefix.setImageResource(R.drawable.prefix)
             addView(prefix)
         } else {
-            getChildAt(0).visibility = View.VISIBLE
+            (getChildAt(0) as ImageView).let {
+                it.visibility = View.VISIBLE
+            }
         }
     }
 

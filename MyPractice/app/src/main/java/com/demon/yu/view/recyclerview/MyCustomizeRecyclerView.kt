@@ -6,6 +6,7 @@ import android.util.AttributeSet
 import android.util.Log
 import androidx.recyclerview.widget.RecyclerView
 import com.demon.yu.extenstion.dp2Px
+import com.example.mypractice.BuildConfig
 import java.lang.Math.pow
 import kotlin.math.sqrt
 
@@ -74,6 +75,9 @@ class MyCustomizeRecyclerView(context: Context, attr: AttributeSet? = null) :
 
     override fun dispatchDraw(canvas: Canvas?) {
         super.dispatchDraw(canvas)
+        if (BuildConfig.DEBUG.not()) {
+            return
+        }
         //debug
         paint.style = Paint.Style.FILL
         paint.color = centerRegionColor

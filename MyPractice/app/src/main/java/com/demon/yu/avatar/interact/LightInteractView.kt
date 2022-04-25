@@ -24,7 +24,6 @@ class LightInteractView(context: Context, attrs: AttributeSet? = null) :
     companion object {
         private const val STATE_IDLE = 0
         private const val STATE_INTERACT = 1
-        private const val INTERACT_TAG = 999
         private const val LIGHT_INTERACT_ANMI_DURATION = 655L
         private const val LIGHT_INTERACT_REPEAT_DELAY = 100L
         private const val LIGHT_INTERACT_BACK_TO_IDLE = 1500L
@@ -51,6 +50,10 @@ class LightInteractView(context: Context, attrs: AttributeSet? = null) :
 
     private var currentLightNumber = 0
     private var reCount: Boolean = true
+
+
+    private var btnIsMySelf: Boolean = false
+    var onBtnClickListener: OnBtnClickListener? = null
 
     private val backToIdleRunnable = Runnable {
         if (horizontalScrollViewIsScrolling.not()) {
@@ -79,6 +82,7 @@ class LightInteractView(context: Context, attrs: AttributeSet? = null) :
         val lp = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
         lp.gravity = Gravity.TOP or Gravity.LEFT
         addView(lightInteractNumberView, lp)
+        changeLightInteractMode(btnIsMySelf)
     }
 
 
@@ -101,23 +105,34 @@ class LightInteractView(context: Context, attrs: AttributeSet? = null) :
 
 
     fun changeLightInteractMode(isMyself: Boolean) {
-        if (isMyself) {
-
+        btnIsMySelf = isMyself
+        if (btnIsMySelf) {
+            leftBtn.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.change_clothes, 0, 0)
+            leftBtn.text = "换装扮"
+            rightBtn.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.change_motion, 0, 0)
+            rightBtn.text = "换表情"
         } else {
-
+            leftBtn.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.send_msg, 0, 0)
+            leftBtn.text = "发消息"
+            rightBtn.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.teke_to, 0, 0)
+            rightBtn.text = "合拍"
         }
+
     }
+
 
     private fun refreshInteractState() {
         if (state == STATE_IDLE) {
-            featureContainer.visibility = View.VISIBLE
-            circleBgView.visibility = View.VISIBLE
+            featureContainer.animate().let {
+                it.alpha(1f).setDuration(LIGHT_INTERACT_ICON_ANIM).start()
+            }
             horizontalScrollView.enableScroll = false
             lightInteractNumberView.end()
             hideSideView()
         } else {
-            featureContainer.visibility = View.INVISIBLE
-            circleBgView.visibility = View.INVISIBLE
+            featureContainer.animate().let {
+                it.alpha(0f).setDuration(LIGHT_INTERACT_ICON_ANIM).start()
+            }
             removeCallbacks(backToIdleRunnable)
 //            horizontalScrollView.enableScroll(true)
             showSideView()
@@ -185,7 +200,7 @@ class LightInteractView(context: Context, attrs: AttributeSet? = null) :
                 lightInteractNumberView.continueNumber(count)
             }
         }, LIGHT_INTERACT_ANMI_DURATION - 100)
-
+        ComposeSystemUtils.vibrator(context)
 
     }
 
@@ -572,5 +587,10 @@ class LightInteractView(context: Context, attrs: AttributeSet? = null) :
             removeCallbacks(backToIdleRunnable)
             delayBackToIdle()
         }
+    }
+
+    interface OnBtnClickListener {
+        fun onLeftBtnClick(view: View, isMySelf: Boolean)
+        fun onRightBtnClick(view: View, isMySelf: Boolean)
     }
 }
