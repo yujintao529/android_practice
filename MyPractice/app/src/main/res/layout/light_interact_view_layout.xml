@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rootView"
+    android:layout_width="match_parent"
+    android:layout_height="76dp"
+    android:layout_gravity="bottom"
+    android:layout_marginBottom="40dp"
+    tools:background="@android:color/white"
+    tools:context="com.demon.yu.avatar.interact.CloneXAvatarComposeAct">
+
+    <com.demon.yu.avatar.interact.InteractHorizontalScrollView
+        android:id="@+id/horizontalScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="76dp">
+
+        <LinearLayout
+            android:id="@+id/lightViewContainer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:orientation="horizontal" />
+    </com.demon.yu.avatar.interact.InteractHorizontalScrollView>
+
+    <View
+        android:id="@+id/circleBg"
+        android:layout_width="76dp"
+        android:layout_height="76dp"
+        android:layout_gravity="center"
+        android:background="@drawable/avatar_light_interact_circle_bg" />
+
+    <FrameLayout
+        android:id="@+id/featureContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_marginStart="22dp"
+        android:layout_marginEnd="22dp">
+
+        <TextView
+            android:id="@+id/leftBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:drawableTop="@drawable/send_msg"
+            android:drawablePadding="6dp"
+            android:gravity="center"
+            android:paddingStart="40dp"
+            android:paddingEnd="40dp"
+            android:text="发消息"
+            android:textColor="#ff161823"
+            android:textSize="11dp" />
+
+        <TextView
+            android:id="@+id/rightBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:drawableTop="@drawable/teke_to"
+            android:drawablePadding="6dp"
+            android:gravity="center"
+            android:paddingStart="40dp"
+            android:paddingEnd="40dp"
+            android:text="合拍"
+            android:textColor="#ff161823"
+            android:textSize="11dp" />
+    </FrameLayout>
+
+</FrameLayout>

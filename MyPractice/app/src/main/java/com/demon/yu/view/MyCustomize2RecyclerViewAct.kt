@@ -43,14 +43,15 @@ class MyCustomize2RecyclerViewAct : AppCompatActivity() {
                     if (child != null) {
 
                         FakeLayoutCoorExchangeUtils.setCenterPivot(child)
+                        val point = FakeLayoutCoorExchangeUtils.getCenterPoint(child)
                         val scale =
-                            recyclerView.getScaleSize(child.getCenterX(), child.getCenterY())
+                            recyclerView.getScaleSize(point.x, point.y)
                         child.scaleX = scale
                         child.scaleY = scale
                         recyclerView.translateXY(
                             child,
-                            child.getCenterX(),
-                            child.getCenterY(),
+                            point.x,
+                            point.y,
                             i == 0
                         )
                         if (i == 0) {
@@ -61,11 +62,7 @@ class MyCustomize2RecyclerViewAct : AppCompatActivity() {
                              */
                             Log.d(
                                 "yujintao",
-                                "input (${child.getCenterX()},${child.getCenterY()}),scale = $scale"
-                            )
-                            Log.d(
-                                "yujintao",
-                                "input (${child.getCenterX()},${child.getCenterY()}),translatex = ${child.translationX},translateY= ${child.translationY}"
+                                "input (${point.x},${point.y}),scale = $scale,translatex = ${child.translationX},translateY= ${child.translationY}"
                             )
                         }
                     }

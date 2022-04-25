@@ -60,7 +60,7 @@ class ClipSimpleDraweeView(context: Context, attr: AttributeSet? = null) :
     /**
      * 特定的格式：
      * real:160*160
-     * fake:120*100
+     * fake:120*120
      * top: 30
      * left:50
      */
@@ -81,7 +81,10 @@ class ClipSimpleDraweeView(context: Context, attr: AttributeSet? = null) :
     }
 
     override fun getCenterPoint(): Point {
-        return Point((right - (left + getFakeLeft())) / 2, (bottom - (top + getFakeTop())) / 2)
+        return Point(
+            width / 2 + getFakeLeft() + left,
+            top + height / 2 + getFakeTop()
+        )
     }
 
     override fun getFakePivotX(): Int {

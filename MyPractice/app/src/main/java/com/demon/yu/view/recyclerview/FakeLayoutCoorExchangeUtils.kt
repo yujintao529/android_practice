@@ -14,7 +14,7 @@ object FakeLayoutCoorExchangeUtils {
         if (view is IFakeLayoutView) {
             val left = positionCenterPoint.x - view.measuredWidth / 2
             val top = positionCenterPoint.y - view.measuredHeight / 2
-            block(left + view.getFakeLeft(), top + view.getFakeTop())
+            block(left - view.getFakeLeft(), top - view.getFakeTop())
         } else {
             block.invoke(
                 positionCenterPoint.x - view.measuredWidth / 2,

@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <item type="id" name="pic_txt_view_key"/>
+    <item type="id" name="interact_view_key" />
 </resources>
