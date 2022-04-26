@@ -11,6 +11,10 @@ fun Point.toDPoint(): DPoint {
     return DPoint(x.toDouble(), y.toDouble())
 }
 
+fun Point.copy(): Point {
+    return Point(this)
+}
+
 fun DPoint.toPoint(): Point {
     return Point(x.toInt(), y.toInt())
 }

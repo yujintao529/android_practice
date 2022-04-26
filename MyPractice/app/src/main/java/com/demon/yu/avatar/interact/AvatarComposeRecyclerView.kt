@@ -2,10 +2,7 @@ package com.demon.yu.avatar.interact
 
 import android.app.Service
 import android.content.Context
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.Rect
+import android.graphics.*
 import android.os.Vibrator
 import android.util.AttributeSet
 import android.util.Log
@@ -15,6 +12,7 @@ import android.view.animation.DecelerateInterpolator
 import androidx.core.graphics.toRectF
 import androidx.recyclerview.widget.RecyclerView
 import com.demon.yu.extenstion.dp2Px
+import com.demon.yu.view.recyclerview.copy
 import com.example.mypractice.BuildConfig
 import kotlin.math.*
 
@@ -31,8 +29,8 @@ class AvatarComposeRecyclerView(context: Context, attr: AttributeSet? = null) :
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG.or(Paint.DITHER_FLAG))
 
 
-    var centerX: Int = 0
-    var centerY: Int = 0
+    private var centerX: Int = 0
+    private var centerY: Int = 0
 
 
     private var radius = 120.dp2Px()
@@ -45,6 +43,10 @@ class AvatarComposeRecyclerView(context: Context, attr: AttributeSet? = null) :
     private var centerRegionRect = Rect()
     private var cornerRadius = 50.dp2Px()
 
+
+    private var centerPoint = Point()
+    var onLayoutListener: OnLayoutListener? = null
+
     override fun onMeasure(widthSpec: Int, heightSpec: Int) {
         super.onMeasure(widthSpec, heightSpec)
         centerX = measuredWidth / 2
@@ -55,13 +57,22 @@ class AvatarComposeRecyclerView(context: Context, attr: AttributeSet? = null) :
             (measuredWidth - centerRegionWidth) / 2 + centerRegionWidth,
             (measuredHeight - centerRegionHeight) / 2 + centerRegionHeight
         )
+    }
 
+    override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
+        super.onLayout(changed, l, t, r, b)
+        val centerX = (r - l) / 2
+        val centerY = (b - t) / 2
+        if (centerPoint.x != centerX || centerPoint.y != centerY) {
+            centerPoint.set(centerX, centerY)
+            onLayoutListener?.onCenter(centerPoint.copy())
+        }
     }
 
 
     override fun dispatchDraw(canvas: Canvas?) {
         super.dispatchDraw(canvas)
-        if (BuildConfig.DEBUG.not()) {
+        if (BuildConfig.DEBUG.not() || isInEditMode.not()) {
             return
         }
         paint.color = Color.RED
@@ -86,10 +97,10 @@ class AvatarComposeRecyclerView(context: Context, attr: AttributeSet? = null) :
         return calculateDistance(x, y)
     }
 
-    fun scrollToCenter(x: Int, y: Int) {
+    fun scrollToCenter(x: Int, y: Int, duration: Int) {
         val vib = context.getSystemService(Service.VIBRATOR_SERVICE) as Vibrator
         vib.vibrate(longArrayOf(100, 30), -1)
-        smoothScrollBy(x - centerX, y - centerY)
+        smoothScrollBy(x - centerX, y - centerY, null, duration)
     }
     /**
      * 不分段实现版本
@@ -273,9 +284,6 @@ class AvatarComposeRecyclerView(context: Context, attr: AttributeSet? = null) :
                 val ratioY = minRatio + sin * minRatioMultiple
 
 
-                val tri = PI / 3
-
-
                 val magnitudeX = centerX - (centerX - x) * (distance - magnitude) / distance
                 view.translationX = magnitudeX - x
                 val magnitudeY = centerY - (centerY - y) * (distance - magnitude) / distance
@@ -301,4 +309,8 @@ class AvatarComposeRecyclerView(context: Context, attr: AttributeSet? = null) :
         ).toFloat()
     }
 
+
+    interface OnLayoutListener {
+        fun onCenter(point: Point)
+    }
 }

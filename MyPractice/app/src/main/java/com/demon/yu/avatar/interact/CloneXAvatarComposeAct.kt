@@ -2,13 +2,12 @@ package com.demon.yu.avatar.interact
 
 import android.graphics.Point
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
-import com.demon.yu.extenstion.dp2Px
 import com.demon.yu.view.recyclerview.MyStaticObj
 import com.example.mypractice.R
-import com.example.mypractice.common.Common
 
 class CloneXAvatarComposeAct : AppCompatActivity() {
     private var lightInteractView: LightInteractView? = null
@@ -26,14 +25,24 @@ class CloneXAvatarComposeAct : AppCompatActivity() {
         rootView = findViewById(R.id.rootView)
         circleBg?.visibility = View.GONE
         lightInteractView?.updateList(createInteractModels(), true)
-        lightInteractView?.setInteractPoint(
-            Point(
-                Common.screenWidth / 2,
-                Common.screenHeight / 2 - 100.dp2Px()
-            )
-        )
         cloneXAvatarComposeLayout = findViewById(R.id.cloneXAvatarComposeLayout)
         cloneXAvatarComposeLayout?.updateData(createAvatarObj())
+        cloneXAvatarComposeLayout?.avatarComposeRecyclerView?.onLayoutListener =
+            object : AvatarComposeRecyclerView.OnLayoutListener {
+                override fun onCenter(point: Point) {
+                    lightInteractView?.setInteractPoint(point)
+                }
+            }
+        cloneXAvatarComposeLayout?.onCenterChangeListener =
+            object : CloneXAvatarComposeLayout.OnCenterChangeListener {
+                override fun onCenter(view: View) {
+                    Log.d("CloneXAvatar", "OnCenterChangeListener onCenter")
+                }
+
+                override fun onScrolled() {
+                    Log.d("CloneXAvatar", "OnCenterChangeListener onScrolled")
+                }
+            }
     }
 
 

@@ -4,6 +4,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.demon.yu.extenstion.dp2Px
 import com.demon.yu.view.fresco.ClipSimpleDraweeView
+import com.demon.yu.view.fresco.FrescoAvatarUtils
+import com.facebook.drawee.view.SimpleDraweeView
 
 class MyStaticAdapter : RecyclerView.Adapter<MyStaticViewHolder>() {
 
@@ -20,10 +22,14 @@ class MyStaticAdapter : RecyclerView.Adapter<MyStaticViewHolder>() {
             val view = MyCircleView(parent.context)
             view.layoutParams = RecyclerView.LayoutParams(60.dp2Px(), 60.dp2Px())
             return MyStaticViewHolder(view)
-        } else {
+        } else if (viewType == 1) {
             val view = ClipSimpleDraweeView(parent.context)
             view.layoutParams = RecyclerView.LayoutParams(60.dp2Px(), 60.dp2Px())
             return MyStaticViewHolder(view)
+        } else {
+            val simpleDraweeView = SimpleDraweeView(parent.context)
+            simpleDraweeView.layoutParams = RecyclerView.LayoutParams(60.dp2Px(), 60.dp2Px())
+            return MyStaticViewHolder(simpleDraweeView)
         }
 
     }
@@ -34,12 +40,20 @@ class MyStaticAdapter : RecyclerView.Adapter<MyStaticViewHolder>() {
         (holder.itemView as? MyCircleView)?.number = position
         if (holder.itemView is ClipSimpleDraweeView) {
             holder.itemView.initAvator()
+        } else if (holder.itemView is SimpleDraweeView) {
+            FrescoAvatarUtils.bindAvatar(
+                holder.itemView,
+                "asset:///avator.webp",
+                60.dp2Px(),
+                60.dp2Px()
+            )
+            FrescoAvatarUtils.asCircle(holder.itemView)
         }
     }
 
     override fun getItemViewType(position: Int): Int {
         if (position == 0) {
-            return 1
+            return 3
         } else {
             return 2
         }

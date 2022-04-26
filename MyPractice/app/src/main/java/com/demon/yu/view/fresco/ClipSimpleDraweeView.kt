@@ -1,7 +1,6 @@
 package com.demon.yu.view.fresco
 
 import android.content.Context
-import android.graphics.Canvas
 import android.graphics.Point
 import android.net.Uri
 import android.util.AttributeSet
@@ -9,6 +8,7 @@ import com.demon.yu.view.FrescoWebpViewAct
 import com.demon.yu.view.recyclerview.IFakeLayoutView
 import com.example.mypractice.Logger
 import com.facebook.drawee.backends.pipeline.Fresco
+import com.facebook.drawee.generic.RoundingParams
 import com.facebook.drawee.interfaces.DraweeController
 import com.facebook.drawee.view.SimpleDraweeView
 import com.facebook.imagepipeline.listener.BaseRequestListener
@@ -21,11 +21,10 @@ class ClipSimpleDraweeView(context: Context, attr: AttributeSet? = null) :
 
     private var ratio: Float = 1f
 
-    override fun onDraw(canvas: Canvas) {
-        canvas.save()
-//        canvas.translate(((-10).dp2Px()).toFloat(), ((-10).dp2Px()).toFloat())
-        super.onDraw(canvas)
-        canvas.restore()
+    init {
+        val roundingParams = RoundingParams()
+        roundingParams.roundAsCircle = true
+        hierarchy.roundingParams = roundingParams
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -61,8 +60,8 @@ class ClipSimpleDraweeView(context: Context, attr: AttributeSet? = null) :
      * 特定的格式：
      * real:160*160
      * fake:120*120
-     * top: 30
-     * left:50
+     * top: 20
+     * left:20
      */
     override fun getFakeHeight(): Int {
         return (120 * ratio).toInt()
@@ -82,8 +81,8 @@ class ClipSimpleDraweeView(context: Context, attr: AttributeSet? = null) :
 
     override fun getCenterPoint(): Point {
         return Point(
-            width / 2 + getFakeLeft() + left,
-            top + height / 2 + getFakeTop()
+            getFakeWidth() / 2 + getFakeLeft() + left,
+            top + getFakeHeight() / 2 + getFakeTop()
         )
     }
 

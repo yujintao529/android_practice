@@ -88,8 +88,8 @@ class LightInteractView(context: Context, attrs: AttributeSet? = null) :
 
     fun setInteractPoint(point: Point) {
         destInteractPoint.set(point.x, point.y)
-        lightInteractNumberView.translationX = point.x.toFloat()
-        lightInteractNumberView.translationY = point.y.toFloat()
+        lightInteractNumberView.translationX = point.x.toFloat() + 30.dp2Px()
+        lightInteractNumberView.translationY = point.y.toFloat() - 20.dp2Px()
     }
 
 
@@ -124,18 +124,21 @@ class LightInteractView(context: Context, attrs: AttributeSet? = null) :
     private fun refreshInteractState() {
         if (state == STATE_IDLE) {
             featureContainer.animate().let {
-                it.alpha(1f).setDuration(LIGHT_INTERACT_ICON_ANIM).start()
+                it.alpha(1f).setDuration(LIGHT_INTERACT_ICON_ANIM).withStartAction {
+                    hideSideView()
+                }.start()
             }
             horizontalScrollView.enableScroll = false
             lightInteractNumberView.end()
-            hideSideView()
         } else {
             featureContainer.animate().let {
-                it.alpha(0f).setDuration(LIGHT_INTERACT_ICON_ANIM).start()
+                it.alpha(0f).setDuration(LIGHT_INTERACT_ICON_ANIM).withEndAction {
+                    showSideView()
+                }.start()
             }
             removeCallbacks(backToIdleRunnable)
 //            horizontalScrollView.enableScroll(true)
-            showSideView()
+
         }
     }
 
@@ -204,7 +207,7 @@ class LightInteractView(context: Context, attrs: AttributeSet? = null) :
 
     }
 
-    private var isClickAnming: Boolean = false
+    private var isClicking: Boolean = false
     private fun startCartoonPlay(needRepeat: Boolean, forceRepeat: Boolean = false) {
         if (needRepeat) {
             if (hasStartRepeatSendCartoon.not() || forceRepeat) {
@@ -219,35 +222,21 @@ class LightInteractView(context: Context, attrs: AttributeSet? = null) :
             }
         } else {
             sendInteractCartoon()
-            if (isClickAnming) {
+            if (isClicking) {
                 return
             }
             currentLightInteractView?.animate()?.let {
-                it.scaleX(0.6f).scaleY(0.6f).setDuration(LIGHT_INTERACT_ICON_ANIM).withStartAction {
-                    isClickAnming = true
-                }.withEndAction {
-                    it.cancel()
-                    it.scaleX(1f).scaleY(1f).setDuration(LIGHT_INTERACT_ICON_ANIM).withEndAction {
-                        isClickAnming = false
-                    }.setListener(object : Animator.AnimatorListener {
-                        override fun onAnimationStart(animation: Animator?) {
-                            log("onAnimationStart")
-                        }
+                it.scaleX(0.6f).scaleY(0.6f).setDuration(LIGHT_INTERACT_ICON_ANIM / 2)
+                    .withStartAction {
+                        isClicking = true
+                    }.withEndAction {
+                        it.cancel()
+                        it.scaleX(1f).scaleY(1f).setDuration(LIGHT_INTERACT_ICON_ANIM / 2)
+                            .withEndAction {
+                                isClicking = false
+                            }.start()
 
-                        override fun onAnimationEnd(animation: Animator?) {
-                            log("onAnimationEnd")
-                        }
-
-                        override fun onAnimationCancel(animation: Animator?) {
-                            log("onAnimationCancel")
-                        }
-
-                        override fun onAnimationRepeat(animation: Animator?) {
-                        }
-
-                    }).start()
-
-                }.start()
+                    }.start()
             }
         }
     }
