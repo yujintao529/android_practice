@@ -98,9 +98,41 @@ class LightInteractView(context: Context, attrs: AttributeSet? = null) :
         list.forEach {
             addLightInteractView(it)
         }
+        fixScrollToPosition()
         if (scrollToCenter) {
             scrollToCenterPosition(needPost = true)
         }
+    }
+
+    //由于一些原因，需要添加前后2个空白的view，来帮助交互的view可以滑到中心
+    private fun fixScrollToPosition() {
+        val childCount = parentContainer.childCount
+        if (childCount == 0) {
+            return
+        }
+        val screenWidth = Common.screenWidth
+        val childMargin = 8.dp2Px()
+        val childWidth = 74.dp2Px() //width(58) + margeleft(8) + margeright(8)
+        val childWidthCount = childCount * childWidth
+        val centerLeft = (screenWidth - childWidth) / 2
+//        val childView = getChildAt(0)
+//        (childView.layoutParams as MarginLayoutParams).leftMargin = childMargin + centerLeft
+        addBlankView(0, centerLeft) //添加前面的
+//        添加后面的view
+        addBlankView(parentContainer.childCount, screenWidth - childWidth - centerLeft)
+//        (getChildAt(childCount - 1).layoutParams as MarginLayoutParams).rightMargin =
+//            maxDiff + childMargin
+    }
+
+    private fun addBlankView(position: Int, width: Int) {
+        val view = View(context)
+        val lp = LinearLayout.LayoutParams(width, 1)
+        if (position >= parentContainer.childCount) {
+            parentContainer.addView(view, lp)
+        } else {
+            parentContainer.addView(view, position, lp)
+        }
+
     }
 
 
@@ -126,7 +158,7 @@ class LightInteractView(context: Context, attrs: AttributeSet? = null) :
             featureContainer.animate().let {
                 it.alpha(1f).setDuration(LIGHT_INTERACT_ICON_ANIM).withStartAction {
                     hideSideView()
-                }.start()
+                }.withEndAction { featureContainer.isEnabled = true }.start()
             }
             horizontalScrollView.enableScroll = false
             lightInteractNumberView.end()
@@ -134,7 +166,7 @@ class LightInteractView(context: Context, attrs: AttributeSet? = null) :
             featureContainer.animate().let {
                 it.alpha(0f).setDuration(LIGHT_INTERACT_ICON_ANIM).withEndAction {
                     showSideView()
-                }.start()
+                }.withStartAction { featureContainer.isEnabled = false }.start()
             }
             removeCallbacks(backToIdleRunnable)
 //            horizontalScrollView.enableScroll(true)
@@ -203,7 +235,6 @@ class LightInteractView(context: Context, attrs: AttributeSet? = null) :
                 lightInteractNumberView.continueNumber(count)
             }
         }, LIGHT_INTERACT_ANMI_DURATION - 100)
-        ComposeSystemUtils.vibrator(context)
 
     }
 
@@ -219,9 +250,11 @@ class LightInteractView(context: Context, attrs: AttributeSet? = null) :
                 }
                 removeCallbacks(sendCartoonRunnable)
                 postDelayed(sendCartoonRunnable, LIGHT_INTERACT_REPEAT_DELAY)
+                ComposeSystemUtils.vibrator(context, true)
             }
         } else {
             sendInteractCartoon()
+            ComposeSystemUtils.vibrator(context, false)
             if (isClicking) {
                 return
             }
@@ -314,6 +347,8 @@ class LightInteractView(context: Context, attrs: AttributeSet? = null) :
                 if (longTouch.not()) {
                     performClick()
                     startCartoonPlay(false)
+                } else {
+                    ComposeSystemUtils.cancelVibrator(context)
                 }
                 v.parent.requestDisallowInterceptTouchEvent(false)
                 endInteract(longTouch)
@@ -336,6 +371,7 @@ class LightInteractView(context: Context, attrs: AttributeSet? = null) :
                 downTimestamp = 0L
                 hasStartRepeatSendCartoon = false
                 horizontalScrollView.enableScroll = true
+                ComposeSystemUtils.cancelVibrator(context)
             }
         }
         return true
@@ -355,7 +391,7 @@ class LightInteractView(context: Context, attrs: AttributeSet? = null) :
             if (index == 0) {
                 return currentLightInteractView
             }
-            for (i in index - 1 downTo 0) {
+            for (i in index - 1 downTo 1) {
                 val destView = parentContainer.getChildAt(i)
                 if (destView.left <= event.rawX + horizontalScrollView.scrollX &&
                     destView.right >= event.rawX + horizontalScrollView.scrollX
@@ -365,7 +401,7 @@ class LightInteractView(context: Context, attrs: AttributeSet? = null) :
             }
         } else {
             val index = parentContainer.indexOfChild(currentLightInteractView)
-            for (i in index until parentContainer.childCount) {
+            for (i in index until parentContainer.childCount - 1) {
                 val destView = parentContainer.getChildAt(i)
                 if (destView.left <= event.rawX + horizontalScrollView.scrollX &&
                     destView.right >= event.rawX + horizontalScrollView.scrollX

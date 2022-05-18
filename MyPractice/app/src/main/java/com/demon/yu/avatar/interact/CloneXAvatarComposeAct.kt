@@ -49,7 +49,7 @@ class CloneXAvatarComposeAct : AppCompatActivity() {
     private fun createInteractModels(): List<LightInteractModel> {
         val drawableArr =
             arrayListOf(R.drawable.heart, R.drawable.zhuoyizhuo, R.drawable.baba, R.drawable.paozhu)
-        return (0..8).map { LightInteractModel(resourceID = drawableArr[it % 4]) }
+        return (0..10).map { LightInteractModel(resourceID = drawableArr[it % 4]) }
     }
 
 

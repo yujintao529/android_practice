@@ -47,6 +47,10 @@ class InteractHorizontalScrollView(context: Context, attrs: AttributeSet? = null
         }
     }
 
+    override fun scrollTo(x: Int, y: Int) {
+        super.scrollTo(x, y)
+    }
+
     override fun onScrollChanged(l: Int, t: Int, oldl: Int, oldt: Int) {
         super.onScrollChanged(l, t, oldl, oldt)
         removeCallbacks(scrollRunnableOnAnimation)

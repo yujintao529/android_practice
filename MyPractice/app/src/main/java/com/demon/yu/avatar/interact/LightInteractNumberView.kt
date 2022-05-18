@@ -40,7 +40,7 @@ class LightInteractNumberView(context: Context?, attrs: AttributeSet? = null) :
 
 
     private fun isReachMax(): Boolean {
-        return currentNumber >= 10
+        return currentNumber >= 999999
     }
 
     fun setNumber(number: Int) {
