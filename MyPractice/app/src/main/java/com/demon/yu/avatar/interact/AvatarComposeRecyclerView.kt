@@ -4,7 +4,6 @@ import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
 import android.view.View
-import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
 import androidx.core.graphics.toRectF
 import androidx.recyclerview.widget.RecyclerView
@@ -89,10 +88,8 @@ class AvatarComposeRecyclerView(context: Context, attr: AttributeSet? = null) :
         )
     }
 
-    private val decelerateInterpolator = DecelerateInterpolator(1.2f)
-    private val accelerateInterpolator = AccelerateInterpolator(2f)
 
-
+    val decelerateInterpolator = DecelerateInterpolator(6f)
     fun getDistance(x: Int, y: Int): Float {
         return calculateDistance(x, y)
     }
@@ -115,24 +112,38 @@ class AvatarComposeRecyclerView(context: Context, attr: AttributeSet? = null) :
                     max(
                         0f,
                         StrictMath.min(
-                            ((StrictMath.abs((y - centerY)) - radius) / (distance - radius)),
+                            ((StrictMath.abs((y - centerY))) / (distance)),
                             1f
                         )
                     )
                 val scale = (scaleDistance - distance) / (scaleDistance - radius)
                 val scaleRatio =
-                    secondScaleSize + pow(ratio.toDouble(), 3.0) * 2.5f
-
+                    secondScaleSize + pow(ratio.toDouble(), 6.0) * 2.5f
                 StrictMath.min(secondScaleSize, 1 + scale * (scaleRatio.toFloat() - 1))
             }
-            distance >= scaleDistance && distance <= radiusDouble -> {
-                1f
-            }
+            distance > scaleDistance -> {
 
-            distance <= radiusDouble + dismiss2NormalScaleDistance && distance >= radiusDouble -> {
-                (dismiss2NormalScaleDistance + radiusDouble - distance) / dismiss2NormalScaleDistance
-            }
+                val ratio = StrictMath.pow(
+                    (1 - (StrictMath.abs((y - centerY))) / (distance)).toDouble(),
+                    2.0
 
+                ).toFloat() //1..0
+                val t = StrictMath.abs((y - centerY)) / (distance)
+                val scale =
+                    (distance - scaleDistance + dismiss2NormalScaleDistance) / dismiss2NormalScaleDistance - 1 //0...max
+
+                max(0f, 1 - scale * scale * scale * scale * scale * scale) // 0..1
+
+            }
+//            distance >= scaleDistance && distance <= radiusDouble -> {
+//               1f
+//            }
+//
+//            distance <= radiusDouble + dismiss2NormalScaleDistance && distance >= radiusDouble -> {
+//
+//                (dismiss2NormalScaleDistance + radiusDouble - distance) / dismiss2NormalScaleDistance
+//            }
+//
             else -> {
                 0f
             }
