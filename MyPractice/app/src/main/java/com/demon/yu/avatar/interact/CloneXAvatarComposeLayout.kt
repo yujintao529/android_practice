@@ -110,17 +110,15 @@ class CloneXAvatarComposeLayout(context: Context, attrs: AttributeSet? = null) :
                 val child = avatarComposeLayoutManager.findViewByPosition(i)
                 if (child != null) {
                     FakeLayoutCoorExchangeUtils.setCenterPivot(child)
-                    val point = FakeLayoutCoorExchangeUtils.getCenterPoint(child)
-                    val scale =
-                        recyclerView.getScaleSize(point.x, point.y)
-                    child.scaleX = scale
-                    child.scaleY = scale
+                    var point = FakeLayoutCoorExchangeUtils.getCenterPoint(child)
+
                     recyclerView.translateXY(
                         child,
                         point.x,
                         point.y,
                         i == 0
                     )
+                    recyclerView.scaleXY(child, point.x, point.y)
                 }
             }
         }
