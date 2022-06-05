@@ -3,7 +3,9 @@ package com.demon.yu.avatar.interact
 import android.content.Context
 import android.graphics.Point
 import android.graphics.Rect
+import android.util.Log
 import android.util.SparseArray
+import android.util.SparseIntArray
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.util.forEach
@@ -13,10 +15,14 @@ import com.demon.yu.view.recyclerview.DPoint
 import com.demon.yu.view.recyclerview.FakeLayoutCoorExchangeUtils
 import com.demon.yu.view.recyclerview.HexagonalPoint
 import com.demon.yu.view.recyclerview.toPoint
+import com.example.mypractice.Logger
+import java.util.*
+import kotlin.collections.HashSet
 import kotlin.math.*
 
 
-class AvatarComposeLayoutManager(val context: Context) : RecyclerView.LayoutManager() {
+class AvatarComposeLayoutManager(val context: Context) : RecyclerView.LayoutManager(),
+    RecyclerView.ChildDrawingOrderCallback {
 
 
     private var measureWidth: Int = 0
@@ -25,6 +31,11 @@ class AvatarComposeLayoutManager(val context: Context) : RecyclerView.LayoutMana
 
     var radius: Int = 120.dp2Px()
     private val coordinateCache: SparseArray<Point> = SparseArray(200)
+
+
+    //drawingOrder array
+    private var orderChildIndexSet = HashSet<Int>()
+    private var orderChildSparseArray = SparseIntArray()
 
     //仅支持matchParent及exactly width/height
     override fun onMeasure(
@@ -85,6 +96,8 @@ class AvatarComposeLayoutManager(val context: Context) : RecyclerView.LayoutMana
     fun fill(recycler: RecyclerView.Recycler, state: RecyclerView.State) {
 
         val viewCache = SparseArray<View>(childCount)
+        orderChildIndexSet.clear()
+        orderChildSparseArray.clear()
 //...
 //...
         if (childCount != 0) {
@@ -103,14 +116,13 @@ class AvatarComposeLayoutManager(val context: Context) : RecyclerView.LayoutMana
         }
 
         val visibleChildCount = getVisibleCount(state)
-        for (i in 0 until visibleChildCount) {
+        for (i in visibleChildCount - 1 downTo 0) {
             var view = viewCache.get(i)
             if (view == null) {
                 view = recycler.getViewForPosition(i)
                 addView(view)
                 measureChildWithMargins(view, 0, 0)
                 layoutChildInternal(view, i, visibleChildCount)
-
             } else {
 
             }
@@ -120,6 +132,12 @@ class AvatarComposeLayoutManager(val context: Context) : RecyclerView.LayoutMana
 
         viewRegion.set(find4Coordinate()) //找到四周的范围
 
+        val array = orderChildIndexSet.toIntArray()
+        Arrays.sort(array)
+        val reversedArray = array.reversedArray()
+        array.forEachIndexed { index, value ->
+            orderChildSparseArray.put(value, reversedArray[index])
+        }
 
         //删除无用detachView
         for (i in 0 until viewCache.size()) {
@@ -155,12 +173,14 @@ class AvatarComposeLayoutManager(val context: Context) : RecyclerView.LayoutMana
         if (position == 0) {
             cache = Point(measureWidth / 2, measureHeight / 2)
             coordinateCache.put(position, cache)
+            orderChildIndexSet.add(0)
             return cache
         } else {
             cache = coordinateCache.get(0)
             if (cache == null) {
                 cache = Point(measureWidth / 2, measureHeight / 2)
-                coordinateCache.put(position, cache)
+                coordinateCache.put(0, cache)
+                orderChildIndexSet.add(0)
             }
         }
         val zero = coordinateCache.get(0)
@@ -248,8 +268,12 @@ class AvatarComposeLayoutManager(val context: Context) : RecyclerView.LayoutMana
         val level = hexagonalPoint.level
 
         if (level == 1) {
+            orderChildIndexSet.add(index)
             return DPoint(centerX.toDouble(), centerY.toDouble())
         } else if (level == 2) {
+            if (hexagonalPoint.levelNumber == 1 || hexagonalPoint.levelNumber == 2) {
+                orderChildIndexSet.add(index)
+            }
             return DPoint(
                 centerX - radius * cos(du * hexagonalPoint.levelNumber),
                 centerY - radius * sin(du * hexagonalPoint.levelNumber)
@@ -313,6 +337,9 @@ class AvatarComposeLayoutManager(val context: Context) : RecyclerView.LayoutMana
                     }
                 }
             }
+            if ((itemGroup == 1 || itemGroup == 2) && itemGroupNum == 1) {
+                orderChildIndexSet.add(index)
+            }
             val tempPointX = centerX - (level - 1) * radius * cos((du * itemGroup))
             val tempPointY = centerY - (level - 1) * radius * sin((du * itemGroup))
             if (itemGroup == 1) {
@@ -338,6 +365,9 @@ class AvatarComposeLayoutManager(val context: Context) : RecyclerView.LayoutMana
         } else {
             val itemGroup = ceil((hexagonalPoint.levelNumber.toDouble() / (level - 1))).toInt()
             val itemGroupNum = hexagonalPoint.levelNumber - (itemGroup - 1) * (level - 1)
+            if ((itemGroup == 1 || itemGroup == 2) && itemGroupNum == 1) {
+                orderChildIndexSet.add(index)
+            }
             val tempPointX = centerX - (level - 1) * radius * cos((du * itemGroup))
             val tempPointY = centerY - (level - 1) * radius * sin((du * itemGroup))
             if (itemGroup == 1) {
@@ -422,5 +452,13 @@ class AvatarComposeLayoutManager(val context: Context) : RecyclerView.LayoutMana
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.MATCH_PARENT
         )
+    }
+
+    override fun onGetChildDrawingOrder(childCount: Int, i: Int): Int {
+//        val p = orderChildSparseArray.get(i, -1)
+//        if (p != -1) {
+//            return p
+//        }
+        return i
     }
 }

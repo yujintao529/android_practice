@@ -1,6 +1,7 @@
 package com.demon.yu.avatar.interact
 
 import android.content.Context
+import android.graphics.Point
 import android.util.AttributeSet
 import android.util.Log
 import android.view.Gravity
@@ -51,6 +52,7 @@ class CloneXAvatarComposeLayout(context: Context, attrs: AttributeSet? = null) :
         avatarComposeRecyclerView.layoutManager = avatarComposeLayoutManager
         avatarComposeRecyclerView.adapter = adapter
         avatarComposeRecyclerView.addOnScrollListener(ComposeOnScrollListener())
+        avatarComposeRecyclerView.setChildDrawingOrderCallback(avatarComposeLayoutManager)
     }
 
     fun updateData(list: List<MyStaticObj>) {
@@ -75,25 +77,29 @@ class CloneXAvatarComposeLayout(context: Context, attrs: AttributeSet? = null) :
             if (lastState != newState && newState == RecyclerView.SCROLL_STATE_IDLE) {
                 recyclerView as AvatarComposeRecyclerView
                 var destChild: View? = null
+                var destCenterPoint: Point? = null
                 var maxCloseDistance: Float = Float.MAX_VALUE
                 var destChildDistance: Float = 0f
                 for (i in 0..adapter.itemCount) {
                     val child = avatarComposeLayoutManager.findViewByPosition(i)
                     if (child != null) {
+                        val centerPoint = FakeLayoutCoorExchangeUtils.getCenterPoint(child)
                         destChildDistance =
-                            recyclerView.getDistance(child.getCenterX(), child.getCenterY())
+                            recyclerView.getDistance(centerPoint.x, centerPoint.y)
                         if (destChildDistance < maxCloseDistance) {
                             maxCloseDistance = destChildDistance
                             destChild = child
+                            destCenterPoint = centerPoint
                         }
                     }
                 }
-                if (destChild != null) {
+                if (destChild != null && destCenterPoint != null) {
+
                     val scrollDuration =
-                        computeScrollDuration(destChild.getCenterX(), destChild.getCenterY(), 0, 0)
+                        computeScrollDuration(destCenterPoint.x, destCenterPoint.y, 0, 0)
                     recyclerView.scrollToCenter(
-                        destChild.getCenterX(),
-                        destChild.getCenterY(),
+                        destCenterPoint.x,
+                        destCenterPoint.y,
                         scrollDuration
                     )
                     Log.d("CloneXAvatar", "scrollDuration =$scrollDuration")

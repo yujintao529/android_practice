@@ -16,6 +16,7 @@ import com.demon.yu.extenstion.dp2Px
 import com.example.mypractice.R
 import com.example.mypractice.common.Common
 import com.facebook.drawee.view.SimpleDraweeView
+import java.lang.Math.max
 
 class LightInteractView(context: Context, attrs: AttributeSet? = null) :
     FrameLayout(context, attrs), View.OnTouchListener,
@@ -114,12 +115,16 @@ class LightInteractView(context: Context, attrs: AttributeSet? = null) :
         val childMargin = 8.dp2Px()
         val childWidth = 74.dp2Px() //width(58) + margeleft(8) + margeright(8)
         val childWidthCount = childCount * childWidth
-        val centerLeft = (screenWidth - childWidth) / 2
+
+        val min = max((screenWidth - childWidthCount - childMargin * 2) / 2, 0)
+
+
+//        val centerLeft = (screenWidth - childWidth) / 2
 //        val childView = getChildAt(0)
 //        (childView.layoutParams as MarginLayoutParams).leftMargin = childMargin + centerLeft
-        addBlankView(0, centerLeft) //添加前面的
+        addBlankView(0, min + childMargin) //添加前面的
 //        添加后面的view
-        addBlankView(parentContainer.childCount, screenWidth - childWidth - centerLeft)
+        addBlankView(parentContainer.childCount, min + childMargin)
 //        (getChildAt(childCount - 1).layoutParams as MarginLayoutParams).rightMargin =
 //            maxDiff + childMargin
     }

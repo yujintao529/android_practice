@@ -12,7 +12,8 @@ import com.demon.yu.extenstion.dp2Px
 import kotlin.math.*
 
 
-class MyCustomizeLayoutManger(val context: Context) : RecyclerView.LayoutManager() {
+class MyCustomizeLayoutManger(val context: Context) : RecyclerView.LayoutManager(),
+    RecyclerView.ChildDrawingOrderCallback {
 
 
     private var measureWidth: Int = 0
@@ -418,5 +419,12 @@ class MyCustomizeLayoutManger(val context: Context) : RecyclerView.LayoutManager
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.MATCH_PARENT
         )
+    }
+
+    override fun onGetChildDrawingOrder(childCount: Int, i: Int): Int {
+        if (i == 0) {
+            return Int.MAX_VALUE
+        }
+        return i
     }
 }

@@ -24,7 +24,7 @@ class MyStaticAdapter : RecyclerView.Adapter<MyStaticViewHolder>() {
             return MyStaticViewHolder(view)
         } else if (viewType == 1) {
             val view = ClipSimpleDraweeView(parent.context)
-            view.layoutParams = RecyclerView.LayoutParams(60.dp2Px(), 60.dp2Px())
+            view.layoutParams = RecyclerView.LayoutParams(view.getDestWidth(60.dp2Px()), view.getDestHeight(60.dp2Px()))
             return MyStaticViewHolder(view)
         } else {
             val simpleDraweeView = SimpleDraweeView(parent.context)
@@ -52,12 +52,7 @@ class MyStaticAdapter : RecyclerView.Adapter<MyStaticViewHolder>() {
     }
 
     override fun getItemViewType(position: Int): Int {
-        if (position == 0) {
-            return 3
-        } else {
-            return 2
-        }
-
+        return 1
     }
 
     override fun getItemCount(): Int {
