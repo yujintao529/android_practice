@@ -6,7 +6,7 @@ import android.util.AttributeSet
 import android.view.View
 import androidx.annotation.Px
 import androidx.core.graphics.toRectF
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.AvatarRecyclerView
 import com.demon.yu.extenstion.dp2Px
 import com.demon.yu.view.fresco.IViewDrawListener
 import com.demon.yu.view.recyclerview.copy
@@ -14,7 +14,7 @@ import java.lang.StrictMath.pow
 import kotlin.math.*
 
 class AvatarComposeRecyclerView(context: Context, attr: AttributeSet? = null) :
-    RecyclerView(context, attr) {
+    AvatarRecyclerView(context, attr) {
 
 
     private val tag = "MyCustomize2RecyclerView"
@@ -68,6 +68,7 @@ class AvatarComposeRecyclerView(context: Context, attr: AttributeSet? = null) :
             onLayoutListener?.onCenter(centerPoint.copy())
         }
     }
+
 
     override fun onScrolled(@Px dx: Int, @Px dy: Int) {
         // Do nothing
