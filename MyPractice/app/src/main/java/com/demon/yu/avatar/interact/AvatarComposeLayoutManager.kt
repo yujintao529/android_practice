@@ -3,10 +3,12 @@ package com.demon.yu.avatar.interact
 import android.content.Context
 import android.graphics.*
 import android.util.Log
+import android.util.Pair
 import android.util.SparseArray
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.util.forEach
+import androidx.recyclerview.widget.AvatarLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.demon.yu.extenstion.dp2Px
 import com.demon.yu.view.recyclerview.DPoint
@@ -16,7 +18,7 @@ import com.demon.yu.view.recyclerview.toPoint
 import kotlin.math.*
 
 
-class AvatarComposeLayoutManager(val context: Context) : RecyclerView.LayoutManager(),
+class AvatarComposeLayoutManager(val context: Context) : AvatarLayoutManager(),
     AvatarComposeRecyclerView.OnDrawListener {
 
 
@@ -393,25 +395,26 @@ class AvatarComposeLayoutManager(val context: Context) : RecyclerView.LayoutMana
         Log.d("CloneXAvatar", "onLayoutCompleted ${state.itemCount}")
     }
 
-    override fun canScrollHorizontally(): Boolean {
-        return true
+    override fun scrollHorAndVerBy(
+        dx: Int,
+        dy: Int,
+        recycler: RecyclerView.Recycler?,
+        state: RecyclerView.State?
+    ): Pair<Int, Int> {
+        offsetChildrenHorAndVer(-dx, -dy)
+        return Pair(dx, dy)
     }
-
-
-    override fun canScrollVertically(): Boolean {
-        return true
-    }
-
 
     override fun scrollHorizontallyBy(
         dx: Int,
         recycler: RecyclerView.Recycler?,
         state: RecyclerView.State?
     ): Int {
+        throw IllegalAccessError("scrollHorizontallyBy not impl please use scrollHorAndVerBy")
 //        Debug.startMethodTracing()
-        offsetChildrenHorizontal(-dx)
+//        offsetChildrenHorizontal(-dx)
 //        Debug.stopMethodTracing()
-        return dx
+//        return dx
     }
 
     override fun scrollVerticallyBy(
@@ -419,10 +422,11 @@ class AvatarComposeLayoutManager(val context: Context) : RecyclerView.LayoutMana
         recycler: RecyclerView.Recycler?,
         state: RecyclerView.State
     ): Int {
+        throw IllegalAccessError("scrollVerticallyBy not impl please use scrollHorAndVerBy")
 //        Debug.startMethodTracing()
-        offsetChildrenVertical(-dy)
+//        offsetChildrenVertical(-dy)
 //        Debug.stopMethodTracing()
-        return dy
+//        return dy
     }
 
     override fun generateDefaultLayoutParams(): RecyclerView.LayoutParams {

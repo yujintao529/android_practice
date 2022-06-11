@@ -3,10 +3,13 @@ package androidx.recyclerview.widget;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.util.Pair;
+import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.os.TraceCompat;
+
 
 /**
  * Created by yujintao.529 on 2022/6/11
@@ -14,6 +17,8 @@ import androidx.core.os.TraceCompat;
  * 或者copy整套代码
  */
 public class AvatarRecyclerView extends RecyclerView {
+    private AvatarLayoutManager avatarLayoutManager;
+
     public AvatarRecyclerView(@NonNull Context context) {
         super(context);
     }
@@ -26,6 +31,16 @@ public class AvatarRecyclerView extends RecyclerView {
         super(context, attrs, defStyleAttr);
     }
 
+    @Override
+    public void setLayoutManager(@Nullable LayoutManager layout) {
+        if (layout instanceof AvatarLayoutManager) {
+            super.setLayoutManager(layout);
+            avatarLayoutManager = (AvatarLayoutManager) layout;
+            return;
+        }
+        throw new IllegalArgumentException("AvatarRecyclerView only support AvatarLayoutManager");
+
+    }
 
     String exceptionLabel() {
         return super.exceptionLabel();
@@ -42,12 +57,10 @@ public class AvatarRecyclerView extends RecyclerView {
 
         int consumedX = 0;
         int consumedY = 0;
-        if (dx != 0) {
-            consumedX = mLayout.scrollHorizontallyBy(dx, mRecycler, mState);
-        }
-        if (dy != 0) {
-            consumedY = mLayout.scrollVerticallyBy(dy, mRecycler, mState);
-        }
+        //同时需要口占layout的scrollHorizontallyBy方法
+        Pair<Integer, Integer> integerPair = avatarLayoutManager.scrollHorAndVerBy(dx, dy, mRecycler, mState);
+        consumedX = integerPair.first;
+        consumedY = integerPair.second;
 
         TraceCompat.endSection();
         repositionShadowingViews();
@@ -60,4 +73,14 @@ public class AvatarRecyclerView extends RecyclerView {
             consumed[1] = consumedY;
         }
     }
+
+    void offsetChildrenHorAndVer(int dx, int dy) {
+        final int childCount = mChildHelper.getChildCount();
+        for (int i = 0; i < childCount; i++) {
+            View view = mChildHelper.getChildAt(i);
+            view.offsetLeftAndRight(dx);
+            view.offsetTopAndBottom(dy);
+        }
+    }
+
 }

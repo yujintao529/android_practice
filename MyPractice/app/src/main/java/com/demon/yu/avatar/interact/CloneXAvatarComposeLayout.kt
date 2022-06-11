@@ -138,13 +138,13 @@ class CloneXAvatarComposeLayout(context: Context, attrs: AttributeSet? = null) :
                     val point = FakeLayoutCoorExchangeUtils.getCenterPoint(child)
                     destChildDistance =
                         avatarComposeRecyclerView.calculateDistance(point.x, point.y)
-                    recyclerView.translateXY(
-                        child,
-                        point.x,
-                        point.y,
-                        destChildDistance
-                    )
-                    recyclerView.scaleXY(child, point.x, point.y, destChildDistance)
+//                    recyclerView.translateXY(
+//                        child,
+//                        point.x,
+//                        point.y,
+//                        destChildDistance
+//                    )
+//                    recyclerView.scaleXY(child, point.x, point.y, destChildDistance)
                     if (destChildDistance < maxCloseDistance) {
                         maxCloseDistance = destChildDistance
                         destChild = child
