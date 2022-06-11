@@ -8,7 +8,6 @@ import com.demon.yu.view.FrescoWebpViewAct
 import com.demon.yu.view.recyclerview.IFakeLayoutView
 import com.example.mypractice.Logger
 import com.facebook.drawee.backends.pipeline.Fresco
-import com.facebook.drawee.generic.RoundingParams
 import com.facebook.drawee.interfaces.DraweeController
 import com.facebook.drawee.view.SimpleDraweeView
 import com.facebook.imagepipeline.listener.BaseRequestListener
@@ -16,7 +15,7 @@ import com.facebook.imagepipeline.request.ImageRequest
 import com.facebook.imagepipeline.request.ImageRequestBuilder
 
 class ClipSimpleDraweeView(context: Context, attr: AttributeSet? = null) :
-    SimpleDraweeView(context, attr), IFakeLayoutView {
+    SimpleDraweeView(context, attr), IFakeLayoutView, IViewDrawListener {
 
 
     private var ratio: Float = 1f
@@ -46,6 +45,7 @@ class ClipSimpleDraweeView(context: Context, attr: AttributeSet? = null) :
         val controller: DraweeController = Fresco.newDraweeControllerBuilder()
             .setAutoPlayAnimations(true)
             .setImageRequest(imageRequestBuilder.build())
+
             .build()
         setController(controller)
     }
@@ -62,8 +62,6 @@ class ClipSimpleDraweeView(context: Context, attr: AttributeSet? = null) :
      * real:160*146 px (w*h)
      *
      */
-
-
 
 
     override fun getFakeHeight(): Int {//62 * 2
@@ -106,4 +104,25 @@ class ClipSimpleDraweeView(context: Context, attr: AttributeSet? = null) :
         return getFakeTop() + getFakeHeight() / 2
     }
 
+    override fun notifyDrawStatus(enableDraw: Boolean) {
+        if (enableDraw) {
+            start()
+        } else {
+            stop()
+        }
+    }
+
+    fun stop() {
+        val animation = controller?.animatable
+        if (animation != null && animation.isRunning) {
+            animation.stop()
+        }
+    }
+
+    fun start() {
+        val animation = controller?.animatable
+        if (animation != null && animation.isRunning.not()) {
+            animation.start()
+        }
+    }
 }

@@ -43,21 +43,21 @@ class LightInteractNumberView(context: Context?, attrs: AttributeSet? = null) :
         return currentNumber >= 999999
     }
 
-    fun setNumber(number: Int) {
+    fun setNumber(number: Int, autoDismiss: Boolean = false) {
         if (alpha < 1f) {
             animate().cancel()
             animate().alpha(1f).setDuration(80L).start()
         }
         addOrShowPrefixViewIfNeed()
-        updateNumber(number)
+        updateNumber(number, autoDismiss)
     }
 
-    fun continueNumber(number: Int) {
-        updateNumber(number)
+    fun continueNumber(number: Int, autoDismiss: Boolean = false) {
+        updateNumber(number, autoDismiss)
     }
 
     private var valueAnimator: ValueAnimator? = null
-    private fun updateNumber(number: Int) {
+    private fun updateNumber(number: Int, autoDismiss: Boolean = false) {
         currentNumber = number
         if (isReachMax()) {
             showMaxView()
@@ -77,6 +77,9 @@ class LightInteractNumberView(context: Context?, attrs: AttributeSet? = null) :
                 scaleY = it.animatedValue as Float
             }
             valueAnimator?.start()
+        }
+        if (autoDismiss) {
+            postDelayed(dismissRunnable, 1000L)
         }
     }
 

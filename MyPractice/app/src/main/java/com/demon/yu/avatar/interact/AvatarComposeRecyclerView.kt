@@ -4,10 +4,11 @@ import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
 import android.view.View
-import android.view.animation.DecelerateInterpolator
+import androidx.annotation.Px
 import androidx.core.graphics.toRectF
 import androidx.recyclerview.widget.RecyclerView
 import com.demon.yu.extenstion.dp2Px
+import com.demon.yu.view.fresco.IViewDrawListener
 import com.demon.yu.view.recyclerview.copy
 import java.lang.StrictMath.pow
 import kotlin.math.*
@@ -43,7 +44,7 @@ class AvatarComposeRecyclerView(context: Context, attr: AttributeSet? = null) :
 
     private var centerPoint = Point()
     var onLayoutListener: OnLayoutListener? = null
-
+    var onDrawListener: OnDrawListener? = null
     override fun onMeasure(widthSpec: Int, heightSpec: Int) {
         super.onMeasure(widthSpec, heightSpec)
         centerX = measuredWidth / 2
@@ -68,8 +69,12 @@ class AvatarComposeRecyclerView(context: Context, attr: AttributeSet? = null) :
         }
     }
 
+    override fun onScrolled(@Px dx: Int, @Px dy: Int) {
+        // Do nothing
+    }
 
-    override fun dispatchDraw(canvas: Canvas?) {
+    override fun dispatchDraw(canvas: Canvas) {
+        onDrawListener?.onDraw(canvas)
         super.dispatchDraw(canvas)
 //        if (BuildConfig.DEBUG.not() || isInEditMode.not()) {
 //            return
@@ -77,30 +82,28 @@ class AvatarComposeRecyclerView(context: Context, attr: AttributeSet? = null) :
         paint.color = Color.RED
         paint.style = Paint.Style.STROKE
         paint.strokeWidth = 2f.dp2Px().toFloat()
-        canvas?.drawCircle(centerX.toFloat(), centerY.toFloat(), radiusDouble.toFloat(), paint)
+        canvas.drawCircle(centerX.toFloat(), centerY.toFloat(), radiusDouble.toFloat(), paint)
         paint.color = Color.BLUE
-        canvas?.drawCircle(centerX.toFloat(), centerY.toFloat(), radius.toFloat(), paint)
-        canvas?.drawRoundRect(
+        canvas.drawCircle(centerX.toFloat(), centerY.toFloat(), radius.toFloat(), paint)
+        canvas.drawRoundRect(
             centerRegionRect.toRectF(),
             cornerRadius.toFloat(),
             cornerRadius.toFloat(),
             paint
         )
+
     }
 
 
-    val decelerateInterpolator = DecelerateInterpolator(6f)
     fun getDistance(x: Int, y: Int): Float {
         return calculateDistance(x, y)
     }
 
     fun scrollToCenter(x: Int, y: Int, duration: Int) {
-        ComposeSystemUtils.vibrator(context, false)
         smoothScrollBy(x - centerX, y - centerY, null, duration)
     }
 
-    fun scaleXY(view: View, x: Int, y: Int) {
-        val distance = calculateDistance(x, y)
+    fun scaleXY(view: View, x: Int, y: Int, distance: Float) {
         val scale = when {
             distance >= 0 && distance <= radius -> {
                 val scale =
@@ -153,8 +156,7 @@ class AvatarComposeRecyclerView(context: Context, attr: AttributeSet? = null) :
     }
 
 
-    fun translateXY(view: View, x: Int, y: Int, log: Boolean) {
-        val distance = calculateDistance(x, y)
+    fun translateXY(view: View, x: Int, y: Int, distance: Float) {
         val translateRange = radius
         if (distance <= translateRange) {
             view.translationX = 0f
@@ -174,15 +176,37 @@ class AvatarComposeRecyclerView(context: Context, attr: AttributeSet? = null) :
         }
     }
 
-    private fun calculateDistance(x: Int, y: Int): Float {
+    fun calculateDistance(x: Int, y: Int): Float {
         return sqrt(
             StrictMath.abs(x - centerX).toDouble().pow(2.0) + StrictMath.abs(y - centerY).toDouble()
                 .pow(2.0)
         ).toFloat()
     }
 
+    override fun drawChild(canvas: Canvas?, child: View, drawingTime: Long): Boolean {
+        val viewHolder = getChildViewHolder(child)
+        if (child.scaleX == 0f) {
+            if (child is IViewDrawListener) {
+                child.notifyDrawStatus(false)
+            }
+            return false
+        }
+        if (child is IViewDrawListener) {
+            child.notifyDrawStatus(true)
+        }
+        return super.drawChild(canvas, child, drawingTime)
+    }
+
+
+    override fun scrollBy(x: Int, y: Int) {
+        super.scrollBy(x, y)
+    }
 
     interface OnLayoutListener {
         fun onCenter(point: Point)
+    }
+
+    interface OnDrawListener {
+        fun onDraw(canvas: Canvas)
     }
 }

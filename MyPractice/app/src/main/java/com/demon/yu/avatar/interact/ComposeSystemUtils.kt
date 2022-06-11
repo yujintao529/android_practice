@@ -8,7 +8,7 @@ object ComposeSystemUtils {
 
     fun vibrator(context: Context, isContinue: Boolean) {
         val vib = context.getSystemService(Service.VIBRATOR_SERVICE) as Vibrator
-        vib.vibrate(longArrayOf(100, 100), if (isContinue) 0 else -1)
+        vib.vibrate(longArrayOf(50, 50), if (isContinue) 0 else -1)
     }
 
     fun cancelVibrator(context: Context) {

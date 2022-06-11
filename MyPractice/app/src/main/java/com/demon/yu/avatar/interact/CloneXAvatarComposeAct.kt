@@ -40,6 +40,7 @@ class CloneXAvatarComposeAct : AppCompatActivity() {
                 }
 
                 override fun onScrolled() {
+                    lightInteractView?.backToIdleLock()
                     Log.d("CloneXAvatar", "OnCenterChangeListener onScrolled")
                 }
             }
@@ -49,12 +50,12 @@ class CloneXAvatarComposeAct : AppCompatActivity() {
     private fun createInteractModels(): List<LightInteractModel> {
         val drawableArr =
             arrayListOf(R.drawable.heart, R.drawable.zhuoyizhuo, R.drawable.baba, R.drawable.paozhu)
-        return (0..4).map { LightInteractModel(resourceID = drawableArr[it % 4]) }
+        return (0..10).map { LightInteractModel(resourceID = drawableArr[it % 4]) }
     }
 
 
     private fun createAvatarObj(): List<MyStaticObj> {
-        return (0..20).map { MyStaticObj() }.toList()
+        return (0..100).map { MyStaticObj(viewType = if (it < 20) 1 else 2) }.toList()
     }
 
 }

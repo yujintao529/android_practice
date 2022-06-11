@@ -29,6 +29,7 @@ class LightInteractView(context: Context, attrs: AttributeSet? = null) :
         private const val LIGHT_INTERACT_REPEAT_DELAY = 100L
         private const val LIGHT_INTERACT_BACK_TO_IDLE = 1500L
         private const val LIGHT_INTERACT_ICON_ANIM = 100L
+        private const val CLICK_TIMELINE = 200L
     }
 
     private var state: Int = STATE_IDLE
@@ -58,8 +59,7 @@ class LightInteractView(context: Context, attrs: AttributeSet? = null) :
 
     private val backToIdleRunnable = Runnable {
         if (horizontalScrollViewIsScrolling.not()) {
-            scrollToCenterPosition(needPost = false)
-            setState(STATE_IDLE)
+            backToIdleLock()
         }
     }
 
@@ -231,20 +231,27 @@ class LightInteractView(context: Context, attrs: AttributeSet? = null) :
         postDelayed(backToIdleRunnable, delay)
     }
 
+    fun backToIdleLock() {
+        if (this.state != STATE_IDLE) {
+            scrollToCenterPosition(needPost = false)
+            setState(STATE_IDLE)
+        }
+    }
+
 
     private fun onLightInteract(count: Int, reStart: Boolean) {
         postDelayed({
             if (reStart) {
-                lightInteractNumberView.setNumber(count)
+                lightInteractNumberView.setNumber(count, state == STATE_IDLE)
             } else {
-                lightInteractNumberView.continueNumber(count)
+                lightInteractNumberView.continueNumber(count, state == STATE_IDLE)
             }
         }, LIGHT_INTERACT_ANMI_DURATION - 100)
-
     }
 
     private var isClicking: Boolean = false
     private fun startCartoonPlay(needRepeat: Boolean, forceRepeat: Boolean = false) {
+        log("startCartoonPlay needRepeat=$needRepeat,hasStartRepeatSendCartoon=$hasStartRepeatSendCartoon")
         if (needRepeat) {
             if (hasStartRepeatSendCartoon.not() || forceRepeat) {
                 sendInteractCartoon()
@@ -326,10 +333,11 @@ class LightInteractView(context: Context, attrs: AttributeSet? = null) :
                 downTimestamp = SystemClock.uptimeMillis()
                 startInteractFromView(v, event)
                 setState(STATE_INTERACT)
-                postDelayed(longTouchRunnable, 200L)//80ms啥都没动，触发longTouch
+                postDelayed(longTouchRunnable, CLICK_TIMELINE)//80ms啥都没动，触发longTouch
             }
             MotionEvent.ACTION_MOVE -> {
-                if ((SystemClock.uptimeMillis() - downTimestamp > 100L ||
+                log("ACTION_MOVE ${longTouch}")
+                if ((SystemClock.uptimeMillis() - downTimestamp > CLICK_TIMELINE ||
                             event.rawX - initRawX >= touchSlop || event.rawY - initRawY >= touchSlop
                             )
                 ) { //长按
@@ -543,7 +551,6 @@ class LightInteractView(context: Context, attrs: AttributeSet? = null) :
         currentLightNumber++
         onLightInteract(currentLightNumber, reCount)
         reCount = false
-
     }
 
     private fun startInteractFromView(v: View, motionEvent: MotionEvent) {
@@ -560,10 +567,8 @@ class LightInteractView(context: Context, attrs: AttributeSet? = null) :
     private fun endInteract(needScaleAnim: Boolean = true) {
         if (needScaleAnim) {
             currentLightInteractView?.let {
-                if (it.scaleX != 1f) {
-                    it.animate().cancel()
-                    it.animate().scaleX(1f).scaleY(1f).setDuration(LIGHT_INTERACT_ICON_ANIM).start()
-                }
+                it.animate().cancel()
+                it.animate().scaleX(1f).scaleY(1f).setDuration(LIGHT_INTERACT_ICON_ANIM).start()
             }
         }
         currentLightInteractViewLocalArrCache.fill(0)

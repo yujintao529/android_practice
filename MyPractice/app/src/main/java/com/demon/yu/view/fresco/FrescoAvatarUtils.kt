@@ -1,6 +1,5 @@
 package com.demon.yu.view.fresco
 
-import android.R.attr.resource
 import android.graphics.*
 import android.net.Uri
 import androidx.annotation.DrawableRes

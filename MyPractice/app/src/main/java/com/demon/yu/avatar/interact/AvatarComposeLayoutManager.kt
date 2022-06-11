@@ -1,11 +1,9 @@
 package com.demon.yu.avatar.interact
 
 import android.content.Context
-import android.graphics.Point
-import android.graphics.Rect
+import android.graphics.*
 import android.util.Log
 import android.util.SparseArray
-import android.util.SparseIntArray
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.util.forEach
@@ -15,14 +13,11 @@ import com.demon.yu.view.recyclerview.DPoint
 import com.demon.yu.view.recyclerview.FakeLayoutCoorExchangeUtils
 import com.demon.yu.view.recyclerview.HexagonalPoint
 import com.demon.yu.view.recyclerview.toPoint
-import com.example.mypractice.Logger
-import java.util.*
-import kotlin.collections.HashSet
 import kotlin.math.*
 
 
 class AvatarComposeLayoutManager(val context: Context) : RecyclerView.LayoutManager(),
-    RecyclerView.ChildDrawingOrderCallback {
+    AvatarComposeRecyclerView.OnDrawListener {
 
 
     private var measureWidth: Int = 0
@@ -32,10 +27,11 @@ class AvatarComposeLayoutManager(val context: Context) : RecyclerView.LayoutMana
     var radius: Int = 120.dp2Px()
     private val coordinateCache: SparseArray<Point> = SparseArray(200)
 
+    private val viewRegion = Rect()
 
-    //drawingOrder array
-    private var orderChildIndexSet = HashSet<Int>()
-    private var orderChildSparseArray = SparseIntArray()
+
+    private var lastChildCount = 0
+
 
     //仅支持matchParent及exactly width/height
     override fun onMeasure(
@@ -57,15 +53,6 @@ class AvatarComposeLayoutManager(val context: Context) : RecyclerView.LayoutMana
         return false
     }
 
-    override fun canScrollHorizontally(): Boolean {
-        return true
-    }
-
-
-    override fun canScrollVertically(): Boolean {
-        return true
-    }
-
 
     override fun onLayoutChildren(recycler: RecyclerView.Recycler, state: RecyclerView.State) {
 //        super.onLayoutChildren(recycler, state)
@@ -79,10 +66,6 @@ class AvatarComposeLayoutManager(val context: Context) : RecyclerView.LayoutMana
         fill(recycler, state)
     }
 
-    private val viewRegion = Rect()
-
-
-    private var lastChildCount = 0
 
     private fun clearCoordinateCacheIfNeed(currentCount: Int) {
         if ((lastChildCount >= 7 && currentCount < 7) || (lastChildCount < 7 && currentCount >= 7)
@@ -96,10 +79,6 @@ class AvatarComposeLayoutManager(val context: Context) : RecyclerView.LayoutMana
     fun fill(recycler: RecyclerView.Recycler, state: RecyclerView.State) {
 
         val viewCache = SparseArray<View>(childCount)
-        orderChildIndexSet.clear()
-        orderChildSparseArray.clear()
-//...
-//...
         if (childCount != 0) {
             //...
             //Cache all views by their existing position, before updating counts
@@ -132,12 +111,7 @@ class AvatarComposeLayoutManager(val context: Context) : RecyclerView.LayoutMana
 
         viewRegion.set(find4Coordinate()) //找到四周的范围
 
-        val array = orderChildIndexSet.toIntArray()
-        Arrays.sort(array)
-        val reversedArray = array.reversedArray()
-        array.forEachIndexed { index, value ->
-            orderChildSparseArray.put(value, reversedArray[index])
-        }
+        Log.d("CloneXAvatar", "viewRegion=$viewRegion")
 
         //删除无用detachView
         for (i in 0 until viewCache.size()) {
@@ -173,14 +147,12 @@ class AvatarComposeLayoutManager(val context: Context) : RecyclerView.LayoutMana
         if (position == 0) {
             cache = Point(measureWidth / 2, measureHeight / 2)
             coordinateCache.put(position, cache)
-            orderChildIndexSet.add(0)
             return cache
         } else {
             cache = coordinateCache.get(0)
             if (cache == null) {
                 cache = Point(measureWidth / 2, measureHeight / 2)
                 coordinateCache.put(0, cache)
-                orderChildIndexSet.add(0)
             }
         }
         val zero = coordinateCache.get(0)
@@ -197,22 +169,24 @@ class AvatarComposeLayoutManager(val context: Context) : RecyclerView.LayoutMana
 
     //先不复用的view的场景下也就是所有的view都添加的情况下，找到最上，最左，最右，最下的坐标，用来辅助是否可以滑动的情况
     private fun find4Coordinate(): Rect {
+        val radius = 60.dp2Px()
         val rect = Rect()
         coordinateCache.forEach { key, value ->
-            if (value.x < rect.left) {
+            if (value.x < rect.left || rect.left == 0) {
                 rect.left = value.x
             }
-            if (value.x > rect.right) {
+            if (value.x > rect.right || rect.right == 0) {
                 rect.right = value.x
             }
-            if (value.y < rect.top) {
+            if (value.y < rect.top || rect.top == 0) {
                 rect.top = value.y
             }
-            if (value.y > rect.bottom) {
+            if (value.y > rect.bottom || rect.bottom == 0) {
                 rect.bottom = value.y
             }
         }
         return rect
+
     }
 
 
@@ -268,12 +242,8 @@ class AvatarComposeLayoutManager(val context: Context) : RecyclerView.LayoutMana
         val level = hexagonalPoint.level
 
         if (level == 1) {
-            orderChildIndexSet.add(index)
             return DPoint(centerX.toDouble(), centerY.toDouble())
         } else if (level == 2) {
-            if (hexagonalPoint.levelNumber == 1 || hexagonalPoint.levelNumber == 2) {
-                orderChildIndexSet.add(index)
-            }
             return DPoint(
                 centerX - radius * cos(du * hexagonalPoint.levelNumber),
                 centerY - radius * sin(du * hexagonalPoint.levelNumber)
@@ -337,9 +307,6 @@ class AvatarComposeLayoutManager(val context: Context) : RecyclerView.LayoutMana
                     }
                 }
             }
-            if ((itemGroup == 1 || itemGroup == 2) && itemGroupNum == 1) {
-                orderChildIndexSet.add(index)
-            }
             val tempPointX = centerX - (level - 1) * radius * cos((du * itemGroup))
             val tempPointY = centerY - (level - 1) * radius * sin((du * itemGroup))
             if (itemGroup == 1) {
@@ -365,9 +332,6 @@ class AvatarComposeLayoutManager(val context: Context) : RecyclerView.LayoutMana
         } else {
             val itemGroup = ceil((hexagonalPoint.levelNumber.toDouble() / (level - 1))).toInt()
             val itemGroupNum = hexagonalPoint.levelNumber - (itemGroup - 1) * (level - 1)
-            if ((itemGroup == 1 || itemGroup == 2) && itemGroupNum == 1) {
-                orderChildIndexSet.add(index)
-            }
             val tempPointX = centerX - (level - 1) * radius * cos((du * itemGroup))
             val tempPointY = centerY - (level - 1) * radius * sin((du * itemGroup))
             if (itemGroup == 1) {
@@ -426,24 +390,38 @@ class AvatarComposeLayoutManager(val context: Context) : RecyclerView.LayoutMana
 
     override fun onLayoutCompleted(state: RecyclerView.State) {
         super.onLayoutCompleted(state)
-
+        Log.d("CloneXAvatar", "onLayoutCompleted ${state.itemCount}")
     }
+
+    override fun canScrollHorizontally(): Boolean {
+        return true
+    }
+
+
+    override fun canScrollVertically(): Boolean {
+        return true
+    }
+
 
     override fun scrollHorizontallyBy(
         dx: Int,
         recycler: RecyclerView.Recycler?,
         state: RecyclerView.State?
     ): Int {
+//        Debug.startMethodTracing()
         offsetChildrenHorizontal(-dx)
+//        Debug.stopMethodTracing()
         return dx
     }
 
     override fun scrollVerticallyBy(
         dy: Int,
         recycler: RecyclerView.Recycler?,
-        state: RecyclerView.State?
+        state: RecyclerView.State
     ): Int {
+//        Debug.startMethodTracing()
         offsetChildrenVertical(-dy)
+//        Debug.stopMethodTracing()
         return dy
     }
 
@@ -454,11 +432,10 @@ class AvatarComposeLayoutManager(val context: Context) : RecyclerView.LayoutMana
         )
     }
 
-    override fun onGetChildDrawingOrder(childCount: Int, i: Int): Int {
-//        val p = orderChildSparseArray.get(i, -1)
-//        if (p != -1) {
-//            return p
-//        }
-        return i
+    private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+    override fun onDraw(canvas: Canvas) {
+        paint.color = Color.CYAN
+        canvas.drawRect(viewRegion, paint)
     }
+
 }
