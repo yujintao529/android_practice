@@ -1,13 +1,14 @@
 package com.demon.yu.view.recyclerview
 
 import android.view.ViewGroup
+import androidx.recyclerview.widget.AvatarRecyclerView
 import androidx.recyclerview.widget.RecyclerView
 import com.demon.yu.extenstion.dp2Px
 import com.demon.yu.view.fresco.ClipSimpleDraweeView
 import com.demon.yu.view.fresco.FrescoAvatarUtils
 import com.facebook.drawee.view.SimpleDraweeView
 
-class MyStaticAdapter : RecyclerView.Adapter<MyStaticViewHolder>() {
+class MyStaticAdapter : AvatarRecyclerView.AvatarAdapter<MyStaticViewHolder>() {
 
     private val listData = mutableListOf<MyStaticObj>()
 
@@ -37,7 +38,15 @@ class MyStaticAdapter : RecyclerView.Adapter<MyStaticViewHolder>() {
 
     }
 
-    override fun onBindViewHolder(holder: MyStaticViewHolder, position: Int) {
+    override fun getItemViewType(position: Int): Int {
+        return listData[position].viewType
+    }
+
+    override fun getItemCount(): Int {
+        return listData.size
+    }
+
+    override fun onRealBind(holder: MyStaticViewHolder, position: Int) {
         val myStaticObj = listData[position]
         (holder.itemView as? MyCircleView)?.color = myStaticObj.color
         (holder.itemView as? MyCircleView)?.number = position
@@ -54,11 +63,18 @@ class MyStaticAdapter : RecyclerView.Adapter<MyStaticViewHolder>() {
         }
     }
 
-    override fun getItemViewType(position: Int): Int {
-        return listData[position].viewType
+    override fun onVisible(holder: MyStaticViewHolder, position: Int) {
+        super.onVisible(holder, position)
+        if (holder.itemView is ClipSimpleDraweeView) {
+            holder.itemView.startAnimation()
+        }
+
     }
 
-    override fun getItemCount(): Int {
-        return listData.size
+    override fun onHide(holder: MyStaticViewHolder, position: Int) {
+        super.onHide(holder, position)
+        if (holder.itemView is ClipSimpleDraweeView) {
+            holder.itemView.stopAnimation()
+        }
     }
 }

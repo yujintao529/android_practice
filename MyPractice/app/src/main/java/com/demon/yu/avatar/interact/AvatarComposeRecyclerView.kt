@@ -8,7 +8,6 @@ import androidx.annotation.Px
 import androidx.core.graphics.toRectF
 import androidx.recyclerview.widget.AvatarRecyclerView
 import com.demon.yu.extenstion.dp2Px
-import com.demon.yu.view.fresco.IViewDrawListener
 import com.demon.yu.view.recyclerview.copy
 import java.lang.StrictMath.pow
 import kotlin.math.*
@@ -182,20 +181,6 @@ class AvatarComposeRecyclerView(context: Context, attr: AttributeSet? = null) :
             StrictMath.abs(x - centerX).toDouble().pow(2.0) + StrictMath.abs(y - centerY).toDouble()
                 .pow(2.0)
         ).toFloat()
-    }
-
-    override fun drawChild(canvas: Canvas?, child: View, drawingTime: Long): Boolean {
-        val viewHolder = getChildViewHolder(child)
-        if (child.scaleX == 0f) {
-            if (child is IViewDrawListener) {
-                child.notifyDrawStatus(false)
-            }
-            return false
-        }
-        if (child is IViewDrawListener) {
-            child.notifyDrawStatus(true)
-        }
-        return super.drawChild(canvas, child, drawingTime)
     }
 
 

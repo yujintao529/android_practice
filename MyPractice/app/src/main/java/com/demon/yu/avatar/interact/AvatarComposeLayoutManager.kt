@@ -2,7 +2,6 @@ package com.demon.yu.avatar.interact
 
 import android.content.Context
 import android.graphics.*
-import android.util.Log
 import android.util.Pair
 import android.util.SparseArray
 import android.view.View
@@ -15,12 +14,16 @@ import com.demon.yu.view.recyclerview.DPoint
 import com.demon.yu.view.recyclerview.FakeLayoutCoorExchangeUtils
 import com.demon.yu.view.recyclerview.HexagonalPoint
 import com.demon.yu.view.recyclerview.toPoint
+import com.example.mypractice.Logger
 import kotlin.math.*
 
 
 class AvatarComposeLayoutManager(val context: Context) : AvatarLayoutManager(),
     AvatarComposeRecyclerView.OnDrawListener {
 
+    companion object {
+        const val TAG = "AvatarComposeLayoutManager"
+    }
 
     private var measureWidth: Int = 0
     private var measureHeight: Int = 0
@@ -30,10 +33,11 @@ class AvatarComposeLayoutManager(val context: Context) : AvatarLayoutManager(),
     private val coordinateCache: SparseArray<Point> = SparseArray(200)
 
     private val viewRegion = Rect()
-
-
     private var lastChildCount = 0
+    private var avatarComposeRecyclerView: AvatarComposeRecyclerView? = null
 
+    private var fakeScrollX: Int = 0
+    private var fakeScrollY: Int = 0
 
     //仅支持matchParent及exactly width/height
     override fun onMeasure(
@@ -45,9 +49,12 @@ class AvatarComposeLayoutManager(val context: Context) : AvatarLayoutManager(),
 //        super.onMeasure(recycler, state, widthSpec, heightSpec)
         measureWidth = View.MeasureSpec.getSize(widthSpec)
         measureHeight = View.MeasureSpec.getSize(heightSpec)
-
-
         setMeasuredDimension(measureWidth, measureHeight)
+    }
+
+    override fun setRecyclerView(recyclerView: RecyclerView?) {
+        super.setRecyclerView(recyclerView)
+        avatarComposeRecyclerView = recyclerView as? AvatarComposeRecyclerView
     }
 
     //关闭，虽然好像没啥用
@@ -57,15 +64,18 @@ class AvatarComposeLayoutManager(val context: Context) : AvatarLayoutManager(),
 
 
     override fun onLayoutChildren(recycler: RecyclerView.Recycler, state: RecyclerView.State) {
-//        super.onLayoutChildren(recycler, state)
-
         if (itemCount == 0) {
-            detachAndScrapAttachedViews(recycler);
-            return;
+            removeAndRecycleAllViews(recycler);
+            return
         }
         detachAndScrapAttachedViews(recycler)
         clearCoordinateCacheIfNeed(state.itemCount)
         fill(recycler, state)
+        recycleScrapViews(recycler)
+    }
+
+    private fun recycleScrapViews(recycler: RecyclerView.Recycler) {
+
     }
 
 
@@ -78,49 +88,56 @@ class AvatarComposeLayoutManager(val context: Context) : AvatarLayoutManager(),
         lastChildCount = currentCount
     }
 
-    fun fill(recycler: RecyclerView.Recycler, state: RecyclerView.State) {
+    private fun fill(recycler: RecyclerView.Recycler, state: RecyclerView.State) {
 
-        val viewCache = SparseArray<View>(childCount)
-        if (childCount != 0) {
-            //...
-            //Cache all views by their existing position, before updating counts
-            for (i in 0 until childCount) {
-                val child = getChildAt(i)
-                viewCache.put(i, child)
-            }
-
-            //Temporarily detach all views.
-            // Views we still need will be added back at the proper index.
-            for (i in 0 until viewCache.size()) {
-                detachView(viewCache.get(i))
-            }
-        }
+//        val viewCache = SparseArray<View>(childCount)
+//        if (childCount != 0) {
+//            //...
+//            //Cache all views by their existing position, before updating counts
+//            for (i in 0 until childCount) {
+//                val child = getChildAt(i)
+//                viewCache.put(i, child)
+//            }
+//
+//            //Temporarily detach all views.
+//            // Views we still need will be added back at the proper index.
+//            for (i in 0 until viewCache.size()) {
+//                detachView(viewCache.get(i))
+//            }
+//        }
 
         val visibleChildCount = getVisibleCount(state)
-        for (i in visibleChildCount - 1 downTo 0) {
-            var view = viewCache.get(i)
-            if (view == null) {
-                view = recycler.getViewForPosition(i)
-                addView(view)
-                measureChildWithMargins(view, 0, 0)
-                layoutChildInternal(view, i, visibleChildCount)
-            } else {
-
-            }
+        for (position in visibleChildCount - 1 downTo 0) {
+            val view = recycler.getViewForPosition(position)
+            addView(view)
+            measureChildWithMargins(view, 0, 0)
+            layoutChildInternal(view, position, visibleChildCount)
+            shapeChange(view, position)
+            bindRealViewHolderIfNeed(view, position)
         }
-
-
-
         viewRegion.set(find4Coordinate()) //找到四周的范围
+        Logger.debug("AvatarComposeLayoutManager", "viewRegion=$viewRegion")
 
-        Log.d("CloneXAvatar", "viewRegion=$viewRegion")
+//        //删除无用detachView
+//        for (i in 0 until viewCache.size()) {
+//            val removingView = viewCache.get(i)
+//            recycler.recycleView(removingView)
+//        }
+    }
 
-        //删除无用detachView
-        for (i in 0 until viewCache.size()) {
-            val removingView = viewCache.get(i)
-            recycler.recycleView(removingView)
-        }
 
+    private fun shapeChange(child: View, position: Int) {
+//        val avatarComposeRecyclerView = avatarComposeRecyclerView ?: return
+//        val childPoint = FakeLayoutCoorExchangeUtils.getCenterPoint(child)
+//        val destChildDistance =
+//            avatarComposeRecyclerView.getDistance(childPoint.x, childPoint.y)
+//        avatarComposeRecyclerView.translateXY(
+//            child,
+//            childPoint.x,
+//            childPoint.y,
+//            destChildDistance
+//        )
+//        avatarComposeRecyclerView.scaleXY(child, childPoint.x, childPoint.y, destChildDistance)
     }
 
 
@@ -137,6 +154,7 @@ class AvatarComposeLayoutManager(val context: Context) : AvatarLayoutManager(),
                 top + childHeight
             )
         }
+
 
     }
 
@@ -392,28 +410,57 @@ class AvatarComposeLayoutManager(val context: Context) : AvatarLayoutManager(),
 
     override fun onLayoutCompleted(state: RecyclerView.State) {
         super.onLayoutCompleted(state)
-        Log.d("CloneXAvatar", "onLayoutCompleted ${state.itemCount}")
+        Logger.debug("AvatarComposeLayoutManager", "onLayoutCompleted ${state.itemCount}")
     }
 
     override fun scrollHorAndVerBy(
         dx: Int,
         dy: Int,
-        recycler: RecyclerView.Recycler?,
-        state: RecyclerView.State?
+        recycler: RecyclerView.Recycler,
+        state: RecyclerView.State
     ): Pair<Int, Int> {
-        offsetChildrenHorAndVer(-dx, -dy)
+        if (dx == 0 && dy == 0) {
+            return Pair(0, 0)
+        }
+        fakeScrollX += dx
+        fakeScrollY += dy
+
+        offsetChild(-dx, -dy, state)
+
+
         return Pair(dx, dy)
     }
+
+    private fun offsetChild(dx: Int, dy: Int, state: RecyclerView.State) {
+        val childCount = getVisibleCount(state)
+        for (position in 0 until childCount) {
+            val child = getChildAt(position)
+            if (child != null) {
+                offsetChildHorAndVer(child, dx, dy)
+                shapeChange(child, position)
+                bindRealViewHolderIfNeed(child, position)
+            }
+        }
+    }
+
+
+//    private fun scrollHorANndVerInterval(
+//        dx: Int,
+//        dy: Int,
+//        recycler: RecyclerView.Recycler?,
+//        state: RecyclerView.State?
+//    ){
+//
+//    }
+//
 
     override fun scrollHorizontallyBy(
         dx: Int,
         recycler: RecyclerView.Recycler?,
         state: RecyclerView.State?
     ): Int {
-        throw IllegalAccessError("scrollHorizontallyBy not impl please use scrollHorAndVerBy")
-//        Debug.startMethodTracing()
+        throw IllegalAccessError("scrollHorizontallyBy not support please use scrollHorAndVerBy")
 //        offsetChildrenHorizontal(-dx)
-//        Debug.stopMethodTracing()
 //        return dx
     }
 
@@ -422,10 +469,8 @@ class AvatarComposeLayoutManager(val context: Context) : AvatarLayoutManager(),
         recycler: RecyclerView.Recycler?,
         state: RecyclerView.State
     ): Int {
-        throw IllegalAccessError("scrollVerticallyBy not impl please use scrollHorAndVerBy")
-//        Debug.startMethodTracing()
+        throw IllegalAccessError("scrollVerticallyBy not support please use scrollHorAndVerBy")
 //        offsetChildrenVertical(-dy)
-//        Debug.stopMethodTracing()
 //        return dy
     }
 
@@ -437,9 +482,14 @@ class AvatarComposeLayoutManager(val context: Context) : AvatarLayoutManager(),
     }
 
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+
+
     override fun onDraw(canvas: Canvas) {
         paint.color = Color.CYAN
+        val restore = canvas.saveCount
+        canvas.translate(-fakeScrollX.toFloat(), -fakeScrollY.toFloat())
         canvas.drawRect(viewRegion, paint)
+        canvas.restoreToCount(restore)
     }
 
 }

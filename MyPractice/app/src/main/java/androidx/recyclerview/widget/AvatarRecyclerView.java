@@ -1,6 +1,7 @@
 package androidx.recyclerview.widget;
 
 import android.content.Context;
+import android.graphics.Canvas;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.Pair;
@@ -10,6 +11,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.os.TraceCompat;
 
+import java.util.List;
+
 
 /**
  * Created by yujintao.529 on 2022/6/11
@@ -18,6 +21,7 @@ import androidx.core.os.TraceCompat;
  */
 public class AvatarRecyclerView extends RecyclerView {
     private AvatarLayoutManager avatarLayoutManager;
+    private AvatarAdapter avatarAdapter;
 
     public AvatarRecyclerView(@NonNull Context context) {
         super(context);
@@ -39,7 +43,16 @@ public class AvatarRecyclerView extends RecyclerView {
             return;
         }
         throw new IllegalArgumentException("AvatarRecyclerView only support AvatarLayoutManager");
+    }
 
+    @Override
+    public void setAdapter(@Nullable Adapter adapter) {
+        if (adapter instanceof AvatarAdapter) {
+            super.setAdapter(adapter);
+            avatarAdapter = (AvatarAdapter) adapter;
+            return;
+        }
+        throw new IllegalArgumentException("AvatarRecyclerView only support AvatarAdapter");
     }
 
     String exceptionLabel() {
@@ -51,7 +64,6 @@ public class AvatarRecyclerView extends RecyclerView {
         Log.d("AvatarRecyclerView", "scrollStep dx=" + dx + " dy=" + dy);
         startInterceptRequestLayout();
         onEnterLayoutOrScroll();
-
         TraceCompat.beginSection(TRACE_SCROLL_TAG);
         fillRemainingScrollValues(mState);
 
@@ -83,4 +95,79 @@ public class AvatarRecyclerView extends RecyclerView {
         }
     }
 
+    @Override
+    public boolean drawChild(Canvas canvas, View child, long drawingTime) {
+        if (isVisible(child)) {
+            return super.drawChild(canvas, child, drawingTime);
+        } else {
+            return false;
+        }
+    }
+
+    void offsetChildrenHorAndVer(View child, int dx, int dy) {
+        child.offsetLeftAndRight(dx);
+        child.offsetTopAndBottom(dy);
+    }
+
+    protected void bindRealViewHolderIfNeed(View child, int position) {
+        ViewHolder viewHolder = getChildViewHolder(child);
+        if (viewHolder instanceof AvatarViewHolder) {
+            AvatarViewHolder avatarViewHolder = (AvatarViewHolder) viewHolder;
+            if (isVisible(child)) {
+                if (!avatarViewHolder.realOnBindState) {
+                    avatarAdapter.onRealBind(avatarViewHolder, position);
+                    avatarViewHolder.realOnBindState = true;
+                }
+                avatarAdapter.onVisible(avatarViewHolder, position);
+            } else {
+                avatarAdapter.onHide(avatarViewHolder, position);
+            }
+
+        } else {
+            throw new IllegalStateException("AvatarRecyclerView only support AvatarViewHolder");
+        }
+
+    }
+
+    protected boolean isVisible(View child) {
+        return child.getScaleY() > 0 && child.getScaleX() > 0;
+    }
+
+    public abstract static class AvatarViewHolder extends RecyclerView.ViewHolder {
+
+        protected boolean realOnBindState;
+
+        public AvatarViewHolder(@NonNull View itemView) {
+            super(itemView);
+        }
+
+        @Override
+        void resetInternal() {
+            super.resetInternal();
+            realOnBindState = false;
+        }
+    }
+
+    public abstract static class AvatarAdapter<VH extends AvatarViewHolder> extends RecyclerView.Adapter<VH> {
+
+        protected abstract void onRealBind(VH holder, int position);
+
+        @Override
+        public final void onBindViewHolder(@NonNull VH holder, int position, @NonNull List<Object> payloads) {
+            super.onBindViewHolder(holder, position, payloads);
+        }
+
+        @Override
+        public final void onBindViewHolder(@NonNull VH holder, int position) {
+        }
+
+        protected void onVisible(VH holder, int position) {
+
+        }
+
+        protected void onHide(VH holder, int position) {
+
+        }
+
+    }
 }

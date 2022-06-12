@@ -17,6 +17,9 @@ import com.facebook.imagepipeline.request.ImageRequestBuilder
 class ClipSimpleDraweeView(context: Context, attr: AttributeSet? = null) :
     SimpleDraweeView(context, attr), IFakeLayoutView, IViewDrawListener {
 
+    init {
+        hierarchy.fadeDuration = 0
+    }
 
     private var ratio: Float = 1f
 
@@ -43,11 +46,24 @@ class ClipSimpleDraweeView(context: Context, attr: AttributeSet? = null) :
                     }
                 })
         val controller: DraweeController = Fresco.newDraweeControllerBuilder()
-            .setAutoPlayAnimations(true)
             .setImageRequest(imageRequestBuilder.build())
-
+            .setAutoPlayAnimations(true)
             .build()
+
+
         setController(controller)
+    }
+
+    fun startAnimation() {
+        if (controller?.animatable != null && controller?.animatable?.isRunning == false) {
+            controller?.animatable?.start()
+        }
+    }
+
+    fun stopAnimation() {
+        if (controller?.animatable != null && controller?.animatable?.isRunning == true) {
+            controller?.animatable?.stop()
+        }
     }
 
     /**
@@ -105,24 +121,24 @@ class ClipSimpleDraweeView(context: Context, attr: AttributeSet? = null) :
     }
 
     override fun notifyDrawStatus(enableDraw: Boolean) {
-        if (enableDraw) {
-            start()
-        } else {
-            stop()
-        }
+//        if (enableDraw) {
+//            start()
+//        } else {
+//            stop()
+//        }
     }
 
-    fun stop() {
-        val animation = controller?.animatable
-        if (animation != null && animation.isRunning) {
-            animation.stop()
-        }
-    }
-
-    fun start() {
-        val animation = controller?.animatable
-        if (animation != null && animation.isRunning.not()) {
-            animation.start()
-        }
-    }
+//    fun stop() {
+//        val animation = controller?.animatable
+//        if (animation != null && animation.isRunning) {
+//            animation.stop()
+//        }
+//    }
+//
+//    fun start() {
+//        val animation = controller?.animatable
+//        if (animation != null && animation.isRunning.not()) {
+//            animation.start()
+//        }
+//    }
 }

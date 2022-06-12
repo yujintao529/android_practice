@@ -4,6 +4,7 @@ import android.graphics.Point
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.EditText
 import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
 import com.demon.yu.view.recyclerview.MyStaticObj
@@ -26,7 +27,7 @@ class CloneXAvatarComposeAct : AppCompatActivity() {
         circleBg?.visibility = View.GONE
         lightInteractView?.updateList(createInteractModels(), true)
         cloneXAvatarComposeLayout = findViewById(R.id.cloneXAvatarComposeLayout)
-        cloneXAvatarComposeLayout?.updateData(createAvatarObj())
+        cloneXAvatarComposeLayout?.updateData(createAvatarObj(8))
         cloneXAvatarComposeLayout?.avatarComposeRecyclerView?.onLayoutListener =
             object : AvatarComposeRecyclerView.OnLayoutListener {
                 override fun onCenter(point: Point) {
@@ -44,6 +45,13 @@ class CloneXAvatarComposeAct : AppCompatActivity() {
                     Log.d("CloneXAvatar", "OnCenterChangeListener onScrolled")
                 }
             }
+        findViewById<View>(R.id.submit).setOnClickListener {
+            val input = findViewById<EditText>(R.id.inputNumber)
+            val result = input.editableText.toString().toIntOrNull()
+            if (result != null && result > 0) {
+                cloneXAvatarComposeLayout?.updateData(createAvatarObj(result))
+            }
+        }
     }
 
 
@@ -54,8 +62,8 @@ class CloneXAvatarComposeAct : AppCompatActivity() {
     }
 
 
-    private fun createAvatarObj(): List<MyStaticObj> {
-        return (0..100).map { MyStaticObj(viewType = if (it < 20) 1 else 2) }.toList()
+    private fun createAvatarObj(number: Int): List<MyStaticObj> {
+        return (0..number).map { MyStaticObj(viewType = if (it < 50) 1 else 2) }.toList()
     }
 
 }
