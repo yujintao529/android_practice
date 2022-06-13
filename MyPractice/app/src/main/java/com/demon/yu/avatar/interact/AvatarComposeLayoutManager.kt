@@ -15,6 +15,7 @@ import com.demon.yu.view.recyclerview.FakeLayoutCoorExchangeUtils
 import com.demon.yu.view.recyclerview.HexagonalPoint
 import com.demon.yu.view.recyclerview.toPoint
 import com.example.mypractice.Logger
+import com.example.mypractice.common.Common
 import kotlin.math.*
 
 
@@ -38,6 +39,10 @@ class AvatarComposeLayoutManager(val context: Context) : AvatarLayoutManager(),
 
     private var fakeScrollX: Int = 0
     private var fakeScrollY: Int = 0
+
+    private var currentPosition: Int = -1
+
+    var onCenterChangedListener: OnCenterChangedListener? = null
 
     //仅支持matchParent及exactly width/height
     override fun onMeasure(
@@ -88,6 +93,8 @@ class AvatarComposeLayoutManager(val context: Context) : AvatarLayoutManager(),
         lastChildCount = currentCount
     }
 
+
+    private var maxCircleRadius = 0
     private fun fill(recycler: RecyclerView.Recycler, state: RecyclerView.State) {
 
 //        val viewCache = SparseArray<View>(childCount)
@@ -105,17 +112,30 @@ class AvatarComposeLayoutManager(val context: Context) : AvatarLayoutManager(),
 //                detachView(viewCache.get(i))
 //            }
 //        }
-
         val visibleChildCount = getVisibleCount(state)
+        var destPosition: Int = 0
+        var destChildDistance = 0f
+        var minCloseDistance: Float = Float.MAX_VALUE
         for (position in visibleChildCount - 1 downTo 0) {
             val view = recycler.getViewForPosition(position)
             addView(view)
             measureChildWithMargins(view, 0, 0)
             layoutChildInternal(view, position, visibleChildCount)
-            shapeChange(view, position)
+            FakeLayoutCoorExchangeUtils.setCenterPivot(view)
+            destChildDistance = shapeChange(view, position)
             bindRealViewHolderIfNeed(view, position)
+            if (destChildDistance < minCloseDistance) {
+                minCloseDistance = destChildDistance
+                destPosition = position
+            }
         }
+        setCenterPosition(destPosition)
         viewRegion.set(find4Coordinate()) //找到四周的范围
+        val point = getCenterPoint()
+        val centerDiffX = abs(viewRegion.exactCenterX() - point.x)
+        val centerDiffY = abs(viewRegion.exactCenterY() - point.y)
+        val radiusDiff = calDistance(centerDiffX.toInt(), centerDiffY.toInt())
+        maxCircleRadius = max(viewRegion.width(), viewRegion.height()) / 2 + radiusDiff
         Logger.debug("AvatarComposeLayoutManager", "viewRegion=$viewRegion")
 
 //        //删除无用detachView
@@ -125,19 +145,27 @@ class AvatarComposeLayoutManager(val context: Context) : AvatarLayoutManager(),
 //        }
     }
 
+    private fun getCenterPoint(): Point {
+        return avatarComposeRecyclerView?.getCenterPoint() ?: Point(
+            Common.screenWidth / 2,
+            Common.screenHeight / 2
+        )
+    }
 
-    private fun shapeChange(child: View, position: Int) {
-//        val avatarComposeRecyclerView = avatarComposeRecyclerView ?: return
-//        val childPoint = FakeLayoutCoorExchangeUtils.getCenterPoint(child)
-//        val destChildDistance =
-//            avatarComposeRecyclerView.getDistance(childPoint.x, childPoint.y)
-//        avatarComposeRecyclerView.translateXY(
-//            child,
-//            childPoint.x,
-//            childPoint.y,
-//            destChildDistance
-//        )
-//        avatarComposeRecyclerView.scaleXY(child, childPoint.x, childPoint.y, destChildDistance)
+
+    private fun shapeChange(child: View, position: Int): Float {
+        val avatarComposeRecyclerView = avatarComposeRecyclerView ?: return 0f
+        val childPoint = FakeLayoutCoorExchangeUtils.getCenterPoint(child)
+        val destChildDistance =
+            avatarComposeRecyclerView.getDistance(childPoint.x, childPoint.y)
+        avatarComposeRecyclerView.translateXY(
+            child,
+            childPoint.x,
+            childPoint.y,
+            destChildDistance
+        )
+        avatarComposeRecyclerView.scaleXY(child, childPoint.x, childPoint.y, destChildDistance)
+        return destChildDistance
     }
 
 
@@ -422,37 +450,88 @@ class AvatarComposeLayoutManager(val context: Context) : AvatarLayoutManager(),
         if (dx == 0 && dy == 0) {
             return Pair(0, 0)
         }
-        fakeScrollX += dx
-        fakeScrollY += dy
-
+        val scrollXY = checkIfScroll(dx, dy)
+        if (scrollXY.first == 0 && scrollXY.second == 0) {
+            return Pair(0, 0)
+        }
+        fakeScrollX += scrollXY.first
+        fakeScrollY += scrollXY.second
         offsetChild(-dx, -dy, state)
-
-
+//        offsetChild(-dx, -dy, state)
         return Pair(dx, dy)
     }
 
-    private fun offsetChild(dx: Int, dy: Int, state: RecyclerView.State) {
-        val childCount = getVisibleCount(state)
-        for (position in 0 until childCount) {
-            val child = getChildAt(position)
-            if (child != null) {
-                offsetChildHorAndVer(child, dx, dy)
-                shapeChange(child, position)
-                bindRealViewHolderIfNeed(child, position)
-            }
+//    fun damping(x: Float, max: Float): Float {
+//        var y = Math.abs(x);
+//
+//        y = (0.82231 * max / (1 + 4338.47 / Math.pow(y, 1.14791))).toFloat()
+//
+//        return Math.round(if (x < 0f) -y else y).toFloat()
+//    }
+
+    private var realScrollXTotal: Float = 0f
+    private var realScrollYTotal: Float = 0f
+    private fun checkIfScroll(dx: Int, dy: Int): Pair<Int, Int> {
+        val distance = calDistance(fakeScrollX + dx, fakeScrollY + dy)
+        val maxDistance = maxCircleRadius.toFloat() + 200f
+        realScrollXTotal += dx
+        realScrollYTotal += dy
+        realScrollXTotal = min(maxDistance, realScrollXTotal)
+        realScrollYTotal = min(maxDistance, realScrollXTotal)
+        if (distance <= maxDistance) {
+            return Pair.create(dx, dy)
+        } else {
+            return Pair.create(0, 0)
+//            val dis = min(maxDistance, distance.toFloat())
+//            var damping = 1 - (dis - maxCircleRadius) / 200f // 1..0
+//            //0.3-0.0
+//            damping *= 0.4f
+////            val ratio = (dis + (dis - maxCircleRadius) * damping) / maxDistance
+//            val resDx = Math.round(dx * damping)
+//            val resDy = Math.round(dy * damping)
+//            return Pair.create(resDx, resDy)
         }
     }
 
 
-//    private fun scrollHorANndVerInterval(
-//        dx: Int,
-//        dy: Int,
-//        recycler: RecyclerView.Recycler?,
-//        state: RecyclerView.State?
-//    ){
-//
-//    }
-//
+    private fun calDistance(x: Int, y: Int): Int {
+        return sqrt(abs(x).toDouble().pow(2) + abs(y).toDouble().pow(2)).toInt()
+    }
+
+
+    private fun offsetChild(dx: Int, dy: Int, state: RecyclerView.State) {
+        val childCount = getVisibleCount(state)
+        var destPosition: Int = 0
+        var destChildDistance = 0f
+        var minCloseDistance: Float = Float.MAX_VALUE
+        for (position in 0 until childCount) {
+            val child = findViewByPosition(position)
+            if (child != null) {
+                offsetChildHorAndVer(child, dx, dy)
+                destChildDistance = shapeChange(child, position)
+                bindRealViewHolderIfNeed(child, position)
+            }
+            if (destChildDistance < minCloseDistance) {
+                minCloseDistance = destChildDistance
+                destPosition = position
+            }
+        }
+        setCenterPosition(destPosition)
+
+    }
+
+    private fun setCenterPosition(destPosition: Int) {
+        val lastPosition = currentPosition
+        if (lastPosition != destPosition) {
+            currentPosition = destPosition
+            notifyCenterChanged(lastPosition, currentPosition)
+        }
+    }
+
+    private fun notifyCenterChanged(lastPosition: Int, currentPosition: Int) {
+        onCenterChangedListener?.onCenter(lastPosition, currentPosition)
+    }
+
 
     override fun scrollHorizontallyBy(
         dx: Int,
@@ -481,15 +560,30 @@ class AvatarComposeLayoutManager(val context: Context) : AvatarLayoutManager(),
         )
     }
 
-    private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = Color.CYAN
+        style = Paint.Style.STROKE
+        strokeWidth = 5f
+    }
 
 
     override fun onDraw(canvas: Canvas) {
-        paint.color = Color.CYAN
-        val restore = canvas.saveCount
+        val restore = canvas.save()
+        paint.strokeWidth = 5f
         canvas.translate(-fakeScrollX.toFloat(), -fakeScrollY.toFloat())
         canvas.drawRect(viewRegion, paint)
+        canvas.drawCircle(
+            getCenterPoint().x.toFloat(),
+            getCenterPoint().y.toFloat(),
+            maxCircleRadius.toFloat(),
+            paint
+        )
+        paint.strokeWidth = 10f
+        canvas.drawPoint(viewRegion.exactCenterX(), viewRegion.exactCenterY(), paint)
         canvas.restoreToCount(restore)
     }
 
+    interface OnCenterChangedListener {
+        fun onCenter(lastPosition: Int, currentPosition: Int)
+    }
 }

@@ -1,11 +1,13 @@
 package com.demon.yu.avatar.interact
 
 import android.content.Context
-import android.graphics.*
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.Point
+import android.graphics.Rect
 import android.util.AttributeSet
 import android.view.View
 import androidx.annotation.Px
-import androidx.core.graphics.toRectF
 import androidx.recyclerview.widget.AvatarRecyclerView
 import com.demon.yu.extenstion.dp2Px
 import com.demon.yu.view.recyclerview.copy
@@ -79,19 +81,23 @@ class AvatarComposeRecyclerView(context: Context, attr: AttributeSet? = null) :
 //        if (BuildConfig.DEBUG.not() || isInEditMode.not()) {
 //            return
 //        }
-        paint.color = Color.RED
-        paint.style = Paint.Style.STROKE
-        paint.strokeWidth = 2f.dp2Px().toFloat()
-        canvas.drawCircle(centerX.toFloat(), centerY.toFloat(), radiusDouble.toFloat(), paint)
-        paint.color = Color.BLUE
-        canvas.drawCircle(centerX.toFloat(), centerY.toFloat(), radius.toFloat(), paint)
-        canvas.drawRoundRect(
-            centerRegionRect.toRectF(),
-            cornerRadius.toFloat(),
-            cornerRadius.toFloat(),
-            paint
-        )
+//        paint.color = Color.RED
+//        paint.style = Paint.Style.STROKE
+//        paint.strokeWidth = 2f.dp2Px().toFloat()
+//        canvas.drawCircle(centerX.toFloat(), centerY.toFloat(), radiusDouble.toFloat(), paint)
+//        paint.color = Color.BLUE
+//        canvas.drawCircle(centerX.toFloat(), centerY.toFloat(), radius.toFloat(), paint)
+//        canvas.drawRoundRect(
+//            centerRegionRect.toRectF(),
+//            cornerRadius.toFloat(),
+//            cornerRadius.toFloat(),
+//            paint
+//        )
 
+    }
+
+    fun getCenterPoint(): Point {
+        return Point(centerX, centerY)
     }
 
 
@@ -183,10 +189,6 @@ class AvatarComposeRecyclerView(context: Context, attr: AttributeSet? = null) :
         ).toFloat()
     }
 
-
-    override fun scrollBy(x: Int, y: Int) {
-        super.scrollBy(x, y)
-    }
 
     interface OnLayoutListener {
         fun onCenter(point: Point)

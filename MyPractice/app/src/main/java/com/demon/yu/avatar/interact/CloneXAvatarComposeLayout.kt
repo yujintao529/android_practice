@@ -31,7 +31,7 @@ class CloneXAvatarComposeLayout(context: Context, attrs: AttributeSet? = null) :
 
     private var currentCenterChild: View? = null
     private var currentCenterPosition: Int = -1
-    var onCenterChangeListener: OnCenterChangeListener? = null
+    var onCenterChangeListener: OnComposeLayoutListener? = null
 
     private val scrollToCenterCallbackRunnable = Runnable {
         circleImageView.animate().alpha(1f).setDuration(80L).start()
@@ -56,8 +56,10 @@ class CloneXAvatarComposeLayout(context: Context, attrs: AttributeSet? = null) :
         avatarComposeLayoutManager = AvatarComposeLayoutManager(context)
         avatarComposeRecyclerView.layoutManager = avatarComposeLayoutManager
         avatarComposeRecyclerView.adapter = adapter
-        avatarComposeRecyclerView.addOnScrollListener(ComposeOnScrollListener())
+        val listener = ComposeOnScrollListener()
+        avatarComposeRecyclerView.addOnScrollListener(listener)
         avatarComposeRecyclerView.onDrawListener = avatarComposeLayoutManager
+        avatarComposeLayoutManager.onCenterChangedListener = listener
     }
 
     fun updateData(list: List<MyStaticObj>) {
@@ -69,23 +71,44 @@ class CloneXAvatarComposeLayout(context: Context, attrs: AttributeSet? = null) :
 //        Log.d(TAG, "onScrollChanged l=$l,t=$t")
     }
 
-    private inner class ComposeOnScrollListener : RecyclerView.OnScrollListener() {
+
+    private inner class ComposeOnScrollListener : RecyclerView.OnScrollListener(),
+        AvatarComposeLayoutManager.OnCenterChangedListener {
         private var lastState = -1 //初始化状态
-        private var enableScrollVibrator = false
+        private var currentPosition = -1
+
         override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
             super.onScrollStateChanged(recyclerView, newState)
             Log.d(TAG, "onScrollStateChanged newState=$newState")
             if (newState == RecyclerView.SCROLL_STATE_DRAGGING ||
                 (lastState != RecyclerView.SCROLL_STATE_DRAGGING && newState == RecyclerView.SCROLL_STATE_SETTLING)
             ) {
-                Log.d(TAG, "onScrollStateChanged newState=$newState")
                 removeCallbacks(scrollToCenterCallbackRunnable)
                 circleImageView.alpha = 0f
                 onCenterChangeListener?.onScrolled()
             }
-            enableScrollVibrator = newState == RecyclerView.SCROLL_STATE_DRAGGING
             if (lastState != newState && newState == RecyclerView.SCROLL_STATE_IDLE) {
                 recyclerView as AvatarComposeRecyclerView
+//                if (currentPosition == -1) {
+//                    return
+//                }
+//                val childView =
+//                    avatarComposeLayoutManager.findViewByPosition(currentPosition) ?: return
+//                val centerPoint = FakeLayoutCoorExchangeUtils.getCenterPoint(childView)
+//                val destChildDistance =
+//                    recyclerView.getDistance(centerPoint.x, centerPoint.y)
+//                if (destChildDistance != 0f) {
+//                    val scrollDuration =
+//                        computeScrollDuration(centerPoint.x, centerPoint.y, 0, 0)
+//                    recyclerView.scrollToCenter(
+//                        centerPoint.x,
+//                        centerPoint.y,
+//                        scrollDuration
+//                    )
+//                    removeCallbacks(scrollToCenterCallbackRunnable)
+//                    postDelayed(scrollToCenterCallbackRunnable, scrollDuration.toLong() / 2)
+//                }
+
                 var destChild: View? = null
                 var destPosition: Int = 0
                 var destChildDistance: Float = 0f
@@ -125,44 +148,52 @@ class CloneXAvatarComposeLayout(context: Context, attrs: AttributeSet? = null) :
         override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
             super.onScrolled(recyclerView, dx, dy)
             recyclerView as AvatarComposeRecyclerView
-            var destChild: View? = null
-            var destPosition: Int = 0
-            var destChildDistance: Float = 0f
-            var maxCloseDistance: Float = Float.MAX_VALUE
-            val init = System.currentTimeMillis()
+//            var destChild: View? = null
+//            var destPosition: Int = 0
+//            var destChildDistance: Float = 0f
+//            var maxCloseDistance: Float = Float.MAX_VALUE
+//            val init = System.currentTimeMillis()
 //            Debug.startMethodTracing()
-            for (i in 0..adapter.itemCount) {
-                val child = avatarComposeLayoutManager.findViewByPosition(i)
-                if (child != null) {
-                    FakeLayoutCoorExchangeUtils.setCenterPivot(child)
-                    val point = FakeLayoutCoorExchangeUtils.getCenterPoint(child)
-                    destChildDistance =
-                        avatarComposeRecyclerView.calculateDistance(point.x, point.y)
-//                    recyclerView.translateXY(
-//                        child,
-//                        point.x,
-//                        point.y,
-//                        destChildDistance
-//                    )
-//                    recyclerView.scaleXY(child, point.x, point.y, destChildDistance)
-                    if (destChildDistance < maxCloseDistance) {
-                        maxCloseDistance = destChildDistance
-                        destChild = child
-                        destPosition = i
-                    }
-                }
-            }
-            if (destChild != null) {
-                if (currentCenterChild != destChild) {
-                    currentCenterChild = destChild
-                    currentCenterPosition = destPosition
-                    if (lastState != -1) {
-                        ComposeSystemUtils.vibrator(context, false)
-                    }
-                }
-            }
+//            for (i in 0..adapter.itemCount) {
+//                val child = avatarComposeLayoutManager.findViewByPosition(i)
+//                if (child != null) {
+//                    FakeLayoutCoorExchangeUtils.setCenterPivot(child)
+//                    val point = FakeLayoutCoorExchangeUtils.getCenterPoint(child)
+//                    destChildDistance =
+//                        avatarComposeRecyclerView.calculateDistance(point.x, point.y)
+////                    recyclerView.translateXY(
+////                        child,
+////                        point.x,
+////                        point.y,
+////                        destChildDistance
+////                    )
+////                    recyclerView.scaleXY(child, point.x, point.y, destChildDistance)
+//                    if (destChildDistance < maxCloseDistance) {
+//                        maxCloseDistance = destChildDistance
+//                        destChild = child
+//                        destPosition = i
+//                    }
+//                }
+//            }
+//            if (destChild != null) {
+//                if (currentCenterChild != destChild) {
+//                    currentCenterChild = destChild
+//                    currentCenterPosition = destPosition
+//                    if (lastState != -1) {
+//                        ComposeSystemUtils.vibrator(context, false)
+//                    }
+//                }
+//            }
 //            Debug.startMethodTracing()
-            Logger.debug(TAG, "execute time ${System.currentTimeMillis() - init}")
+//            Logger.debug(TAG, "execute time ${System.currentTimeMillis() - init}")
+        }
+
+        override fun onCenter(lastPosition: Int, currentPosition: Int) {
+            if (lastState != -1) {
+                ComposeSystemUtils.vibrator(context, false)
+            }
+            this.currentPosition = currentPosition
+            Logger.debug(TAG, "onCenter currentPosition = $currentPosition")
         }
     }
 
@@ -196,7 +227,7 @@ class CloneXAvatarComposeLayout(context: Context, attrs: AttributeSet? = null) :
         return Math.sin(f.toDouble()).toFloat()
     }
 
-    interface OnCenterChangeListener {
+    interface OnComposeLayoutListener {
         fun onCenter(view: View)
         fun onScrolled()
     }
