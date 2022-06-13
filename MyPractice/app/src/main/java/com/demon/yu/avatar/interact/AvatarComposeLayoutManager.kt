@@ -130,13 +130,26 @@ class AvatarComposeLayoutManager(val context: Context) : AvatarLayoutManager(),
             }
         }
         setCenterPosition(destPosition)
-        viewRegion.set(find4Coordinate()) //找到四周的范围
-        val point = getCenterPoint()
-        val centerDiffX = abs(viewRegion.exactCenterX() - point.x)
-        val centerDiffY = abs(viewRegion.exactCenterY() - point.y)
-        val radiusDiff = calDistance(centerDiffX.toInt(), centerDiffY.toInt())
-        maxCircleRadius = max(viewRegion.width(), viewRegion.height()) / 2 + radiusDiff
-        Logger.debug("AvatarComposeLayoutManager", "viewRegion=$viewRegion")
+        if (visibleChildCount == 1) {
+            maxCircleRadius = radius
+            val left = (measureWidth - maxCircleRadius * 2) / 2
+            val top = (measureHeight - maxCircleRadius * 2) / 2
+            viewRegion.set(
+                left,
+                top,
+                left + maxCircleRadius * 2,
+                top + maxCircleRadius * 2
+            ) //找到四周的范围
+        } else {
+            viewRegion.set(find4Coordinate()) //找到四周的范围
+            val point = getCenterPoint()
+            val centerDiffX = abs(viewRegion.exactCenterX() - point.x)
+            val centerDiffY = abs(viewRegion.exactCenterY() - point.y)
+            val radiusDiff = calDistance(centerDiffX.toInt(), centerDiffY.toInt())
+            maxCircleRadius = max(viewRegion.width(), viewRegion.height()) / 2 + radiusDiff
+        }
+
+//        Logger.debug("AvatarComposeLayoutManager", "viewRegion=$viewRegion")
 
 //        //删除无用detachView
 //        for (i in 0 until viewCache.size()) {
@@ -217,7 +230,6 @@ class AvatarComposeLayoutManager(val context: Context) : AvatarLayoutManager(),
 
     //先不复用的view的场景下也就是所有的view都添加的情况下，找到最上，最左，最右，最下的坐标，用来辅助是否可以滑动的情况
     private fun find4Coordinate(): Rect {
-        val radius = 60.dp2Px()
         val rect = Rect()
         coordinateCache.forEach { key, value ->
             if (value.x < rect.left || rect.left == 0) {
@@ -532,26 +544,6 @@ class AvatarComposeLayoutManager(val context: Context) : AvatarLayoutManager(),
         onCenterChangedListener?.onCenter(lastPosition, currentPosition)
     }
 
-
-    override fun scrollHorizontallyBy(
-        dx: Int,
-        recycler: RecyclerView.Recycler?,
-        state: RecyclerView.State?
-    ): Int {
-        throw IllegalAccessError("scrollHorizontallyBy not support please use scrollHorAndVerBy")
-//        offsetChildrenHorizontal(-dx)
-//        return dx
-    }
-
-    override fun scrollVerticallyBy(
-        dy: Int,
-        recycler: RecyclerView.Recycler?,
-        state: RecyclerView.State
-    ): Int {
-        throw IllegalAccessError("scrollVerticallyBy not support please use scrollHorAndVerBy")
-//        offsetChildrenVertical(-dy)
-//        return dy
-    }
 
     override fun generateDefaultLayoutParams(): RecyclerView.LayoutParams {
         return RecyclerView.LayoutParams(

@@ -2,7 +2,6 @@ package com.demon.yu.avatar.interact
 
 import android.content.Context
 import android.graphics.Canvas
-import android.graphics.Paint
 import android.graphics.Point
 import android.graphics.Rect
 import android.util.AttributeSet
@@ -23,8 +22,6 @@ class AvatarComposeRecyclerView(context: Context, attr: AttributeSet? = null) :
     private var maxScaleSize = 124f / 60f
 
     private var secondScaleSize = 85f / 60f
-
-    private val paint = Paint(Paint.ANTI_ALIAS_FLAG.or(Paint.DITHER_FLAG))
 
 
     private var centerX: Int = 0

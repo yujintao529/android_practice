@@ -51,4 +51,16 @@ abstract public class AvatarLayoutManager extends RecyclerView.LayoutManager {
     public boolean canScrollVertically() {
         return true;
     }
+
+    @Override
+    public final int scrollHorizontallyBy(int dx, RecyclerView.Recycler recycler, RecyclerView.State state) {
+        throw new IllegalAccessError("scrollHorizontallyBy not support please use scrollHorAndVerBy");
+    }
+
+    @Override
+    public final int scrollVerticallyBy(int dy, RecyclerView.Recycler recycler, RecyclerView.State state) {
+        throw new IllegalAccessError("scrollVerticallyBy not support please use scrollHorAndVerBy");
+    }
+
+
 }

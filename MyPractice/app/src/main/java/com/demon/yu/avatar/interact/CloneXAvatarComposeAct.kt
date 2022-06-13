@@ -27,7 +27,7 @@ class CloneXAvatarComposeAct : AppCompatActivity() {
         circleBg?.visibility = View.GONE
         lightInteractView?.updateList(createInteractModels(), true)
         cloneXAvatarComposeLayout = findViewById(R.id.cloneXAvatarComposeLayout)
-        cloneXAvatarComposeLayout?.updateData(createAvatarObj(10))
+        cloneXAvatarComposeLayout?.updateData(createAvatarObj(5))
         cloneXAvatarComposeLayout?.avatarComposeRecyclerView?.onLayoutListener =
             object : AvatarComposeRecyclerView.OnLayoutListener {
                 override fun onCenter(point: Point) {
@@ -63,7 +63,7 @@ class CloneXAvatarComposeAct : AppCompatActivity() {
 
 
     private fun createAvatarObj(number: Int): List<MyStaticObj> {
-        return (0..number).map { MyStaticObj(viewType = if (it < 50) 1 else 2) }.toList()
+        return (0 until number).map { MyStaticObj(viewType = if (it < 50) 1 else 2) }.toList()
     }
 
 }

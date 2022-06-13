@@ -33,7 +33,7 @@ class ClipSimpleDraweeView(context: Context, attr: AttributeSet? = null) :
      */
     fun initAvator() {
         val imageRequestBuilder =
-            ImageRequestBuilder.newBuilderWithSource(Uri.parse("asset:///mock_header2.webp"))
+            ImageRequestBuilder.newBuilderWithSource(Uri.parse("asset:///mock_header3.webp"))
                 .setRequestListener(object : BaseRequestListener() {
                     override fun onRequestFailure(
                         request: ImageRequest,
@@ -89,7 +89,7 @@ class ClipSimpleDraweeView(context: Context, attr: AttributeSet? = null) :
     }
 
     override fun getFakeTop(): Int { // 146 -124
-        return (22 * ratio).toInt()
+        return (23 * ratio).toInt()
     }
 
     override fun getFakeLeft(): Int { // (160-124)/2
