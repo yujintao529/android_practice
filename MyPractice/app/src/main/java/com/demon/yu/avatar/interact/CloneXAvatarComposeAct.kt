@@ -7,7 +7,7 @@ import android.view.View
 import android.widget.EditText
 import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
-import com.demon.yu.view.recyclerview.MyStaticObj
+import com.example.mypractice.Logger
 import com.example.mypractice.R
 
 class CloneXAvatarComposeAct : AppCompatActivity() {
@@ -31,13 +31,14 @@ class CloneXAvatarComposeAct : AppCompatActivity() {
         cloneXAvatarComposeLayout?.avatarComposeRecyclerView?.onLayoutListener =
             object : AvatarComposeRecyclerView.OnLayoutListener {
                 override fun onCenter(point: Point) {
+                    Logger.debug(CloneXComposeUiConfig.TAG, "onCenter point = $point")
                     lightInteractView?.setInteractPoint(point)
                 }
             }
         cloneXAvatarComposeLayout?.onCenterChangeListener =
-            object : CloneXAvatarComposeLayout.OnComposeLayoutListener {
-                override fun onCenter(view: View) {
-                    Log.d("CloneXAvatar", "OnCenterChangeListener onCenter")
+            object : CloneXAvatarComposeLayout.OnAvatarComposeListener {
+                override fun onCenter(position: Int, any: Any?) {
+                    Log.d("CloneXAvatar", "OnCenterChangeListener onCenter position=$position")
                 }
 
                 override fun onScrolled() {
@@ -62,8 +63,8 @@ class CloneXAvatarComposeAct : AppCompatActivity() {
     }
 
 
-    private fun createAvatarObj(number: Int): List<MyStaticObj> {
-        return (0 until number).map { MyStaticObj(viewType = if (it < 50) 1 else 2) }.toList()
+    private fun createAvatarObj(number: Int): List<CloneXStaticObj> {
+        return (0 until number).map { CloneXStaticObj(viewType = 2) }.toList()
     }
 
 }

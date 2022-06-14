@@ -3,7 +3,6 @@ package androidx.recyclerview.widget;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.util.Pair;
 import android.view.View;
 
@@ -61,7 +60,6 @@ public class AvatarRecyclerView extends RecyclerView {
 
     @Override
     void scrollStep(int dx, int dy, @Nullable int[] consumed) {
-        Log.d("AvatarRecyclerView", "scrollStep dx=" + dx + " dy=" + dy);
         startInterceptRequestLayout();
         onEnterLayoutOrScroll();
         TraceCompat.beginSection(TRACE_SCROLL_TAG);

@@ -4,6 +4,6 @@ import android.view.View
 import androidx.recyclerview.widget.AvatarRecyclerView
 
 
-class MyStaticViewHolder(view: View) : AvatarRecyclerView.AvatarViewHolder(view) {
+open class MyStaticViewHolder(view: View) : AvatarRecyclerView.AvatarViewHolder(view) {
 
 }

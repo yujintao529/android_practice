@@ -9,6 +9,7 @@
 
     <permission android:name="com.example.practice.RECEIVE_PRO" />
     <permission android:name="com.example.practice.SEND_PRO" />
+
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
@@ -493,9 +494,11 @@
         <activity
             android:name="com.demon.yu.avatar.interact.CloneXAvatarComposeAct"
             android:label="avatar/CloneXAvatarComposeAct"
-            android:theme="@style/AppTheme">
+            android:theme="@style/AppTheme"
+            android:windowSoftInputMode="adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="com.example.apidemons.CATEGORY_SAMPLES" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>

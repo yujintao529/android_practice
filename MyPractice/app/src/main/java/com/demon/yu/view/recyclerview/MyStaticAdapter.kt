@@ -8,9 +8,18 @@ import com.demon.yu.view.fresco.ClipSimpleDraweeView
 import com.demon.yu.view.fresco.FrescoAvatarUtils
 import com.facebook.drawee.view.SimpleDraweeView
 
-class MyStaticAdapter : AvatarRecyclerView.AvatarAdapter<MyStaticViewHolder>() {
+class MyStaticAdapter() : AvatarRecyclerView.AvatarAdapter<MyStaticViewHolder>() {
 
     private val listData = mutableListOf<MyStaticObj>()
+
+    init {
+        setHasStableIds(true)
+    }
+
+
+    override fun getItemId(position: Int): Long {
+        return position.toLong()
+    }
 
     fun update(data: List<MyStaticObj>) {
         listData.clear()
@@ -77,4 +86,6 @@ class MyStaticAdapter : AvatarRecyclerView.AvatarAdapter<MyStaticViewHolder>() {
             holder.itemView.stopAnimation()
         }
     }
+
+
 }
