@@ -29,7 +29,7 @@ class CloneXAvatarComposeAct : AppCompatActivity() {
         cloneXAvatarComposeLayout = findViewById(R.id.cloneXAvatarComposeLayout)
         cloneXAvatarComposeLayout?.updateData(createAvatarObj(5))
         cloneXAvatarComposeLayout?.avatarComposeRecyclerView?.onLayoutListener =
-            object : AvatarComposeRecyclerView.OnLayoutListener {
+            object : CloneXComposeRecyclerView.OnLayoutListener {
                 override fun onCenter(point: Point) {
                     Logger.debug(CloneXComposeUiConfig.TAG, "onCenter point = $point")
                     lightInteractView?.setInteractPoint(point)

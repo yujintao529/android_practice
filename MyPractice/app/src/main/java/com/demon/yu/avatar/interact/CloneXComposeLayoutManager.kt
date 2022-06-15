@@ -16,8 +16,8 @@ import com.example.mypractice.common.Common
 import kotlin.math.*
 
 
-class AvatarComposeLayoutManager(val context: Context) : AvatarLayoutManager(),
-    AvatarComposeRecyclerView.OnDrawListener {
+class CloneXComposeLayoutManager(val context: Context) : AvatarLayoutManager(),
+    CloneXComposeRecyclerView.OnDrawListener {
     private var measuredWidth: Int = 0
     private var measuredHeight: Int = 0
     private var centerX: Int = 0
@@ -32,7 +32,7 @@ class AvatarComposeLayoutManager(val context: Context) : AvatarLayoutManager(),
     private var scaleDistance = radiusDouble
 
     private val coordinateCache: SparseArray<Point> = SparseArray(200)
-    private var avatarComposeRecyclerView: AvatarComposeRecyclerView? = null
+    private var cloneXComposeRecyclerView: CloneXComposeRecyclerView? = null
 
 
     private var fakeScrollX: Int = 0
@@ -62,8 +62,8 @@ class AvatarComposeLayoutManager(val context: Context) : AvatarLayoutManager(),
 
     override fun setRecyclerView(recyclerView: RecyclerView?) {
         super.setRecyclerView(recyclerView)
-        avatarComposeRecyclerView = recyclerView as? AvatarComposeRecyclerView
-        avatarComposeRecyclerView?.onDrawListener = this
+        cloneXComposeRecyclerView = recyclerView as? CloneXComposeRecyclerView
+        cloneXComposeRecyclerView?.onDrawListener = this
     }
 
 
@@ -167,7 +167,7 @@ class AvatarComposeLayoutManager(val context: Context) : AvatarLayoutManager(),
 
 
     private fun getCenterPoint(): Point {
-        return avatarComposeRecyclerView?.getCenterPoint() ?: Point(
+        return cloneXComposeRecyclerView?.getCenterPoint() ?: Point(
             Common.screenWidth / 2,
             Common.screenHeight / 2
         )

@@ -19,10 +19,10 @@ class CloneXAvatarComposeLayout(context: Context, attrs: AttributeSet? = null) :
         private const val TAG = "CloneXAvatarComposeLayout"
     }
 
-    val avatarComposeRecyclerView = AvatarComposeRecyclerView(context)
+    val avatarComposeRecyclerView = CloneXComposeRecyclerView(context)
     private val circleImageView = ImageView(context)
 
-    var avatarComposeLayoutManager: AvatarComposeLayoutManager
+    var cloneXComposeLayoutManager: CloneXComposeLayoutManager
     private val adapter = CloneXComposeAdapter(this)
 
     //
@@ -46,12 +46,12 @@ class CloneXAvatarComposeLayout(context: Context, attrs: AttributeSet? = null) :
         circleImageView.setImageResource(R.drawable.avatar_compose_circle_shaddow)
         addView(circleImageView, lp)
         addView(avatarComposeRecyclerView, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
-        avatarComposeLayoutManager = AvatarComposeLayoutManager(context)
-        avatarComposeRecyclerView.layoutManager = avatarComposeLayoutManager
+        cloneXComposeLayoutManager = CloneXComposeLayoutManager(context)
+        avatarComposeRecyclerView.layoutManager = cloneXComposeLayoutManager
         avatarComposeRecyclerView.adapter = adapter
         val composeListener = ComposeOnScrollListener()
         avatarComposeRecyclerView.addOnScrollListener(composeListener)
-        avatarComposeLayoutManager.onCenterChangedListener = composeListener
+        cloneXComposeLayoutManager.onCenterChangedListener = composeListener
         post {
             circleImageView.pivotX = (circleImageView.width / 2).toFloat()
             circleImageView.pivotY = (circleImageView.height / 2).toFloat()
@@ -64,7 +64,7 @@ class CloneXAvatarComposeLayout(context: Context, attrs: AttributeSet? = null) :
     }
 
     private inner class ComposeOnScrollListener : RecyclerView.OnScrollListener(),
-        AvatarComposeLayoutManager.OnCenterChangedListener {
+        CloneXComposeLayoutManager.OnCenterChangedListener {
         private var lastState = -1 //初始化状态
 
         override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
@@ -80,17 +80,17 @@ class CloneXAvatarComposeLayout(context: Context, attrs: AttributeSet? = null) :
                 onCenterChangeListener?.onScrolled()
             }
             if (lastState != newState && newState == RecyclerView.SCROLL_STATE_IDLE) {
-                recyclerView as AvatarComposeRecyclerView
+                recyclerView as CloneXComposeRecyclerView
                 var destChild: View? = null
                 var destChildDistance: Float = 0f
                 var minCloseDistance: Float = Float.MAX_VALUE
 
                 for (i in 0 until adapter.itemCount) {
-                    val child = avatarComposeLayoutManager.findViewByPosition(i)
+                    val child = cloneXComposeLayoutManager.findViewByPosition(i)
                     if (child != null) {
                         val centerPoint = FakeLayoutCoorExchangeUtils.getCenterPoint(child)
                         destChildDistance =
-                            avatarComposeLayoutManager.calculateDistance(
+                            cloneXComposeLayoutManager.calculateDistance(
                                 centerPoint.x,
                                 centerPoint.y
                             )
@@ -172,7 +172,7 @@ class CloneXAvatarComposeLayout(context: Context, attrs: AttributeSet? = null) :
     }
 
     private fun getCurrentCenterViewLock(): View? {
-        return avatarComposeLayoutManager.findViewByPosition(currentCenterPosition)
+        return cloneXComposeLayoutManager.findViewByPosition(currentCenterPosition)
     }
 
     private fun getCurrentCenterModelLock(): Any? {

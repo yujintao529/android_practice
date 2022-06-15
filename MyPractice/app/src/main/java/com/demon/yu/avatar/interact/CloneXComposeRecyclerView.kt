@@ -10,7 +10,7 @@ import com.demon.yu.view.recyclerview.FakeLayoutCoorExchangeUtils
 import com.demon.yu.view.recyclerview.copy
 import com.example.mypractice.Logger
 
-class AvatarComposeRecyclerView(context: Context, attr: AttributeSet? = null) :
+class CloneXComposeRecyclerView(context: Context, attr: AttributeSet? = null) :
     AvatarRecyclerView(context, attr) {
     companion object {
         private const val MAX_SCROLL_TO_CENTER_DURATION = 2000
