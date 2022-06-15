@@ -116,8 +116,8 @@ class CloneXComposeLayoutManager(val context: Context) : AvatarLayoutManager(),
         val visibleChildCount = getVisibleCount(state)
         var destPosition: Int = 0
         var destChildDistance = 0f
-        fakeScrollY = 0
-        fakeScrollX = 0
+//        fakeScrollY = 0
+//        fakeScrollX = 0
         var minCloseDistance: Float = Float.MAX_VALUE
         for (position in visibleChildCount - 1 downTo 0) {
             val view = recycler.getViewForPosition(position)
@@ -125,7 +125,7 @@ class CloneXComposeLayoutManager(val context: Context) : AvatarLayoutManager(),
             measureChildWithMargins(view, 0, 0)
             layoutChildInternal(view, position, visibleChildCount)
             FakeLayoutCoorExchangeUtils.setCenterPivot(view)
-//            offsetChildHorAndVer(view, -fakeScrollX, -fakeScrollY)
+            offsetChildHorAndVer(view, -fakeScrollX, -fakeScrollY)
             destChildDistance = shapeChange(view, position)
             bindRealViewHolderIfNeed(view, position)
             if (destChildDistance < minCloseDistance) {
@@ -133,7 +133,13 @@ class CloneXComposeLayoutManager(val context: Context) : AvatarLayoutManager(),
                 destPosition = position
             }
         }
+
         setCenterPosition(destPosition)
+        if ((fakeScrollX != 0 || fakeScrollY != 0) && minCloseDistance != 0f) {
+            //有可能scroll造成更新后，没有滑动到中心，需要修正一下
+            scrollToPosition(currentPosition)
+        }
+
         if (visibleChildCount == 1) {
             maxCircleRadius = radius
             val left = (measuredWidth - maxCircleRadius * 2) / 2
@@ -153,8 +159,23 @@ class CloneXComposeLayoutManager(val context: Context) : AvatarLayoutManager(),
             maxCircleRadius =
                 (max(viewRegion.width(), viewRegion.height()) / 2 + radiusDiff).toInt()
         }
+        Logger.debug(
+            CloneXComposeUiConfig.TAG,
+            "viewRegion =  $viewRegion, maxCircleRadius= $maxCircleRadius"
+        )
     }
 
+    override fun scrollToPosition(position: Int) {
+        val centerChild = findViewByPosition(position) ?: return
+        val childPoint = FakeLayoutCoorExchangeUtils.getCenterPoint(centerChild)
+        val diffX = centerX - childPoint.x
+        val diffY = centerY - childPoint.y
+        fakeScrollX -= diffX
+        fakeScrollY -= diffY
+        avatarRecyclerView?.post {
+            requestLayout()
+        }
+    }
 
     fun calculateDistance(x: Int, y: Int): Float {
         return calDistance(x - centerX, y - centerY)
@@ -193,13 +214,13 @@ class CloneXComposeLayoutManager(val context: Context) : AvatarLayoutManager(),
     private fun shapeChange(child: View, position: Int): Float {
         val childPoint = FakeLayoutCoorExchangeUtils.getCenterPoint(child)
         val destChildDistance = calculateDistance(childPoint.x, childPoint.y)
-        translateXY(
-            child,
-            childPoint.x,
-            childPoint.y,
-            destChildDistance
-        )
-        scaleXY(child, childPoint.x, childPoint.y, destChildDistance)
+//        translateXY(
+//            child,
+//            childPoint.x,
+//            childPoint.y,
+//            destChildDistance
+//        )
+//        scaleXY(child, childPoint.x, childPoint.y, destChildDistance)
         return destChildDistance
     }
 
@@ -219,9 +240,9 @@ class CloneXComposeLayoutManager(val context: Context) : AvatarLayoutManager(),
 
     private fun calculateChildCoordinate(position: Int, childCount: Int): Point {
         var cache = coordinateCache.get(position)
-        if (cache != null) {
-            return cache
-        }
+//        if (cache != null) {
+//            return cache
+//        }
         if (position == 0) {
             cache = Point(measuredWidth / 2, measuredHeight / 2)
             coordinateCache.put(position, cache)

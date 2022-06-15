@@ -500,7 +500,6 @@
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="com.example.apidemons.CATEGORY_SAMPLES" />
-                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 

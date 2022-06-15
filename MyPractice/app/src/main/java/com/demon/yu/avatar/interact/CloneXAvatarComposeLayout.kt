@@ -36,6 +36,7 @@ class CloneXAvatarComposeLayout(context: Context, attrs: AttributeSet? = null) :
     private val maxScaleSize = 124f / 60f
 
     private val scrollToCenterCallbackRunnable = Runnable {
+        Logger.debug(TAG, "onScrollStateChanged circleImageView alpha= 1")
         circleImageView.animate().alpha(1f).setDuration(80L).start()
     }
 
@@ -58,7 +59,12 @@ class CloneXAvatarComposeLayout(context: Context, attrs: AttributeSet? = null) :
         }
     }
 
+    private var lastCount = 0
     fun updateData(list: List<CloneXStaticObj>) {
+        if (lastCount >= 7) {
+            avatarComposeRecyclerView.itemAnimator = null
+        }
+        lastCount = list.size
         adapter.update(list)
         scrollToCenterCallbackRunnable.run()
     }
@@ -75,7 +81,9 @@ class CloneXAvatarComposeLayout(context: Context, attrs: AttributeSet? = null) :
             if (newState == RecyclerView.SCROLL_STATE_DRAGGING ||
                 (lastState != RecyclerView.SCROLL_STATE_DRAGGING && newState == RecyclerView.SCROLL_STATE_SETTLING)
             ) {
+                Logger.debug(TAG, "onScrollStateChanged circleImageView alpha= 0")
                 removeCallbacks(scrollToCenterCallbackRunnable)
+                circleImageView.animate().cancel()
                 circleImageView.alpha = 0f
                 onCenterChangeListener?.onScrolled()
             }

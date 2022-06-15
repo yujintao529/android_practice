@@ -55,6 +55,7 @@ class CloneXComposeRecyclerView(context: Context, attr: AttributeSet? = null) :
         smoothScrollBy(x - centerX, y - centerY, null, duration)
     }
 
+
     /**
      * @return int 滑动预估时间
      */
