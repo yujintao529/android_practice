@@ -2,6 +2,7 @@ package com.demon.yu.avatar.interact
 
 import android.animation.ValueAnimator
 import android.content.Context
+import android.content.Intent
 import android.util.AttributeSet
 import android.util.Log
 import android.view.Gravity
@@ -9,6 +10,7 @@ import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
+import com.demon.yu.view.FrescoWebpViewAct
 import com.demon.yu.view.recyclerview.FakeLayoutCoorExchangeUtils
 import com.example.mypractice.Logger
 import com.example.mypractice.R
@@ -222,5 +224,7 @@ class CloneXAvatarComposeLayout(context: Context, attrs: AttributeSet? = null) :
             avatarComposeRecyclerView.scrollCenterToPosition(position)
             return
         }
+        val intent = Intent(context, FrescoWebpViewAct::class.java)
+        context.startActivity(intent)
     }
 }

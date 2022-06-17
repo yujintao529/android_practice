@@ -137,7 +137,7 @@ class CloneXComposeLayoutManager(val context: Context) : AvatarLayoutManager(),
         setCenterPosition(destPosition)
         if ((fakeScrollX != 0 || fakeScrollY != 0) && minCloseDistance != 0f) {
             //有可能scroll造成更新后，没有滑动到中心，需要修正一下
-            scrollToPosition(currentPosition)
+            avatarRecyclerView.smoothScrollToPosition(currentPosition)
         }
 
         if (visibleChildCount == 1) {
@@ -172,9 +172,17 @@ class CloneXComposeLayoutManager(val context: Context) : AvatarLayoutManager(),
         val diffY = centerY - childPoint.y
         fakeScrollX -= diffX
         fakeScrollY -= diffY
-        avatarRecyclerView?.post {
+        postOnAnimation {
             requestLayout()
         }
+    }
+
+    override fun smoothScrollToPosition(
+        recyclerView: RecyclerView?,
+        state: RecyclerView.State?,
+        position: Int
+    ) {
+        cloneXComposeRecyclerView?.scrollCenterToPosition(position)
     }
 
     fun calculateDistance(x: Int, y: Int): Float {
@@ -214,13 +222,13 @@ class CloneXComposeLayoutManager(val context: Context) : AvatarLayoutManager(),
     private fun shapeChange(child: View, position: Int): Float {
         val childPoint = FakeLayoutCoorExchangeUtils.getCenterPoint(child)
         val destChildDistance = calculateDistance(childPoint.x, childPoint.y)
-//        translateXY(
-//            child,
-//            childPoint.x,
-//            childPoint.y,
-//            destChildDistance
-//        )
-//        scaleXY(child, childPoint.x, childPoint.y, destChildDistance)
+        translateXY(
+            child,
+            childPoint.x,
+            childPoint.y,
+            destChildDistance
+        )
+        scaleXY(child, childPoint.x, childPoint.y, destChildDistance)
         return destChildDistance
     }
 
