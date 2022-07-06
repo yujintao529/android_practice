@@ -119,6 +119,7 @@ class CloneXComposeLayoutManager(val context: Context) : AvatarLayoutManager(),
 //        fakeScrollY = 0
 //        fakeScrollX = 0
         var minCloseDistance: Float = Float.MAX_VALUE
+//        for (position in visibleChildCount - 1 downTo 0) {
         for (position in visibleChildCount - 1 downTo 0) {
             val view = recycler.getViewForPosition(position)
             addView(view)

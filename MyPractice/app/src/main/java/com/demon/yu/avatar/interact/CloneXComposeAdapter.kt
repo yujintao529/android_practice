@@ -2,11 +2,13 @@ package com.demon.yu.avatar.interact
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.AvatarRecyclerView
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.demon.yu.extenstion.dp2Px
 import com.demon.yu.view.fresco.ClipSimpleDraweeView
 import com.demon.yu.view.fresco.FrescoAvatarUtils
 import com.demon.yu.view.recyclerview.MyCircleView
+import com.example.mypractice.Logger
 import com.facebook.drawee.view.SimpleDraweeView
 
 class CloneXComposeAdapter(val onComposeAdapterListener: OnComposeAdapterListener) :
@@ -15,7 +17,52 @@ class CloneXComposeAdapter(val onComposeAdapterListener: OnComposeAdapterListene
 
     init {
         //不要修改这个，这个adapter不需要实现itemChanged这些，因为是稳定的stableids
-        setHasStableIds(true)
+//        setHasStableIds(true)
+        registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+            override fun onChanged() {
+                super.onChanged()
+            }
+
+            override fun onItemRangeChanged(positionStart: Int, itemCount: Int) {
+                super.onItemRangeChanged(positionStart, itemCount)
+                Logger.debug(
+                    "CloneXComposeAdapter",
+                    "onItemRangeChanged positionStart =$positionStart,itemCount=$itemCount"
+                )
+            }
+
+            override fun onItemRangeChanged(positionStart: Int, itemCount: Int, payload: Any?) {
+                super.onItemRangeChanged(positionStart, itemCount, payload)
+                Logger.debug(
+                    "CloneXComposeAdapter",
+                    "onItemRangeChanged positionStart =$positionStart,itemCount=$itemCount"
+                )
+            }
+
+            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                super.onItemRangeInserted(positionStart, itemCount)
+                Logger.debug(
+                    "CloneXComposeAdapter",
+                    "onItemRangeInserted positionStart =$positionStart,itemCount=$itemCount"
+                )
+            }
+
+            override fun onItemRangeRemoved(positionStart: Int, itemCount: Int) {
+                super.onItemRangeRemoved(positionStart, itemCount)
+                Logger.debug(
+                    "CloneXComposeAdapter",
+                    "onItemRangeRemoved positionStart =$positionStart,itemCount=$itemCount"
+                )
+            }
+
+            override fun onItemRangeMoved(fromPosition: Int, toPosition: Int, itemCount: Int) {
+                super.onItemRangeMoved(fromPosition, toPosition, itemCount)
+                Logger.debug(
+                    "CloneXComposeAdapter",
+                    "onItemRangeMoved fromPosition =$fromPosition,toPosition=$toPosition,itemCount=$itemCount"
+                )
+            }
+        })
     }
 
     private val listData = mutableListOf<CloneXStaticObj>()
@@ -24,6 +71,20 @@ class CloneXComposeAdapter(val onComposeAdapterListener: OnComposeAdapterListene
         listData.clear()
         listData.addAll(data)
         notifyDataSetChanged()
+    }
+
+    fun notifyItemChanged(data: List<CloneXStaticObj>) {
+        val oldList = ArrayList<CloneXStaticObj>(listData)
+        listData.clear()
+        listData.addAll(data)
+        DiffUtil.calculateDiff(DiffCallback(oldList, listData)).dispatchUpdatesTo(this)
+    }
+
+    fun notifyItemChanged(position: Int, obj: CloneXStaticObj) {
+        if (listData.size > position) {
+            listData[position] = obj
+            notifyItemChanged(position)
+        }
     }
 
     override fun getItemId(position: Int): Long {
@@ -89,11 +150,11 @@ class CloneXComposeAdapter(val onComposeAdapterListener: OnComposeAdapterListene
         (holder.itemView as? MyCircleView)?.color = myStaticObj.color
         (holder.itemView as? MyCircleView)?.number = position
         if (holder.itemView is ClipSimpleDraweeView) {
-            holder.itemView.initAvator()
+            holder.itemView.initAvatar(myStaticObj.assetAvatarUri)
         } else if (holder.itemView is SimpleDraweeView) {
             FrescoAvatarUtils.bindAvatar(
                 holder.itemView,
-                "asset:///avator.webp",
+                "asset:///avatar1.webp",
                 60.dp2Px(),
                 60.dp2Px()
             )
@@ -114,5 +175,38 @@ class CloneXComposeAdapter(val onComposeAdapterListener: OnComposeAdapterListene
     override fun onHide(holder: CloneXComposeViewHolder<*>, position: Int) {
         super.onHide(holder, position)
         holder.onHide(position)
+    }
+
+    class DiffCallback(val origin: List<CloneXStaticObj>, val newList: List<CloneXStaticObj>) :
+        DiffUtil.Callback() {
+        override fun getOldListSize(): Int {
+            return origin.size
+        }
+
+        override fun getNewListSize(): Int {
+            return newList.size
+        }
+
+        override fun getChangePayload(oldItemPosition: Int, newItemPosition: Int): Any? {
+            return super.getChangePayload(oldItemPosition, newItemPosition)
+        }
+
+        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            return areContentsTheSame(oldItemPosition, newItemPosition)
+        }
+
+        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            val oldObj = origin[oldItemPosition]
+            val newObj = newList[newItemPosition]
+
+            if (oldObj.viewType == 1 && newObj.viewType == 1) {
+                return oldObj.assetAvatarUri?.toString() == newObj.assetAvatarUri?.toString()
+            }
+            if (oldObj.viewType == 2 && newObj.viewType == 2) {
+                return oldObj.color == newObj.color
+            }
+            return false
+        }
+
     }
 }

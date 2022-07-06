@@ -60,11 +60,10 @@ class MyStaticAdapter() : AvatarRecyclerView.AvatarAdapter<MyStaticViewHolder>()
         (holder.itemView as? MyCircleView)?.color = myStaticObj.color
         (holder.itemView as? MyCircleView)?.number = position
         if (holder.itemView is ClipSimpleDraweeView) {
-            holder.itemView.initAvator()
         } else if (holder.itemView is SimpleDraweeView) {
             FrescoAvatarUtils.bindAvatar(
                 holder.itemView,
-                "asset:///avator.webp",
+                "asset:///avatar1.webp",
                 60.dp2Px(),
                 60.dp2Px()
             )

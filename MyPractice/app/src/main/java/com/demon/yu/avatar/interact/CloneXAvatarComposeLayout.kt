@@ -55,6 +55,7 @@ class CloneXAvatarComposeLayout(context: Context, attrs: AttributeSet? = null) :
         val composeListener = ComposeOnScrollListener()
         avatarComposeRecyclerView.addOnScrollListener(composeListener)
         cloneXComposeLayoutManager.onCenterChangedListener = composeListener
+        avatarComposeRecyclerView.itemAnimator = null
         post {
             circleImageView.pivotX = (circleImageView.width / 2).toFloat()
             circleImageView.pivotY = (circleImageView.height / 2).toFloat()
@@ -70,6 +71,17 @@ class CloneXAvatarComposeLayout(context: Context, attrs: AttributeSet? = null) :
         adapter.update(list)
         scrollToCenterCallbackRunnable.run()
     }
+
+    fun notifyItemChanged(data: List<CloneXStaticObj>) {
+        adapter.notifyItemChanged(data)
+        lastCount = data.size
+        scrollToCenterCallbackRunnable.run()
+    }
+
+    fun notifyItemChanged(position: Int, obj: CloneXStaticObj) {
+        adapter.notifyItemChanged(position, obj)
+    }
+
 
     private inner class ComposeOnScrollListener : RecyclerView.OnScrollListener(),
         CloneXComposeLayoutManager.OnCenterChangedListener {
@@ -220,6 +232,7 @@ class CloneXAvatarComposeLayout(context: Context, attrs: AttributeSet? = null) :
 
 
     override fun onClick(model: ComposeUserModel, position: Int) {
+        Logger.debug("CloneXComposeAdapter", "position =$position,model=$model")
         if (currentCenterPosition != position) {
             avatarComposeRecyclerView.scrollCenterToPosition(position)
             return

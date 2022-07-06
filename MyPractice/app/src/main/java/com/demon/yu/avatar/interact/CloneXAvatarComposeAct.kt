@@ -1,6 +1,7 @@
 package com.demon.yu.avatar.interact
 
 import android.graphics.Point
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -9,6 +10,7 @@ import android.widget.FrameLayout
 import androidx.appcompat.app.AppCompatActivity
 import com.example.mypractice.Logger
 import com.example.mypractice.R
+import kotlin.random.Random
 
 class CloneXAvatarComposeAct : AppCompatActivity() {
     private var lightInteractView: LightInteractView? = null
@@ -27,7 +29,7 @@ class CloneXAvatarComposeAct : AppCompatActivity() {
         circleBg?.visibility = View.GONE
         lightInteractView?.updateList(createInteractModels(), true)
         cloneXAvatarComposeLayout = findViewById(R.id.cloneXAvatarComposeLayout)
-        cloneXAvatarComposeLayout?.updateData(createAvatarObj(16))
+        cloneXAvatarComposeLayout?.updateData(createColorObj(20))
         cloneXAvatarComposeLayout?.avatarComposeRecyclerView?.onLayoutListener =
             object : CloneXComposeRecyclerView.OnLayoutListener {
                 override fun onCenter(point: Point) {
@@ -50,7 +52,16 @@ class CloneXAvatarComposeAct : AppCompatActivity() {
             val input = findViewById<EditText>(R.id.inputNumber)
             val result = input.editableText.toString().toIntOrNull()
             if (result != null && result > 0) {
-                cloneXAvatarComposeLayout?.updateData(createAvatarObj(result))
+//                val colorObj = createAvatarObj(1)
+//                val dest = mutableListOf<CloneXStaticObj>()
+//                dest.addAll(colorObj)
+//                dest.addAll(avatarObj)
+//                val obj = createAvatarWebpObj(Uri.parse("asset:///avatar2.webp"))
+//                cloneXAvatarComposeLayout?.notifyItemChanged(1, obj)
+//                val mutable = mutableListOf<CloneXStaticObj>()
+//                mutable.add(createAvatarWebpObj(Uri.parse("asset:///avatar2.webp")))
+//                mutable.add(createAvatarWebpObj(Uri.parse("asset:///avatar3.webp")))
+                cloneXAvatarComposeLayout?.notifyItemChanged(createColorObj(result - 1))
             }
         }
     }
@@ -63,7 +74,52 @@ class CloneXAvatarComposeAct : AppCompatActivity() {
     }
 
 
-    private fun createAvatarObj(number: Int): List<CloneXStaticObj> {
+    private fun createAvatarWebpObj(uri: Uri? = null): CloneXStaticObj {
+        return CloneXStaticObj(viewType = 1).apply {
+            assetAvatarUri = uri
+        }
+    }
+
+    private val assetsArray =
+        mutableListOf("asset:///avatar2.webp", "asset:///avatar1.webp", "asset:///avatar3.webp")
+
+    private fun createAvatar(number: Int): List<CloneXStaticObj> {
+        return (0 until number).map {
+            createAvatarWebpObj(Uri.parse(assetsArray[Random.nextInt(0, assetsArray.size)]))
+        }.toList()
+    }
+
+    private fun createAvatarAndColorObj(
+        colorNumber: Int,
+        placeHolderNumber: Int,
+        avatarNumber: Int
+    ): List<CloneXStaticObj> {
+        return (0 until (colorNumber + placeHolderNumber + avatarNumber)).map {
+            if (it < colorNumber) {
+                CloneXStaticObj(viewType = 2)
+            } else if (it < (placeHolderNumber + colorNumber)) {
+                createAvatarWebpObj(Uri.parse("asset:///avatar_placeholder_anim.webp"))
+            } else {
+                createAvatarWebpObj(Uri.parse("asset:///avatar2.webp"))
+            }
+        }.toList()
+    }
+
+    private fun createAvatarAndColorObj(
+        colorNumber: Int,
+        avatarNumber: Int
+    ): List<CloneXStaticObj> {
+        return (0 until (colorNumber + avatarNumber)).map {
+            if (it < avatarNumber) {
+                createAvatarWebpObj(Uri.parse("asset:///avatar2.webp"))
+            } else {
+                CloneXStaticObj(viewType = 2)
+            }
+        }.toList()
+    }
+
+
+    private fun createColorObj(number: Int): List<CloneXStaticObj> {
         return (0 until number).map { CloneXStaticObj(viewType = 2) }.toList()
     }
 

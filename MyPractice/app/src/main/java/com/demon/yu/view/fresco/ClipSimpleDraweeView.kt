@@ -31,9 +31,9 @@ class ClipSimpleDraweeView(context: Context, attr: AttributeSet? = null) :
     /**
      * 这个图片原始是200*200
      */
-    fun initAvator() {
+    fun initAvatar(uri: Uri? = null) {
         val imageRequestBuilder =
-            ImageRequestBuilder.newBuilderWithSource(Uri.parse("asset:///mock_header3.webp"))
+            ImageRequestBuilder.newBuilderWithSource(uri)
                 .setRequestListener(object : BaseRequestListener() {
                     override fun onRequestFailure(
                         request: ImageRequest,
