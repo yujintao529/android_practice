@@ -35,12 +35,13 @@ class CloneXComposeLayoutManager(val context: Context) : AvatarLayoutManager(),
     private var cloneXComposeRecyclerView: CloneXComposeRecyclerView? = null
 
 
-    private var fakeScrollX: Int = 0
-    private var fakeScrollY: Int = 0
     private var maxCircleRadius = 0
     private var currentPosition: Int = -1
     var onCenterChangedListener: OnCenterChangedListener? = null
 
+
+    private var showRegion = Rect()
+    private val layoutState = LayoutState()
 
     //仅支持matchParent及exactly width/height
     override fun onMeasure(
@@ -58,6 +59,7 @@ class CloneXComposeLayoutManager(val context: Context) : AvatarLayoutManager(),
         scaleDistance =
             (2 * cos(PI / 6) * radius).toInt() + (radiusDouble - (2 * cos(PI / 6) * radius).toInt()) / 6
         Logger.debug("AvatarComposeLayoutManager", "onMeasure centerX=$centerX,centerY=$centerY")
+        showRegion.set(-100, 100, measuredWidth + 100, measuredHeight + 100)
     }
 
     override fun setRecyclerView(recyclerView: RecyclerView?) {
@@ -78,6 +80,7 @@ class CloneXComposeLayoutManager(val context: Context) : AvatarLayoutManager(),
             removeAndRecycleAllViews(recycler);
             return
         }
+        offsetShowRegion()
         detachAndScrapAttachedViews(recycler)
         clearCoordinateCacheIfNeed(state.itemCount)
         fill(recycler, state)
@@ -116,17 +119,17 @@ class CloneXComposeLayoutManager(val context: Context) : AvatarLayoutManager(),
         val visibleChildCount = getVisibleCount(state)
         var destPosition: Int = 0
         var destChildDistance = 0f
-//        fakeScrollY = 0
-//        fakeScrollX = 0
         var minCloseDistance: Float = Float.MAX_VALUE
 //        for (position in visibleChildCount - 1 downTo 0) {
-        for (position in visibleChildCount - 1 downTo 0) {
+        for (position in 0 until visibleChildCount - 1) {
+
+
             val view = recycler.getViewForPosition(position)
             addView(view)
             measureChildWithMargins(view, 0, 0)
             layoutChildInternal(view, position, visibleChildCount)
             FakeLayoutCoorExchangeUtils.setCenterPivot(view)
-            offsetChildHorAndVer(view, -fakeScrollX, -fakeScrollY)
+            offsetChildHorAndVer(view, -layoutState.scrollX, -layoutState.scrollY)
             destChildDistance = shapeChange(view, position)
             bindRealViewHolderIfNeed(view, position)
             if (destChildDistance < minCloseDistance) {
@@ -136,7 +139,7 @@ class CloneXComposeLayoutManager(val context: Context) : AvatarLayoutManager(),
         }
 
         setCenterPosition(destPosition)
-        if ((fakeScrollX != 0 || fakeScrollY != 0) && minCloseDistance != 0f) {
+        if ((layoutState.scrollX != 0 || layoutState.scrollY != 0) && minCloseDistance != 0f) {
             //有可能scroll造成更新后，没有滑动到中心，需要修正一下
             avatarRecyclerView.smoothScrollToPosition(currentPosition)
         }
@@ -171,8 +174,8 @@ class CloneXComposeLayoutManager(val context: Context) : AvatarLayoutManager(),
         val childPoint = FakeLayoutCoorExchangeUtils.getCenterPoint(centerChild)
         val diffX = centerX - childPoint.x
         val diffY = centerY - childPoint.y
-        fakeScrollX -= diffX
-        fakeScrollY -= diffY
+        layoutState.scrollX -= diffX
+        layoutState.scrollY -= diffY
         postOnAnimation {
             requestLayout()
         }
@@ -574,10 +577,16 @@ class CloneXComposeLayoutManager(val context: Context) : AvatarLayoutManager(),
         if (scrollXY.first == 0 && scrollXY.second == 0) {
             return Pair(0, 0)
         }
-        fakeScrollX += scrollXY.first
-        fakeScrollY += scrollXY.second
+        layoutState.scrollX += scrollXY.first
+        layoutState.scrollY += scrollXY.second
+        offsetShowRegion()
         offsetChild(-dx, -dy, state)
         return Pair(dx, dy)
+    }
+
+    private fun offsetShowRegion() {
+        showRegion.set(0, 0, measuredWidth, measuredHeight)
+        showRegion.offset(layoutState.scrollX, layoutState.scrollY)
     }
 
     private fun offsetChild(dx: Int, dy: Int, state: RecyclerView.State) {
@@ -657,4 +666,17 @@ class CloneXComposeLayoutManager(val context: Context) : AvatarLayoutManager(),
         canvas.drawPoint(viewRegion.exactCenterX(), viewRegion.exactCenterY(), paint)
         canvas.restoreToCount(restore)
     }
+
+
+    private inner class LayoutState {
+        var scrollX: Int = 0
+        var scrollY: Int = 0
+
+        fun reset() {
+            scrollX = 0
+            scrollX = 0
+        }
+    }
+
 }
+
