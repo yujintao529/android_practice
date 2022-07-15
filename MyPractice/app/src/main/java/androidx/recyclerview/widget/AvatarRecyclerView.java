@@ -10,6 +10,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.os.TraceCompat;
 
+import com.example.mypractice.Logger;
+
 import java.util.List;
 
 
@@ -96,7 +98,10 @@ public class AvatarRecyclerView extends RecyclerView {
     @Override
     public boolean drawChild(Canvas canvas, View child, long drawingTime) {
         if (isVisible(child)) {
-            return super.drawChild(canvas, child, drawingTime);
+            TraceCompat.beginSection("avatarRecyclerView drawChild");
+            boolean result = super.drawChild(canvas, child, drawingTime);
+            TraceCompat.endSection();
+            return result;
         } else {
             return false;
         }
@@ -153,6 +158,7 @@ public class AvatarRecyclerView extends RecyclerView {
         @Override
         public final void onBindViewHolder(@NonNull VH holder, int position, @NonNull List<Object> payloads) {
             super.onBindViewHolder(holder, position, payloads);
+            Logger.debug("AvatarAdapter", "onBindViewHolder " + position + " ;" + holder);
         }
 
         @Override
@@ -167,5 +173,34 @@ public class AvatarRecyclerView extends RecyclerView {
 
         }
 
+        @Override
+        public void onViewRecycled(@NonNull VH holder) {
+            super.onViewRecycled(holder);
+            Logger.debug("AvatarAdapter", "onViewRecycled " + holder);
+        }
+
+        @Override
+        public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView) {
+            super.onAttachedToRecyclerView(recyclerView);
+            Logger.debug("AvatarAdapter", "onAttachedToRecyclerView ");
+        }
+
+        @Override
+        public void onDetachedFromRecyclerView(@NonNull RecyclerView recyclerView) {
+            super.onDetachedFromRecyclerView(recyclerView);
+            Logger.debug("AvatarAdapter", "onDetachedFromRecyclerView ");
+        }
+
+        @Override
+        public void onViewAttachedToWindow(@NonNull VH holder) {
+            super.onViewAttachedToWindow(holder);
+            Logger.debug("AvatarAdapter", "onViewAttachedToWindow " + holder);
+        }
+
+        @Override
+        public void onViewDetachedFromWindow(@NonNull VH holder) {
+            super.onViewDetachedFromWindow(holder);
+            Logger.debug("AvatarAdapter", "onViewDetachedFromWindow " + holder);
+        }
     }
 }

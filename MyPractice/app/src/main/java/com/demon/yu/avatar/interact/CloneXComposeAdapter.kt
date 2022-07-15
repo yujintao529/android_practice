@@ -124,7 +124,7 @@ class CloneXComposeAdapter(val onComposeAdapterListener: OnComposeAdapterListene
                 view.getDestWidth(60.dp2Px()),
                 view.getDestHeight(60.dp2Px())
             )
-            return CloneXStaticViewHolder(view)
+            return CloneXAnimViewHolder(view)
         } else {
             val simpleDraweeView = SimpleDraweeView(parent.context)
             simpleDraweeView.layoutParams = RecyclerView.LayoutParams(60.dp2Px(), 60.dp2Px())
@@ -147,18 +147,24 @@ class CloneXComposeAdapter(val onComposeAdapterListener: OnComposeAdapterListene
 
     override fun onRealBind(holder: CloneXComposeViewHolder<*>, position: Int) {
         val myStaticObj = listData[position]
-        (holder.itemView as? MyCircleView)?.color = myStaticObj.color
-        (holder.itemView as? MyCircleView)?.number = position
-        if (holder.itemView is ClipSimpleDraweeView) {
-            holder.itemView.initAvatar(myStaticObj.assetAvatarUri)
-        } else if (holder.itemView is SimpleDraweeView) {
-            FrescoAvatarUtils.bindAvatar(
-                holder.itemView,
-                "asset:///avatar1.webp",
-                60.dp2Px(),
-                60.dp2Px()
-            )
-            FrescoAvatarUtils.asCircle(holder.itemView)
+        Logger.debug("CloneXComposeAdapter", "onRealBind $position")
+        when {
+            holder is CloneXAnimViewHolder -> {
+                holder.bindData(myStaticObj, position, null)
+            }
+            holder.itemView is MyCircleView -> {
+                (holder.itemView as? MyCircleView)?.color = myStaticObj.color
+                (holder.itemView as? MyCircleView)?.number = position
+            }
+            holder.itemView is SimpleDraweeView -> {
+                FrescoAvatarUtils.bindAvatar(
+                    holder.itemView,
+                    "asset:///avatar1.webp",
+                    60.dp2Px(),
+                    60.dp2Px()
+                )
+                FrescoAvatarUtils.asCircle(holder.itemView)
+            }
         }
         holder.itemView.setOnClickListener {
             onComposeAdapterListener.onClick(ComposeUserModel(), position)

@@ -29,7 +29,7 @@ class CloneXAvatarComposeAct : AppCompatActivity() {
         circleBg?.visibility = View.GONE
         lightInteractView?.updateList(createInteractModels(), true)
         cloneXAvatarComposeLayout = findViewById(R.id.cloneXAvatarComposeLayout)
-        cloneXAvatarComposeLayout?.updateData(createColorObj(20))
+        cloneXAvatarComposeLayout?.updateData(createAvatar(100))
         cloneXAvatarComposeLayout?.avatarComposeRecyclerView?.onLayoutListener =
             object : CloneXComposeRecyclerView.OnLayoutListener {
                 override fun onCenter(point: Point) {
@@ -61,7 +61,7 @@ class CloneXAvatarComposeAct : AppCompatActivity() {
 //                val mutable = mutableListOf<CloneXStaticObj>()
 //                mutable.add(createAvatarWebpObj(Uri.parse("asset:///avatar2.webp")))
 //                mutable.add(createAvatarWebpObj(Uri.parse("asset:///avatar3.webp")))
-                cloneXAvatarComposeLayout?.notifyItemChanged(createColorObj(result - 1))
+                cloneXAvatarComposeLayout?.notifyItemChanged(createAvatar(result - 1))
             }
         }
     }
