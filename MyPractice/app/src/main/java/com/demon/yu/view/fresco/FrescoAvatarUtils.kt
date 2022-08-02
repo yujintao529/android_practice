@@ -9,6 +9,7 @@ import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.drawee.generic.RoundingParams
 import com.facebook.drawee.interfaces.DraweeController
 import com.facebook.drawee.view.SimpleDraweeView
+import com.facebook.imagepipeline.common.ImageDecodeOptions
 import com.facebook.imagepipeline.common.ImageDecodeOptionsBuilder
 import com.facebook.imagepipeline.common.ResizeOptions
 import com.facebook.imagepipeline.listener.BaseRequestListener
@@ -40,7 +41,7 @@ object FrescoAvatarUtils {
     }
 
     fun bindAvatar(simpleDraweeView: SimpleDraweeView, uri: String, width: Int, height: Int) {
-        val imageDecodeOptions = ImageDecodeOptionsBuilder()
+        val imageDecodeOptions = ImageDecodeOptions.newBuilder()
             .setForceStaticImage(true)
             .build()
         val imageRequestBuilder =

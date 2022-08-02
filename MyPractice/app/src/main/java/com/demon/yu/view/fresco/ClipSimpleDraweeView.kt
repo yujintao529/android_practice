@@ -47,9 +47,9 @@ class ClipSimpleDraweeView(context: Context, attr: AttributeSet? = null) :
                 })
         val controller: DraweeController = Fresco.newDraweeControllerBuilder()
             .setImageRequest(imageRequestBuilder.build())
+            .setOldController(controller)
             .setAutoPlayAnimations(true)
             .build()
-
 
         setController(controller)
     }

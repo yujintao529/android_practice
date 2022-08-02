@@ -61,7 +61,7 @@ class CloneXAvatarComposeAct : AppCompatActivity() {
 //                val mutable = mutableListOf<CloneXStaticObj>()
 //                mutable.add(createAvatarWebpObj(Uri.parse("asset:///avatar2.webp")))
 //                mutable.add(createAvatarWebpObj(Uri.parse("asset:///avatar3.webp")))
-                cloneXAvatarComposeLayout?.notifyItemChanged(createAvatar(result - 1))
+                cloneXAvatarComposeLayout?.notifyItemChanged(createAvatar(result ))
             }
         }
     }
