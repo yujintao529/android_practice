@@ -9,7 +9,8 @@ android {
     defaultConfig {
         consumerProguardFile("consumer-rules.pro")
         ndk {
-            abiFilters.add("x86")
+//            abiFilters.add("x86")
+            abiFilters.add("x86_64")
             abiFilters.add("armeabi-v7a")
         }
         //特别奇葩，必须得像下面配置那样
