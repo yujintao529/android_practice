@@ -29,7 +29,7 @@ class CloneXAvatarComposeAct : AppCompatActivity() {
         circleBg?.visibility = View.GONE
         lightInteractView?.updateList(createInteractModels(), true)
         cloneXAvatarComposeLayout = findViewById(R.id.cloneXAvatarComposeLayout)
-        cloneXAvatarComposeLayout?.updateData(createAvatar(100))
+        cloneXAvatarComposeLayout?.updateData(createColorObj(100))
         cloneXAvatarComposeLayout?.avatarComposeRecyclerView?.onLayoutListener =
             object : CloneXComposeRecyclerView.OnLayoutListener {
                 override fun onCenter(point: Point) {

@@ -63,7 +63,7 @@ class CloneXComposeLayoutManager(val context: Context) : AvatarLayoutManager(),
         scaleDistance =
             (2 * cos(PI / 6) * radius).toInt() + (radiusDouble - (2 * cos(PI / 6) * radius).toInt()) / 6
         Logger.debug("AvatarComposeLayoutManager", "onMeasure centerX=$centerX,centerY=$centerY")
-        offsetShowRegion()
+        layoutState.offsetShowRegion()
     }
 
     override fun setRecyclerView(recyclerView: RecyclerView?) {
@@ -84,9 +84,9 @@ class CloneXComposeLayoutManager(val context: Context) : AvatarLayoutManager(),
             removeAndRecycleAllViews(recycler);
             return
         }
-        offsetShowRegion()
+        layoutState.offsetShowRegion()
         detachAndScrapAttachedViews(recycler)
-        clearCoordinateCacheIfNeed(state.itemCount)
+        clearCoordinateCacheIfNeed(getItemCount(state))
         fill(recycler, state, true)
         recycleScrapViews(recycler)
     }
@@ -111,11 +111,7 @@ class CloneXComposeLayoutManager(val context: Context) : AvatarLayoutManager(),
     private var lastChildCount = 0
 
     private fun clearCoordinateCacheIfNeed(currentCount: Int) {
-        if ((lastChildCount >= 7 && currentCount < 7) || (lastChildCount < 7 && currentCount >= 7)
-            || (lastChildCount < 7 && currentCount != lastChildCount)
-        ) {
-            coordinateCache.clear()
-        }
+        coordinateCache.clear()
         lastChildCount = currentCount
     }
 
@@ -146,35 +142,32 @@ class CloneXComposeLayoutManager(val context: Context) : AvatarLayoutManager(),
         var destPosition: Int = -1
         var destChildDistance = 0f
         var minCloseDistance: Float = Float.MAX_VALUE
-        TraceCompat.beginSection("CCLM fill")
-
-//        for (position in visibleChildCount - 1 downTo 0) {
+        TraceCompat.beginSection("cclm fillInternal")
         for (position in 0 until visibleChildCount) {
             val point = calculateChildCoordinate(position, visibleChildCount)
-            if (layoutState.showRegion.contains(point.x, point.y).not()) {
+            if (layoutState.showRegion.contains(point.x, point.y).not()) { //判断这个点是否可见
                 continue
             }
-            val view = recycler.getViewForPosition(position) //会处理
+            val view = recycler.getViewForPosition(position) //拿到对应position的view
             if (view.parent == null) {
-                addView(view)
-                measureChildWithMargins(view, 0, 0)
-                layoutChildInternal(view, position, point)
-                FakeLayoutCoorExchangeUtils.setCenterPivot(view)
+                addView(view)//进行添加
+                measureChildWithMargins(view, 0, 0)//测量view
+                layoutChildInternal(view, position, point) //根据坐标进行布局
+                FakeLayoutCoorExchangeUtils.setCenterPivot(view)//因为有矩阵变换，所以需要设置下缩放的中心点
             }
-            offsetChildHorAndVer(view, -layoutState.scrollX, -layoutState.scrollY)
-            destChildDistance = shapeChange(view, position)
-            TraceCompat.beginSection("CCLM fill bindRealViewHolderIfNeed")
-            bindRealViewHolderIfNeed(view, position)
-            TraceCompat.endSection()
-            if (destChildDistance < minCloseDistance) {
+            offsetChildHorAndVer(view, -layoutState.scrollX, -layoutState.scrollY) //根据滚动距离，移动子view，offsetLeftAndRight及offsetTopAndBottom
+            destChildDistance = shapeChange(view, position) //矩阵变形，根据移动距离及到中心点的距离
+            bindRealViewHolderIfNeed(view, position)//一些viewHolder绑定的优化处理
+            if (destChildDistance < minCloseDistance) { //找出当前距离中心距离最短的点，作为中心点触发回掉，业务会震动等等
                 minCloseDistance = destChildDistance
                 destPosition = position
             }
         }
-        if(destPosition!=-1){
+        if (destPosition != -1) {
             layoutState.minCloseDistance = minCloseDistance
             setCenterPosition(destPosition)
         }
+        TraceCompat.endSection()
     }
 
 
@@ -202,7 +195,6 @@ class CloneXComposeLayoutManager(val context: Context) : AvatarLayoutManager(),
             CloneXComposeUiConfig.TAG,
             "viewRegion =  $viewRegion, maxCircleRadius= $maxCircleRadius"
         )
-        TraceCompat.endSection()
     }
 
 
@@ -398,62 +390,62 @@ class CloneXComposeLayoutManager(val context: Context) : AvatarLayoutManager(),
         } else if (level == 3) {
             var itemGroup = ceil((hexagonalPoint.levelNumber.toDouble() / (level - 1))).toInt()
             var itemGroupNum = hexagonalPoint.levelNumber - (itemGroup - 1) * (level - 1)
-            when (itemGroup) {
-                1 -> {
-                    if (itemGroupNum == 1) {
-                        itemGroup = 1
-                        itemGroupNum = 2
-                    } else {
-                        itemGroup = 4
-                        itemGroupNum = 2
-                    }
-                }
-                2 -> {
-                    if (itemGroupNum == 1) {
-                        itemGroup = 2
-                        itemGroupNum = 2
-                    } else {
-                        itemGroup = 6
-                        itemGroupNum = 2
-                    }
-                }
-                3 -> {
-                    if (itemGroupNum == 1) {
-                        itemGroup = 3
-                        itemGroupNum = 2
-                    } else {
-                        itemGroup = 5
-                        itemGroupNum = 2
-                    }
-                }
-                4 -> {
-                    if (itemGroupNum == 1) {
-                        itemGroup = 2
-                        itemGroupNum = 1
-                    } else {
-                        itemGroup = 1
-                        itemGroupNum = 1
-                    }
-                }
-                5 -> {
-                    if (itemGroupNum == 1) {
-                        itemGroup = 4
-                        itemGroupNum = 1
-                    } else {
-                        itemGroup = 5
-                        itemGroupNum = 1
-                    }
-                }
-                6 -> {
-                    if (itemGroupNum == 1) {
-                        itemGroup = 3
-                        itemGroupNum = 1
-                    } else {
-                        itemGroup = 6
-                        itemGroupNum = 1
-                    }
-                }
-            }
+//            when (itemGroup) {
+//                1 -> {
+//                    if (itemGroupNum == 1) {
+//                        itemGroup = 1
+//                        itemGroupNum = 2
+//                    } else {
+//                        itemGroup = 4
+//                        itemGroupNum = 2
+//                    }
+//                }
+//                2 -> {
+//                    if (itemGroupNum == 1) {
+//                        itemGroup = 2
+//                        itemGroupNum = 2
+//                    } else {
+//                        itemGroup = 6
+//                        itemGroupNum = 2
+//                    }
+//                }
+//                3 -> {
+//                    if (itemGroupNum == 1) {
+//                        itemGroup = 3
+//                        itemGroupNum = 2
+//                    } else {
+//                        itemGroup = 5
+//                        itemGroupNum = 2
+//                    }
+//                }
+//                4 -> {
+//                    if (itemGroupNum == 1) {
+//                        itemGroup = 2
+//                        itemGroupNum = 1
+//                    } else {
+//                        itemGroup = 1
+//                        itemGroupNum = 1
+//                    }
+//                }
+//                5 -> {
+//                    if (itemGroupNum == 1) {
+//                        itemGroup = 4
+//                        itemGroupNum = 1
+//                    } else {
+//                        itemGroup = 5
+//                        itemGroupNum = 1
+//                    }
+//                }
+//                6 -> {
+//                    if (itemGroupNum == 1) {
+//                        itemGroup = 3
+//                        itemGroupNum = 1
+//                    } else {
+//                        itemGroup = 6
+//                        itemGroupNum = 1
+//                    }
+//                }
+//            }
             val tempPointX = centerX - (level - 1) * radius * cos((du * itemGroup))
             val tempPointY = centerY - (level - 1) * radius * sin((du * itemGroup))
             if (itemGroup == 1) {
@@ -544,9 +536,10 @@ class CloneXComposeLayoutManager(val context: Context) : AvatarLayoutManager(),
                         )
                     )
                 val scale = (scaleDistance - distance) / (scaleDistance - radius)
-                val scaleRatio =
-                    secondScaleSize + StrictMath.pow(ratio.toDouble(), 6.0) * 2.5f
-                StrictMath.min(secondScaleSize, 1 + scale * (scaleRatio.toFloat() - 1))
+//                val scaleRatio =
+//                    secondScaleSize + StrictMath.pow(ratio.toDouble(), 6.0) * 2.5f
+                StrictMath.min(secondScaleSize, scale+1)
+
             }
             distance > scaleDistance -> {
                 val scale =
@@ -577,7 +570,8 @@ class CloneXComposeLayoutManager(val context: Context) : AvatarLayoutManager(),
             else -> {
                 val magnitude = (distance - translateRange) * 0.35f/// translateRange * 124f
                 val cos = StrictMath.abs((centerY - y) / distance)
-                val ratio = 1f - 0.5 * (StrictMath.pow(cos.toDouble(), 8.0))
+//                val ratio = 1f - 0.5 * (StrictMath.pow(cos.toDouble(), 8.0))
+                val ratio = 1f
                 val magnitudeX = centerX - (centerX - x) * (distance - magnitude) / distance
                 view.translationX = ((magnitudeX - x) * ratio).toFloat()
                 val magnitudeY = centerY - (centerY - y) * (distance - magnitude) / distance
@@ -615,7 +609,7 @@ class CloneXComposeLayoutManager(val context: Context) : AvatarLayoutManager(),
         }
         layoutState.scrollX += scrollXY.first
         layoutState.scrollY += scrollXY.second
-        offsetShowRegion()
+        layoutState.offsetShowRegion()
         detachAndScrapAttachedViews(recycler)
         fill(recycler, state, false)
         recycleScrapViews(recycler)
@@ -623,16 +617,6 @@ class CloneXComposeLayoutManager(val context: Context) : AvatarLayoutManager(),
         return Pair(dx, dy)
     }
 
-    private fun offsetShowRegion() {
-        val len = 50.dp2Px()
-        layoutState.showRegion.set(
-            -len,
-            -len,
-            measuredWidth + len,
-            measuredHeight + len
-        )
-        layoutState.showRegion.offset(layoutState.scrollX, layoutState.scrollY)
-    }
 
     private fun offsetChild(dx: Int, dy: Int, state: RecyclerView.State) {
         val childCount = getItemCount(state)
@@ -704,12 +688,6 @@ class CloneXComposeLayoutManager(val context: Context) : AvatarLayoutManager(),
         canvas.restoreToCount(restore)
     }
 
-    /**
-     * 滚动处理逻辑梳理：
-     * 1. 收集滚动信息
-     * 2. 滚动不处理detach/remove，只处理添加
-     */
-
     private inner class LayoutState {
         var scrollX: Int = 0
         var scrollY: Int = 0
@@ -719,9 +697,19 @@ class CloneXComposeLayoutManager(val context: Context) : AvatarLayoutManager(),
             scrollX = 0
             scrollY = 0
             minCloseDistance = 0f
-            showRegion.set(0, 0, measuredWidth, measuredHeight)
+            offsetShowRegion()
         }
 
+        fun offsetShowRegion() {
+            val len = 100.dp2Px()
+            layoutState.showRegion.set(
+                -len,
+                -len,
+                measuredWidth + len,
+                measuredHeight + len
+            )
+            layoutState.showRegion.offset(layoutState.scrollX, layoutState.scrollY)
+        }
     }
 
 }
