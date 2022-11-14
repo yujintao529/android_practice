@@ -567,6 +567,17 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name="com.demon.yu.system.FitSystemWindowAct"
+            android:label="system/FitSystemWindowAct"
+            android:theme="@style/statusBarTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="com.example.apidemons.CATEGORY_SAMPLES" />
+            </intent-filter>
+        </activity>
+
+
 
         <service android:name=".process.BinderService" />
         <service android:name=".process.ProcessService" />
@@ -608,6 +619,7 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/example_appwidget_info_2" />
         </receiver>
+
 
 
     </application>
