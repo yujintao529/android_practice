@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.demon.yu.system.FitSystemFrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/fitSystemFrameLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <com.demon.yu.system.FitSystemViewPager
+        android:id="@+id/fitSystemViewPager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <com.demon.yu.view.HorToolsView
+        android:id="@+id/horToolsView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_marginBottom="80dp" />
+</com.demon.yu.system.FitSystemFrameLayout>

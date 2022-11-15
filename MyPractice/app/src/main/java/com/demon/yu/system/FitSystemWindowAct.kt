@@ -1,0 +1,117 @@
+package com.demon.yu.system
+
+import android.graphics.Color
+import android.os.Build
+import android.os.Bundle
+import android.util.TypedValue
+import android.view.Gravity
+import android.view.View
+import android.view.ViewGroup
+import android.view.WindowManager
+import android.widget.FrameLayout
+import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.viewpager.widget.PagerAdapter
+import com.demon.yu.view.recyclerview.ColorUtils
+import com.example.mypractice.Logger
+import com.example.mypractice.R
+import kotlinx.android.synthetic.main.activity_fitsystem_window.*
+
+/**
+ * @description
+ *
+ *  q1. viewpager不设置fitsSystemWindows，让其adpater的子view设置没有效果？理论上应该会生效的。
+ *     a1: 因为viewPager是在adapter中添加view的，dispatchApplyWindowInsets是在viewLayout前发生的。
+ *         所以需要在添加子view后，调用requestApplyInsets，重新触发一次传递才可以生效
+ *
+ *  q2. 在viewPager中，如何让每个page的背景铺满（一个imageView做为背景），然后titleBar正常下移呢
+ *     a2： 在添加view的时候触发requestApplyInsets，同时让titlBar设置fitsSystemWindows即可
+ *
+ *  info1：windowInsets.consumeSystemWindowInsets 会生成一个完全消费系统状态栏等insets的结构，如果要消费部分，需要自己builder
+ *        一个windowInsets。
+ *  info2：viewGroup.dispatchApplyWindowInsets-viewGroup.onApplyWindowInsets
+ *  ｜fitsSystemWindows=true --->  fitSystemWindowsInt --->自己消费
+ *  ｜fitsSystemWindows=false ---> fitSystemWindows--->子view.dispatchApplyWindowInsets
+ *
+ *
+ * @author yujinta.529
+ * @create 2022-11-14
+ */
+class FitSystemWindowAct : AppCompatActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_fitsystem_window)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.decorView.systemUiVisibility =
+                (View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN.or(View.SYSTEM_UI_FLAG_LAYOUT_STABLE))
+            window.statusBarColor = Color.TRANSPARENT // Color.parseColor("#3300FFFF")
+        }
+
+        val pagerAdapter = initAdapter()
+        fitSystemViewPager.adapter = pagerAdapter
+
+        val result = ViewCompat.getFitsSystemWindows(fitSystemViewPager)
+        Logger.debug("FitSystemWindowAct", "getFitsSystemWindows $result")
+    }
+
+    private fun initAdapter(): PagerAdapter {
+        val list = mutableListOf<View>()
+        for (i in 0..5) {
+            val view = FitSystemFrameLayout(this)
+//            view.fitsSystemWindows = true
+            val titleBar = TextView(this)
+            titleBar.text = "我是titleBar"
+            titleBar.setPadding(20, 10, 20, 10)
+            titleBar.setBackgroundColor(Color.WHITE)
+            titleBar.setTextColor(Color.BLACK)
+            titleBar.fitsSystemWindows = true
+            titleBar.requestApplyInsets()
+            titleBar.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20f)
+            val lp = FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+            lp.gravity = Gravity.CENTER_HORIZONTAL
+            val bg = View(this)
+            bg.setBackgroundColor(ColorUtils.getRandomColor())
+            view.addView(
+                bg,
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+            )
+            view.addView(titleBar, lp)
+            list.add(view)
+        }
+        return FitViewAdapter(list)
+    }
+
+
+    class FitViewAdapter(val listView: List<View>) : PagerAdapter() {
+        override fun getCount(): Int {
+            return listView.size
+        }
+
+        override fun isViewFromObject(view: View, `object`: Any): Boolean {
+            return view == `object`
+        }
+
+        override fun instantiateItem(container: ViewGroup, position: Int): Any {
+            val view = listView[position]
+            container.addView(
+                view,
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+            )
+            container.requestApplyInsets()
+            return view
+        }
+
+        override fun destroyItem(container: ViewGroup, position: Int, `object`: Any) {
+            container.removeView(`object` as View)
+        }
+    }
+
+}
