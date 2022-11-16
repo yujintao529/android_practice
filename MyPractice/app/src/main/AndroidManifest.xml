@@ -570,6 +570,7 @@
         <activity
             android:name="com.demon.yu.system.FitSystemWindowAct"
             android:label="system/FitSystemWindowAct"
+            android:windowSoftInputMode="adjustResize"
             android:theme="@style/statusBarTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

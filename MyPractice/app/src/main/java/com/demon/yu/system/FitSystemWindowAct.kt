@@ -4,13 +4,13 @@ import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.util.TypedValue
-import android.view.Gravity
-import android.view.View
-import android.view.ViewGroup
-import android.view.WindowManager
+import android.view.*
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.AppCompatEditText
+import androidx.core.content.ContextCompat
+import androidx.core.view.OnApplyWindowInsetsListener
 import androidx.core.view.ViewCompat
 import androidx.viewpager.widget.PagerAdapter
 import com.demon.yu.view.recyclerview.ColorUtils
@@ -34,6 +34,13 @@ import kotlinx.android.synthetic.main.activity_fitsystem_window.*
  *  ｜fitsSystemWindows=true --->  fitSystemWindowsInt --->自己消费
  *  ｜fitsSystemWindows=false ---> fitSystemWindows--->子view.dispatchApplyWindowInsets
  *
+ *
+ *  fitsSystemWindows ：只是增加了默认处理行为，也就是增加了padding，如果不设置也会收到onApplyWindowInsets回掉，
+ *                      但是需要根据自己的业务自己处理行为了
+ *
+ *
+ *  sBrokenInsetsDispatch ：在targetSdkVersion < Build.VERSION_CODES.Q前，windowInsets被消费后，会停止后面子view继续消费，
+ *                          新版本上，会继续消费回掉。
  *
  * @author yujinta.529
  * @create 2022-11-14
@@ -61,20 +68,22 @@ class FitSystemWindowAct : AppCompatActivity() {
         val list = mutableListOf<View>()
         for (i in 0..5) {
             val view = FitSystemFrameLayout(this)
-//            view.fitsSystemWindows = true
             val titleBar = TextView(this)
             titleBar.text = "我是titleBar"
             titleBar.setPadding(20, 10, 20, 10)
             titleBar.setBackgroundColor(Color.WHITE)
             titleBar.setTextColor(Color.BLACK)
-            titleBar.fitsSystemWindows = true
-            titleBar.requestApplyInsets()
             titleBar.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20f)
             val lp = FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
             )
-            lp.gravity = Gravity.CENTER_HORIZONTAL
+            ViewCompat.setOnApplyWindowInsetsListener(titleBar) { v, insets ->
+                lp.topMargin = insets.systemWindowInsetTop
+                Logger.debug("FitSystemWindowAct", "$v ${insets.systemWindowInsets}")
+                insets//不能消费，因为sBrokenInsetsDispatch这个会导致editText无法收到回掉了
+            }
+            lp.gravity = Gravity.CENTER_HORIZONTAL or Gravity.TOP
             val bg = View(this)
             bg.setBackgroundColor(ColorUtils.getRandomColor())
             view.addView(
@@ -83,6 +92,25 @@ class FitSystemWindowAct : AppCompatActivity() {
                 ViewGroup.LayoutParams.MATCH_PARENT
             )
             view.addView(titleBar, lp)
+            val editText = AppCompatEditText(this)
+            editText.hint = "请点击"
+            val editLp = FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+            ViewCompat.setOnApplyWindowInsetsListener(editText) { v, insets ->
+                editLp.bottomMargin = insets.systemWindowInsetBottom + 40
+                insets
+            }
+            editText.setHintTextColor(Color.GRAY)
+            editText.setPadding(20, 10, 20, 10)
+            editText.setBackgroundColor(Color.WHITE)
+            editText.setTextColor(Color.BLACK)
+            editText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20f)
+
+            editLp.setMargins(40, 20, 100, 40)
+            editLp.gravity = Gravity.BOTTOM
+            view.addView(editText, editLp)
             list.add(view)
         }
         return FitViewAdapter(list)

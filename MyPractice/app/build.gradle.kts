@@ -19,6 +19,7 @@ configure<com.android.build.gradle.internal.dsl.BaseAppModuleExtension> {
         ndk {
             abiFilters.add("x86")
             abiFilters.add("armeabi-v7a")
+            abiFilters.add("arm64-v8a")
             resConfigs("cn", "xhdpi")
         }
 
@@ -64,7 +65,6 @@ configure<com.android.build.gradle.internal.dsl.BaseAppModuleExtension> {
         targetCompatibility = JavaVersion.VERSION_1_8
     }
     packagingOptions {
-        exclude("lib/arm64-v8a/*")
         exclude("lib/armeabi/*")
         exclude("lib/x86_64/*")
         exclude("lib/mips/*")
