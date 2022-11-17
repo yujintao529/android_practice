@@ -42,6 +42,8 @@ import kotlinx.android.synthetic.main.activity_fitsystem_window.*
  *  sBrokenInsetsDispatch ：在targetSdkVersion < Build.VERSION_CODES.Q前，windowInsets被消费后，会停止后面子view继续消费，
  *                          新版本上，会继续消费回掉。
  *
+ *
+ *
  * @author yujinta.529
  * @create 2022-11-14
  */
@@ -54,7 +56,7 @@ class FitSystemWindowAct : AppCompatActivity() {
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             window.decorView.systemUiVisibility =
                 (View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN.or(View.SYSTEM_UI_FLAG_LAYOUT_STABLE))
-            window.statusBarColor = Color.TRANSPARENT // Color.parseColor("#3300FFFF")
+            window.statusBarColor = Color.TRANSPARENT
         }
 
         val pagerAdapter = initAdapter()
@@ -81,10 +83,10 @@ class FitSystemWindowAct : AppCompatActivity() {
             ViewCompat.setOnApplyWindowInsetsListener(titleBar) { v, insets ->
                 lp.topMargin = insets.systemWindowInsetTop
                 Logger.debug("FitSystemWindowAct", "$v ${insets.systemWindowInsets}")
-                insets//不能消费，因为sBrokenInsetsDispatch这个会导致editText无法收到回掉了
+                insets//不能使用insets.consumeSystemWindowInsets()消费内容，因为sBrokenInsetsDispatch这个会导致editText无法收到回掉了
             }
             lp.gravity = Gravity.CENTER_HORIZONTAL or Gravity.TOP
-            val bg = View(this)
+            val bg = View(this)//背景view，可能是个网络图啥的
             bg.setBackgroundColor(ColorUtils.getRandomColor())
             view.addView(
                 bg,
@@ -92,14 +94,14 @@ class FitSystemWindowAct : AppCompatActivity() {
                 ViewGroup.LayoutParams.MATCH_PARENT
             )
             view.addView(titleBar, lp)
-            val editText = AppCompatEditText(this)
+            val editText = AppCompatEditText(this)//输入框
             editText.hint = "请点击"
             val editLp = FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
             )
             ViewCompat.setOnApplyWindowInsetsListener(editText) { v, insets ->
-                editLp.bottomMargin = insets.systemWindowInsetBottom + 40
+                editLp.bottomMargin = insets.systemWindowInsetBottom + 40 //处理输入发的高度
                 insets
             }
             editText.setHintTextColor(Color.GRAY)
@@ -133,7 +135,7 @@ class FitSystemWindowAct : AppCompatActivity() {
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT
             )
-            container.requestApplyInsets()
+            container.requestApplyInsets()////必须每次添加必须要触发，因为requestApplyInsets是在布局前或者有系统布局改变时触发
             return view
         }
 

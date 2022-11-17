@@ -16,6 +16,7 @@ import android.graphics.Color
 val colorBlack: Int = 0xFFFFFFFF.toInt()
 val colorBlack2: Int = -0x1
 val colorjava: Int = Color.WHITE
+//val colorBlockError: Int = 0xFFFFFFFF
 
 fun main(args: Array<String>) {
     println("colorBlack=$colorBlack colorBlack2=$colorBlack2 colorjava=$colorjava")
