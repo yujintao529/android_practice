@@ -22,11 +22,11 @@ allprojects {
         mavenCentral()
     }
 
-    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().all {
-        kotlinOptions {
-            jvmTarget = "1.8"
-        }
-    }
+//    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().all {
+//        kotlinOptions {
+//            jvmTarget = "1.8"
+//        }
+//    }
 }
 //buildscript {
 //    repositories {

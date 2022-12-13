@@ -54,8 +54,8 @@ class lateinitActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        lastUser = User(intent.getStringExtra("name"))
-        user = User(intent.getStringExtra("name"))
+        lastUser = User(intent.getStringExtra("name")?:"")
+        user = User(intent.getStringExtra("name")?:"")
 
         Log.d("lateinitActivity", "user ${user.name}")
         //        Log.d("lateinitActivity", "lastuser ${lastUser.name}")//由于kotlin可空检查机制，不允许直接使用

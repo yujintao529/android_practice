@@ -8,12 +8,14 @@ plugins {
     kotlin("kapt")
 }
 apply(rootProject.file("gradle/deps.gradle.kts"))
+apply(rootProject.file("add_export.gradle"))
 configure<com.android.build.gradle.internal.dsl.BaseAppModuleExtension> {
     defaultConfig {
-        applicationId("com.example.mypractice")
-        minSdkVersion(Versions.minSdkVersion)
-        compileSdkVersion(Versions.compileSdkVersion)
-        targetSdkVersion(Versions.targetSdkVersion)
+        applicationId = "com.example.mypractice"
+        minSdk = Versions.minSdkVersion
+//        compileSdkVersion =  Versions.compileSdkVersion.toString()
+        compileSdkVersion=Versions.compileSdkVersion
+        targetSdk = Versions.targetSdkVersion
         multiDexEnabled = true
         multiDexKeepProguard = rootProject.file("maindexlist.txt")
         ndk {
@@ -42,7 +44,7 @@ configure<com.android.build.gradle.internal.dsl.BaseAppModuleExtension> {
     }
     buildTypes {
         getByName("release") {
-            minifyEnabled(true)
+            isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(
                     getDefaultProguardFile("proguard-android.txt"),
@@ -52,7 +54,7 @@ configure<com.android.build.gradle.internal.dsl.BaseAppModuleExtension> {
             signingConfig = signingConfigs.getByName("release")
         }
         getByName("debug") {
-            minifyEnabled(false)
+            isMinifyEnabled = false
             proguardFiles(
                     getDefaultProguardFile("proguard-android.txt"),
                     "proguard-rules.pro"
@@ -61,8 +63,8 @@ configure<com.android.build.gradle.internal.dsl.BaseAppModuleExtension> {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
     packagingOptions {
         exclude("lib/armeabi/*")
@@ -95,7 +97,7 @@ dependencies {
     implementation(Deps.material)
     implementation(Deps.rxJavaDependency)
     implementation(Deps.rxAndroidDependency)
-    implementation(Deps.autoService)
+//    implementation(Deps.autoService)
     implementation(Deps.debugdb)
     implementation(Deps.glide)
     implementation(Deps.fresco)
@@ -104,7 +106,7 @@ dependencies {
     implementation(Deps.wecahtOpenSdk)
     debugImplementation(Deps.leakcanary)
     releaseImplementation(Deps.leakcanary_noop)
-    implementation(project(":libgaussia"))
+//    implementation(project(":libgaussia"))
     implementation(project(":libavd"))
     implementation(Deps.butterKnife)
     implementation(Deps.stetho)

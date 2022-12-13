@@ -5,10 +5,10 @@
  */
 object Deps {
 
-    const val kotlin_version = "1.5.30"
+    const val kotlin_version = "1.6.0"
 
     //lifecycle and  ViewModel and LiveData
-    const val lifecycle_version = "2.2.0"
+    const val lifecycle_version = "2.5.1"
 
     // ViewModel
     const val viewModel = "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
@@ -37,20 +37,21 @@ object Deps {
     // optional - ReactiveStreams support for LiveData
     const val lifecycle_reactivestreams_ktx = "androidx.lifecycle:lifecycle-reactivestreams-ktx:$lifecycle_version"
 
+
     //androidx
-    private const val appcompat_version = "1.2.0"
+    private const val appcompat_version = "1.5.1"
     const val appcompat = "androidx.appcompat:appcompat:$appcompat_version"
     // For loading and tinting drawables on older versions of the platform
     const val appcompat_resources = "androidx.appcompat:appcompat-resources:$appcompat_version"
 
-    private const val fragment_version = "1.2.5"
+    private const val fragment_version = "1.5.4"
 
     // Java language implementation
     const val fragment= "androidx.fragment:fragment:$fragment_version"
     // Kotlin
     const val fragment_ktx= "androidx.fragment:fragment-ktx:$fragment_version"
     //annotation
-    const val annotation = "androidx.annotation:annotation:1.1.0"
+    const val annotation = "androidx.annotation:annotation:1.5.0"
 
 
     const val recyclerview ="androidx.recyclerview:recyclerview:1.1.0"
@@ -129,15 +130,15 @@ object Deps {
     const val kotlinCoroutinesTest = "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.5.2"
 
     const val kotlinGradlePlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-    const val androidToolsBuildGradle = "com.android.tools.build:gradle:4.1.0"
+    const val androidToolsBuildGradle = "com.android.tools.build:gradle:7.0.0"
 
     //test
     const val junit4 = "junit:junit:4.8.2"
 }
 
 object Versions {
-    const val compileSdkVersion = 29
+    const val compileSdkVersion = "android-32"
     const val minSdkVersion = 21
-    const val targetSdkVersion = 29
-    const val buildToolsVersion = "29.0.2"
+    const val targetSdkVersion = 32
+    const val buildToolsVersion = "30.0.2"
 }

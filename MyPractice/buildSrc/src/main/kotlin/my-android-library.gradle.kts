@@ -1,21 +1,22 @@
 plugins {
     id("com.android.library") apply false
 }
-android { //also work but only for plugins{} not for apply way
-
-}
+//android { //also work but only for plugins{} not for apply way
+//
+//}
 configure<com.android.build.gradle.LibraryExtension> { //work well with plugins{} and apply
-    compileSdkVersion(Versions.compileSdkVersion)
+    compileSdkVersion = Versions.compileSdkVersion
     defaultConfig {
-        minSdkVersion(Versions.minSdkVersion)
-        targetSdkVersion(Versions.targetSdkVersion)
+        minSdk = Versions.minSdkVersion
+        targetSdk = Versions.targetSdkVersion
+        buildToolsVersion = Versions.buildToolsVersion
     }
     buildTypes {
         getByName("release") {
-            minifyEnabled(true)
+//            minifyEnabled(true)
             proguardFiles(
-                    getDefaultProguardFile("proguard-android.txt"),
-                    "proguard-rules.pro"
+                getDefaultProguardFile("proguard-android.txt"),
+                "proguard-rules.pro"
             )
         }
     }
@@ -26,7 +27,7 @@ configure<com.android.build.gradle.LibraryExtension> { //work well with plugins{
         jniLibs.srcDirs("libs")
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
 }

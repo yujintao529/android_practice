@@ -4,12 +4,11 @@
     package="com.example.mypractice"
     android:versionCode="1"
     android:versionName="1.0"
-    tools:node="replace">
+    tools:node="merge">
 
 
     <permission android:name="com.example.practice.RECEIVE_PRO" />
     <permission android:name="com.example.practice.SEND_PRO" />
-
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
@@ -25,6 +24,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".ApiLaunch"
+            android:exported="true"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -34,6 +34,7 @@
         </activity>
         <activity
             android:name=".view.AutoGridLayoutAct"
+            android:exported="true"
             android:label="view/autogridlayout">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -43,6 +44,7 @@
         </activity>
         <activity
             android:name=".graphic.DrawingBoradAct"
+            android:exported="true"
             android:label="graphic/drawingboard">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -52,6 +54,7 @@
         </activity>
         <activity
             android:name=".matrix.FlowerAct"
+            android:exported="true"
             android:label="matrix/flower">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -61,6 +64,7 @@
         </activity>
         <activity
             android:name=".dialog.PopuwindowAct"
+            android:exported="true"
             android:label="dialog/popuwindow">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -70,6 +74,7 @@
         </activity>
         <activity
             android:name=".gradient.RadialGradientAct"
+            android:exported="true"
             android:label="gradient/radialgradient">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -79,6 +84,7 @@
         </activity>
         <activity
             android:name=".resource.drawable.DrawableResourceInfoAct"
+            android:exported="true"
             android:label="resource/drawable/resourceInfo">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -88,6 +94,7 @@
         </activity>
         <activity
             android:name=".canvas.DrawArcByPaintAct"
+            android:exported="true"
             android:label="canvas/drawarcBypaint">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -97,6 +104,7 @@
         </activity>
         <activity
             android:name=".canvas.PaintFlagsDrawFilterAct"
+            android:exported="true"
             android:label="canvas/paintFlagsDrawFilterAct">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -106,6 +114,7 @@
         </activity>
         <activity
             android:name=".canvas.CreateBitmapAct"
+            android:exported="true"
             android:label="canvas/CreateBitmapAct">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -115,6 +124,7 @@
         </activity>
         <activity
             android:name=".canvas.ColorMatrixFilterAct"
+            android:exported="true"
             android:label="canvas/ColorMatrixFilterAct">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -124,6 +134,7 @@
         </activity>
         <activity
             android:name=".matrix.TranslateAndRotation"
+            android:exported="true"
             android:label="matrix/TranslateAndRotation">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -133,6 +144,7 @@
         </activity>
         <activity
             android:name=".gradient.LinearGradientAct"
+            android:exported="true"
             android:label="gradient/LinearGradientAct">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -142,6 +154,7 @@
         </activity>
         <activity
             android:name=".resource.drawable.LampCordAct"
+            android:exported="true"
             android:label="drawable/LampCordAct">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -150,6 +163,7 @@
         </activity>
         <activity
             android:name=".v7.RecycleViewAct"
+            android:exported="true"
             android:label="v7/RecycleViewAct">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -158,6 +172,7 @@
         </activity>
         <activity
             android:name=".v7.RecycleViewPagerAct"
+            android:exported="true"
             android:label="v7/RecycleViewPagerAct">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -166,6 +181,7 @@
         </activity>
         <activity
             android:name=".view.ScrollerStudyAct"
+            android:exported="true"
             android:label="view/ScrollerStudyAct">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -174,6 +190,7 @@
         </activity>
         <activity
             android:name=".view.ScrollViewAct"
+            android:exported="true"
             android:label="view/ScrollViewAct">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -182,6 +199,7 @@
         </activity>
         <activity
             android:name=".v4.DragHelperAct"
+            android:exported="true"
             android:label="v4/DragHelperAct">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -190,6 +208,7 @@
         </activity>
         <activity
             android:name=".v4.DrawerlayoutAct"
+            android:exported="true"
             android:label="v4/DrawerlayoutAct">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -198,6 +217,7 @@
         </activity>
         <activity
             android:name=".v7.ToolbarAct"
+            android:exported="true"
             android:label="v7/ToolbarAct"
             android:theme="@style/toolbarTheme">
             <intent-filter>
@@ -207,6 +227,7 @@
         </activity>
         <activity
             android:name=".db.SQLiteAct"
+            android:exported="true"
             android:label="db/SQLiteAct"
             android:theme="@style/toolbarTheme">
             <intent-filter>
@@ -216,6 +237,7 @@
         </activity>
         <activity
             android:name=".view.PicAndTextAct"
+            android:exported="true"
             android:label="view/PicAndTextAct"
             android:theme="@style/toolbarTheme">
             <intent-filter>
@@ -225,6 +247,7 @@
         </activity>
         <activity
             android:name=".process.ProcessAct"
+            android:exported="true"
             android:label="process/ProcessAct"
             android:theme="@style/toolbarTheme">
             <intent-filter>
@@ -234,6 +257,7 @@
         </activity>
         <activity
             android:name=".broadcast.BroadcastAct"
+            android:exported="true"
             android:label="broadcast/BroadcastAct"
             android:theme="@style/toolbarTheme">
             <intent-filter>
@@ -243,6 +267,7 @@
         </activity>
         <activity
             android:name=".base.LoderActivity"
+            android:exported="true"
             android:label="base/LoderActivity"
             android:theme="@style/toolbarTheme">
             <intent-filter>
@@ -253,6 +278,7 @@
         </activity>
         <activity
             android:name=".v7.CardViewAct"
+            android:exported="true"
             android:label="v7/CardViewAct"
             android:theme="@style/AppTheme">
             <intent-filter>
@@ -263,6 +289,7 @@
         </activity>
         <activity
             android:name=".other.RxAndroidAct"
+            android:exported="true"
             android:label="other/RxAndroidAct"
             android:theme="@style/toolbarTheme">
             <intent-filter>
@@ -273,6 +300,7 @@
         </activity>
         <activity
             android:name=".canvas.ClippathAct"
+            android:exported="true"
             android:label="canvas/ClippathAct"
             android:theme="@style/toolbarTheme">
             <intent-filter>
@@ -283,6 +311,7 @@
         </activity>
         <activity
             android:name=".resource.drawable.LayerListDrawableAct"
+            android:exported="true"
             android:label="resource/drawable/LayerListDrawableAct"
             android:theme="@style/toolbarTheme">
             <intent-filter>
@@ -293,6 +322,7 @@
         </activity>
         <activity
             android:name=".v4.TablayoutAct"
+            android:exported="true"
             android:label="v4/TablayoutAct"
             android:theme="@style/AppTheme">
             <intent-filter>
@@ -303,6 +333,7 @@
         </activity>
         <activity
             android:name=".v7.MaterilActivity"
+            android:exported="true"
             android:label="v7/MaterilActivity"
             android:theme="@style/AppTheme">
             <intent-filter>
@@ -313,6 +344,7 @@
         </activity>
         <activity
             android:name=".view.DoubleSeekBarAct"
+            android:exported="true"
             android:label="view/DoubleSeekBarAct">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -323,6 +355,7 @@
 
         <activity
             android:name=".test.FrameLayoutTestAct"
+            android:exported="true"
             android:label="test/frameLayoutTest">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -332,6 +365,7 @@
         </activity>
         <activity
             android:name=".resource.drawable.DrawableAct"
+            android:exported="true"
             android:label="resource/drawable/DrawableAct"
             android:theme="@style/AppTheme">
             <intent-filter>
@@ -342,6 +376,7 @@
         </activity>
         <activity
             android:name=".view.TouchEventAct"
+            android:exported="true"
             android:label="view/TouchEventAct">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -350,6 +385,7 @@
         </activity>
         <activity
             android:name=".kotlin.DelegateActivity"
+            android:exported="true"
             android:label="kotlin/DelegateActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -358,6 +394,7 @@
         </activity>
         <activity
             android:name=".source.FouceActivity"
+            android:exported="true"
             android:label="source/FouceActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -367,7 +404,8 @@
 
         <activity
             android:name=".source.DispatchTouchActivity"
-            android:label="source/DispatchTouchActivity">
+            android:label="source/DispatchTouchActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="com.example.apidemons.CATEGORY_SAMPLES" />
@@ -375,6 +413,7 @@
         </activity>
         <activity
             android:name=".source.DrawActivity"
+            android:exported="true"
             android:label="source/DrawActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -383,6 +422,7 @@
         </activity>
         <activity
             android:name="com.demon.yu.weixin.WexinShareActivity"
+            android:exported="true"
             android:label="weixin/WexinShareActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -391,6 +431,7 @@
         </activity>
         <activity
             android:name=".process.OtherProccesActivity"
+            android:exported="true"
             android:label="process/OtherProccesActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -400,6 +441,7 @@
 
         <activity
             android:name="com.demon.yu.jvm.MemoryDoudongActivity"
+            android:exported="true"
             android:label="jvm/MemoryDoudongActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -408,6 +450,7 @@
         </activity>
         <activity
             android:name="com.demon.yu.na.GaussianActivity"
+            android:exported="true"
             android:label="na/GaussianActivity"
             android:theme="@style/AppBaseTheme">
             <intent-filter>
@@ -417,6 +460,7 @@
         </activity>
         <activity
             android:name=".resource.drawable.DrawableAct2"
+            android:exported="true"
             android:label="resource/drawable/DrawableAct2"
             android:theme="@style/AppTheme">
             <intent-filter>
@@ -426,6 +470,7 @@
         </activity>
         <activity
             android:name="com.demon.yu.view.NextScrollViewAct"
+            android:exported="true"
             android:label="view/NextScrollViewAct"
             android:theme="@style/AppTheme">
             <intent-filter>
@@ -435,6 +480,7 @@
         </activity>
         <activity
             android:name="com.demon.yu.view.FrescoWebpViewAct"
+            android:exported="true"
             android:label="view/FrescoWebpViewAct"
             android:theme="@style/AppTheme">
             <intent-filter>
@@ -444,6 +490,7 @@
         </activity>
         <activity
             android:name="com.demon.yu.window.OverlayWindowActivity"
+            android:exported="true"
             android:label="win/OverlayWindowActivity"
             android:launchMode="singleTop"
             android:theme="@style/AppTheme">
@@ -455,6 +502,7 @@
 
         <activity
             android:name=".view.GradientViewActivity"
+            android:exported="true"
             android:label="view/GradientViewActivity"
             android:theme="@style/AppTheme">
             <intent-filter>
@@ -464,6 +512,7 @@
         </activity>
         <activity
             android:name="com.demon.yu.na.VadActivity"
+            android:exported="true"
             android:label="na/VadActivity"
             android:theme="@style/AppTheme">
             <intent-filter>
@@ -474,6 +523,7 @@
 
         <activity
             android:name="com.demon.yu.view.TestRefreshFirstActivity"
+            android:exported="true"
             android:label="view/TestRefreshFirstActivity"
             android:theme="@style/AppTheme">
             <intent-filter>
@@ -484,6 +534,7 @@
 
         <activity
             android:name="com.demon.yu.view.MyCustomizeRecyclerViewAct"
+            android:exported="true"
             android:label="view/MyCustomizeRecyclerViewAct"
             android:theme="@style/AppTheme">
             <intent-filter>
@@ -493,6 +544,7 @@
         </activity>
         <activity
             android:name="com.demon.yu.avatar.interact.CloneXAvatarComposeAct"
+            android:exported="true"
             android:label="avatar/CloneXAvatarComposeAct"
             android:theme="@style/AppTheme"
             android:windowSoftInputMode="adjustPan">
@@ -506,6 +558,7 @@
 
         <activity
             android:name="com.demon.yu.view.MyCustomize2RecyclerViewAct"
+            android:exported="true"
             android:label="view/MyCustomize2RecyclerViewAct"
             android:theme="@style/AppTheme">
             <intent-filter>
@@ -516,6 +569,7 @@
         </activity>
         <activity
             android:name="com.demon.yu.view.MyCustomizeCircleRecyclerViewAct"
+            android:exported="true"
             android:label="view/MyCustomizeCircleRecyclerViewAct"
             android:theme="@style/AppTheme">
             <intent-filter>
@@ -526,6 +580,7 @@
 
         <activity
             android:name="com.demon.yu.view.TestRefreshSecondActivity"
+            android:exported="true"
             android:label="view/TestRefreshSecondActivity"
             android:theme="@style/AppTheme">
             <intent-filter>
@@ -537,6 +592,7 @@
 
         <activity
             android:name="com.demon.yu.widget.AppWidgetTargetAct"
+            android:exported="true"
             android:label="widget/AppWidgetTargetAct"
             android:theme="@style/AppTheme">
             <intent-filter>
@@ -548,6 +604,7 @@
 
         <activity
             android:name="com.demon.yu.kotlin.Coroutines1Act"
+            android:exported="true"
             android:label="kotlin/Coroutines1Act"
             android:theme="@style/AppTheme">
             <intent-filter>
@@ -559,6 +616,7 @@
 
         <activity
             android:name="com.demon.yu.kotlin.Coroutines2Act"
+            android:exported="true"
             android:label="kotlin/Coroutines2Act"
             android:theme="@style/AppTheme">
             <intent-filter>
@@ -569,9 +627,10 @@
 
         <activity
             android:name="com.demon.yu.system.FitSystemWindowAct"
+            android:exported="true"
             android:label="system/FitSystemWindowAct"
-            android:windowSoftInputMode="adjustResize"
-            android:theme="@style/statusBarTheme">
+            android:theme="@style/statusBarTheme"
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="com.example.apidemons.CATEGORY_SAMPLES" />
@@ -579,9 +638,10 @@
         </activity>
         <activity
             android:name="com.demon.yu.kotlin.ColorIntAct"
+            android:exported="true"
             android:label="kotlin/ColorIntAct"
-            android:windowSoftInputMode="adjustResize"
-            android:theme="@style/AppTheme">
+            android:theme="@style/AppTheme"
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="com.example.apidemons.CATEGORY_SAMPLES" />
@@ -612,7 +672,9 @@
         </receiver>
 
 
-        <receiver android:name="com.demon.yu.widget.ExampleAppWidgetProvider">
+        <receiver
+            android:name="com.demon.yu.widget.ExampleAppWidgetProvider"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -621,7 +683,9 @@
                 android:resource="@xml/example_appwidget_info" />
         </receiver>
 
-        <receiver android:name="com.demon.yu.widget.ExampleAppWidgetProvider2">
+        <receiver
+            android:name="com.demon.yu.widget.ExampleAppWidgetProvider2"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -632,6 +696,13 @@
 
 
 
+        <activity
+            android:name="com.squareup.leakcanary.internal.DisplayLeakActivity"
+            android:exported="false"/>
+        <activity
+            android:name="com.squareup.leakcanary.internal.RequestStoragePermissionActivity"
+            android:exported="false"
+            />
     </application>
 
 </manifest>

@@ -1,17 +1,21 @@
 package com.demon.yu.system
 
+import android.annotation.SuppressLint
+import android.app.Activity
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
+import android.os.CancellationSignal
 import android.util.TypedValue
 import android.view.*
 import android.widget.FrameLayout
 import android.widget.TextView
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.core.content.ContextCompat
-import androidx.core.view.OnApplyWindowInsetsListener
-import androidx.core.view.ViewCompat
+import androidx.core.view.*
 import androidx.viewpager.widget.PagerAdapter
 import com.demon.yu.view.recyclerview.ColorUtils
 import com.example.mypractice.Logger
@@ -47,7 +51,7 @@ import kotlinx.android.synthetic.main.activity_fitsystem_window.*
  * @author yujinta.529
  * @create 2022-11-14
  */
-class FitSystemWindowAct : AppCompatActivity() {
+class FitSystemWindowAct : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_fitsystem_window)
@@ -66,6 +70,7 @@ class FitSystemWindowAct : AppCompatActivity() {
         Logger.debug("FitSystemWindowAct", "getFitsSystemWindows $result")
     }
 
+    @SuppressLint("WrongConstant")
     private fun initAdapter(): PagerAdapter {
         val list = mutableListOf<View>()
         for (i in 0..5) {
@@ -100,19 +105,44 @@ class FitSystemWindowAct : AppCompatActivity() {
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
             )
-            ViewCompat.setOnApplyWindowInsetsListener(editText) { v, insets ->
-                editLp.bottomMargin = insets.systemWindowInsetBottom + 40 //处理输入发的高度
-                insets
-            }
             editText.setHintTextColor(Color.GRAY)
             editText.setPadding(20, 10, 20, 10)
             editText.setBackgroundColor(Color.WHITE)
             editText.setTextColor(Color.BLACK)
             editText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20f)
 
-            editLp.setMargins(40, 20, 100, 40)
+            editLp.setMargins(40, 20, 100, 0)
             editLp.gravity = Gravity.BOTTOM
             view.addView(editText, editLp)
+
+            val button = AppCompatButton(this)
+            button.text = "点击输入"
+            button.setPadding(40, 30, 40, 30)
+            button.setTextColor(Color.BLACK)
+            val btnLp = FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+            btnLp.gravity = Gravity.CENTER
+            //21一下会使用applyWindowInsets替换，30会使用动画
+            ViewCompat.setWindowInsetsAnimationCallback(editText,object:
+                WindowInsetsAnimationCompat.Callback(DISPATCH_MODE_STOP) {
+                override fun onProgress(
+                    insets: WindowInsetsCompat,
+                    runningAnimations: MutableList<WindowInsetsAnimationCompat>
+                ): WindowInsetsCompat {
+                    editText.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                        bottomMargin = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom
+                    }
+                    return insets
+                }
+            })
+            button.setOnClickListener {
+                WindowInsetsControllerUtils.showInputMethod(window, editText)
+            }
+            view.addView(button, btnLp)
+
+
             list.add(view)
         }
         return FitViewAdapter(list)

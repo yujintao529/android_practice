@@ -7,7 +7,7 @@ import android.graphics.Canvas
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.os.Bundle
-import com.demon.yu.lib.gaussian.GaussianHelper
+//import com.demon.yu.lib.gaussian.GaussianHelper
 import com.example.mypractice.R
 import kotlinx.android.synthetic.main.activity_gaussian.*
 
@@ -22,7 +22,7 @@ class GaussianActivity : Activity() {
         originBitmap.setImageResource(R.drawable.lol_jinkesi)
         val bitmap=BitmapFactory.decodeResource(resources,R.drawable.lol_jinkesi)
         blur.setOnClickListener {
-            GaussianHelper.blur(bitmap)
+//            GaussianHelper.blur(bitmap)
             destBitmap.setImageBitmap(bitmap)
         }
     }
