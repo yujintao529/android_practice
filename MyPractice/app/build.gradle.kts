@@ -9,22 +9,20 @@ plugins {
 }
 apply(rootProject.file("gradle/deps.gradle.kts"))
 apply(rootProject.file("add_export.gradle"))
+apply(rootProject.file("gradle/base_custom_utils.gradle.kts"))
 configure<com.android.build.gradle.internal.dsl.BaseAppModuleExtension> {
     defaultConfig {
         applicationId = "com.example.mypractice"
         minSdk = Versions.minSdkVersion
 //        compileSdkVersion =  Versions.compileSdkVersion.toString()
-        compileSdkVersion=Versions.compileSdkVersion
+        compileSdkVersion = Versions.compileSdkVersion
         targetSdk = Versions.targetSdkVersion
         multiDexEnabled = true
         multiDexKeepProguard = rootProject.file("maindexlist.txt")
         ndk {
-            abiFilters.add("x86")
-            abiFilters.add("armeabi-v7a")
-            abiFilters.add("arm64-v8a")
+            abiFilters.addAll(rootProject.extra["supportAbis"] as List<String>)
             resConfigs("cn", "xhdpi")
         }
-
     }
     signingConfigs {
         val properties = Properties()
@@ -47,8 +45,8 @@ configure<com.android.build.gradle.internal.dsl.BaseAppModuleExtension> {
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(
-                    getDefaultProguardFile("proguard-android.txt"),
-                    "proguard-rules.pro"
+                getDefaultProguardFile("proguard-android.txt"),
+                "proguard-rules.pro"
             )
 
             signingConfig = signingConfigs.getByName("release")
@@ -56,8 +54,8 @@ configure<com.android.build.gradle.internal.dsl.BaseAppModuleExtension> {
         getByName("debug") {
             isMinifyEnabled = false
             proguardFiles(
-                    getDefaultProguardFile("proguard-android.txt"),
-                    "proguard-rules.pro"
+                getDefaultProguardFile("proguard-android.txt"),
+                "proguard-rules.pro"
             )
             signingConfig = signingConfigs.getByName("release")
         }
@@ -67,13 +65,12 @@ configure<com.android.build.gradle.internal.dsl.BaseAppModuleExtension> {
         targetCompatibility = JavaVersion.VERSION_11
     }
     packagingOptions {
-        exclude("lib/armeabi/*")
-        exclude("lib/x86_64/*")
-        exclude("lib/mips/*")
-//        exclude("lib/x86/*")
-        exclude("META-INF/LICENSE.txt")
-        exclude("META-INF/NOTICE.txt")
+        jniLibs {
+            pickFirsts.addAll((rootProject.extra["supportAbis"] as List<String>).map { "lib/$it/*" }.toList())
+            excludes.addAll(listOf("lib/armeabi/*","lib/mips/*","META-INF/LICENSE.txt","META-INF/NOTICE.txt"))
+        }
     }
+
     kotlinOptions {
         jvmTarget = "1.8"
     }
@@ -106,7 +103,7 @@ dependencies {
     implementation(Deps.wecahtOpenSdk)
     debugImplementation(Deps.leakcanary)
     releaseImplementation(Deps.leakcanary_noop)
-//    implementation(project(":libgaussia"))
+    implementation(project(":libgaussia"))
     implementation(project(":libavd"))
     implementation(Deps.butterKnife)
     implementation(Deps.stetho)

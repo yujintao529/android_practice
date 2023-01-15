@@ -1,0 +1,1 @@
+apply(rootProject.file("gradle/ndk.gradle.kts"))

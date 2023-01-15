@@ -1,4 +1,4 @@
-package com.demon.yu.na
+package com.demon.yu.avd
 
 import android.Manifest
 import android.os.Bundle
@@ -6,10 +6,8 @@ import android.text.method.ScrollingMovementMethod
 import android.util.Log
 import android.widget.ScrollView
 import android.widget.Toast
-import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import com.example.mypractice.R
 import kotlinx.android.synthetic.main.activity_vad.*
 import permissions.dispatcher.*
 import java.text.SimpleDateFormat
@@ -35,7 +33,6 @@ class VadActivity : AppCompatActivity() {
             }
         }
         startRecord.setOnClickListener {
-            showAudioWithPermissionCheck()
         }
         logcat.movementMethod=ScrollingMovementMethod.getInstance()
     }

@@ -1,3 +1,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.demon.yu.avd">
+    <application>
+        <activity
+            android:name="com.demon.yu.avd.VadActivity"
+            android:exported="true"
+            android:label="avd/VadActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="com.example.apidemons.CATEGORY_SAMPLES" />
+            </intent-filter>
+        </activity>
+    </application>
 </manifest>

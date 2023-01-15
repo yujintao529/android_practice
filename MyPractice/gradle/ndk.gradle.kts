@@ -1,0 +1,1 @@
+rootProject.extra.set("supportAbis",(rootProject.extra["abiFilters"] as String).split(","))

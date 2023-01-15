@@ -18,4 +18,8 @@ class BaseTester {
         val dest = RectF()
         matrix.mapRect(src, dest)//dest(100f,100f,200f,200f)
     }
+
+    fun testKotlin() {
+        "s".split(",")
+    }
 }
