@@ -5,7 +5,6 @@
 #include <android/log.h>
 #include "gaussian_logger.h"
 
-
 void __x_debug_log(const char *tag, const char *fmt) {
     LOG_D("[%s] %s", tag, fmt);
 }

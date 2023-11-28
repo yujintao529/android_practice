@@ -489,6 +489,16 @@
             </intent-filter>
         </activity>
         <activity
+            android:name="com.demon.yu.view.FrameLayoutTestAct"
+            android:exported="false"
+            android:label="view/FrameLayoutTestAct"
+            android:theme="@style/AppTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="com.example.apidemons.CATEGORY_SAMPLES" />
+            </intent-filter>
+        </activity>
+        <activity
             android:name="com.demon.yu.window.OverlayWindowActivity"
             android:exported="true"
             android:label="win/OverlayWindowActivity"
@@ -567,6 +577,20 @@
                 <category android:name="com.example.apidemons.CATEGORY_SAMPLES" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name="com.demon.yu.douyin.DouyinAct"
+            android:label="douyin/DouyinAct"
+            android:exported="false"
+            android:theme="@style/AppTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="com.example.apidemons.CATEGORY_SAMPLES" />
+            </intent-filter>
+        </activity>
+
+
         <activity
             android:name="com.demon.yu.view.MyCustomizeCircleRecyclerViewAct"
             android:exported="true"
@@ -640,6 +664,29 @@
             android:name="com.demon.yu.kotlin.ColorIntAct"
             android:exported="true"
             android:label="kotlin/ColorIntAct"
+            android:theme="@style/AppTheme"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="com.example.apidemons.CATEGORY_SAMPLES" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name="com.demon.yu.memory.MemoryActivity"
+            android:exported="true"
+            android:label="memory/MemoryActivity"
+            android:theme="@style/AppTheme"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="com.example.apidemons.CATEGORY_SAMPLES" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.demon.yu.cpu.CpuAct"
+            android:exported="true"
+            android:label="cpu/cpuAct"
             android:theme="@style/AppTheme"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>

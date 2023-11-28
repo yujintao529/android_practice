@@ -28,4 +28,7 @@ public class StudentNative {
 
     public native long createStudent();
 
+
+    public native static long mallocMemory(int size);
+
 }

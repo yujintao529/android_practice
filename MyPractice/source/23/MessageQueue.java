@@ -330,14 +330,21 @@ public final class MessageQueue {
                 final long now = SystemClock.uptimeMillis();
                 Message prevMsg = null;
                 Message msg = mMessages;
-                if (msg != null && msg.target == null) {
+                /**
+                 * 1. 同步屏障
+                 *    1. 没有异步消息，那么prevMsg,msg，mMessages,都是同一个，啥都不干
+                 *    2. 有异步消息，返回，同时把同步屏障的next，只是异步消息的nest。当前mssage仍然是消息屏障
+                 * 2. 普通消息
+                 *    1. 正常消费
+                 */
+                if (msg != null && msg.target == null) { //
                     // Stalled by a barrier.  Find the next asynchronous message in the queue.
                     do {
                         prevMsg = msg;
                         msg = msg.next;
                     } while (msg != null && !msg.isAsynchronous());
                 }
-                if (msg != null) {
+                if (msg != null) { //异步消息
                     if (now < msg.when) {
                         // Next message is not ready.  Set a timeout to wake up when it is ready.
                         nextPollTimeoutMillis = (int) Math.min(msg.when - now, Integer.MAX_VALUE);
@@ -346,7 +353,7 @@ public final class MessageQueue {
                         mBlocked = false;
                         if (prevMsg != null) {
                             prevMsg.next = msg.next;
-                        } else {
+                        } else { //普通消息，需要next
                             mMessages = msg.next;
                         }
                         msg.next = null;
@@ -474,6 +481,7 @@ public final class MessageQueue {
 
             Message prev = null;
             Message p = mMessages;
+            //找到大于when的msg，插到其前面
             if (when != 0) {
                 while (p != null && p.when <= when) {
                     prev = p;

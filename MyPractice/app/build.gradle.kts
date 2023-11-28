@@ -21,7 +21,7 @@ configure<com.android.build.gradle.internal.dsl.BaseAppModuleExtension> {
         ndk {
             abiFilters.add("x86")
             abiFilters.add("armeabi-v7a")
-            abiFilters.add("arm64-v8a")
+//            abiFilters.add("arm64-v8a")
             resConfigs("cn", "xhdpi")
         }
 
@@ -106,7 +106,7 @@ dependencies {
     implementation(Deps.wecahtOpenSdk)
     debugImplementation(Deps.leakcanary)
     releaseImplementation(Deps.leakcanary_noop)
-//    implementation(project(":libgaussia"))
+    implementation(project(":libgaussia"))
     implementation(project(":libavd"))
     implementation(Deps.butterKnife)
     implementation(Deps.stetho)

@@ -17,7 +17,7 @@
     aux_source_directory("src/main/cpp" GAUSSIAN_SOURCE) # 会扫描src/main/cpp下的所有.c,.cc,cpp文件作为源码
     MESSAGE(STATUS "sources ${GAUSSIAN_SOURCE}")
 
-    include_directories(${PROJECT_ROOT} ${INCLUDE_DIR})     # make sure your .h all inside.
+    include_directories(${PROJECT_ROOT} ${INCLUDE_DIR} )     # make sure your .h all inside.
 
     # Specifies a library name, specifies whether the library is STATIC or
     # SHARED, and provides relative paths to the source code. You can
@@ -36,13 +36,6 @@
             ${GAUSSIAN_SOURCE}
             )
 
-    find_library( # Defines the name of the path variable that stores the
-            # location of the NDK library.
-            log-lib
 
-            # Specifies the name of the NDK library that
-            # CMake needs to locate.
-            log)
-
-    target_link_libraries(gaussia-lib jnigraphics android ${log-lib})
+    target_link_libraries(gaussia-lib jnigraphics android  log)
 

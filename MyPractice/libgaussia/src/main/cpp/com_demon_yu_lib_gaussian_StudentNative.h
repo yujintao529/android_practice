@@ -32,6 +32,14 @@ JNIEXPORT void JNICALL Java_com_demon_yu_lib_gaussian_StudentNative_releaseStude
 JNIEXPORT jlong JNICALL Java_com_demon_yu_lib_gaussian_StudentNative_createStudent
   (JNIEnv *, jobject);
 
+
+JNIEXPORT jlong JNICALL Java_com_demon_yu_lib_gaussian_StudentNative_mallocMemory
+        (JNIEnv *, jclass ,jint);
+
+JNIEXPORT void JNICALL Java_com_bytedance_Test_crash
+        (JNIEnv *, jclass);
+
+
 #ifdef __cplusplus
 }
 #endif
