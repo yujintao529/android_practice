@@ -1,4 +1,4 @@
-package com.demon.yu.na
+package com.demon.yu.lib.gaussian
 
 import android.app.Activity
 import android.graphics.Bitmap
@@ -7,8 +7,6 @@ import android.graphics.Canvas
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.os.Bundle
-//import com.demon.yu.lib.gaussian.GaussianHelper
-import com.example.mypractice.R
 import kotlinx.android.synthetic.main.activity_gaussian.*
 
 
@@ -19,10 +17,10 @@ class GaussianActivity : Activity() {
         super.onCreate(savedInstanceState)
         //        getWindow().setBackgroundDrawable(null);
         setContentView(R.layout.activity_gaussian)
-        originBitmap.setImageResource(R.drawable.lol_jinkesi)
-        val bitmap=BitmapFactory.decodeResource(resources,R.drawable.lol_jinkesi)
+        originBitmap.setImageResource(R.drawable.gauss_lol_jinkesi)
+        val bitmap=BitmapFactory.decodeResource(resources,R.drawable.gauss_lol_jinkesi)
         blur.setOnClickListener {
-//            GaussianHelper.blur(bitmap)
+            GaussianHelper.blur(bitmap)
             destBitmap.setImageBitmap(bitmap)
         }
     }

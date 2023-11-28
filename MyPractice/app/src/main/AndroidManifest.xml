@@ -449,16 +449,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.demon.yu.na.GaussianActivity"
-            android:exported="true"
-            android:label="na/GaussianActivity"
-            android:theme="@style/AppBaseTheme">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="com.example.apidemons.CATEGORY_SAMPLES" />
-            </intent-filter>
-        </activity>
-        <activity
             android:name=".resource.drawable.DrawableAct2"
             android:exported="true"
             android:label="resource/drawable/DrawableAct2"

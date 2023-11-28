@@ -20,7 +20,7 @@
         android:id="@+id/originBitmap"
         android:layout_width="300dp"
         android:scaleType="centerInside"
-        android:src="@drawable/lol_jinkesi"
+        android:src="@drawable/gauss_lol_jinkesi"
         android:layout_height="300dp"/>
 
     <ImageView

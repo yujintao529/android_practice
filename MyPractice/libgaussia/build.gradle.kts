@@ -4,14 +4,12 @@ plugins {
     kotlin("android.extensions")
     kotlin("kapt")
 }
-
+apply(rootProject.file("gradle/base_custom_utils.gradle.kts"))
 android {
     defaultConfig {
         consumerProguardFile("consumer-rules.pro")
         ndk {
-//            abiFilters.add("x86")
-            abiFilters.add("armeabi-v7a")
-//            abiFilters.add("arm64-v8a")
+            abiFilters.addAll(rootProject.extra["supportAbis"] as List<String>)
         }
         //特别奇葩，必须得像下面配置那样
         externalNativeBuild {
@@ -29,3 +27,6 @@ android {
     }
 }
 
+dependencies {
+    implementation(Deps.appcompat)
+}

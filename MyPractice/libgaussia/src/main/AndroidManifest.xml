@@ -1,2 +1,26 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.demon.yu.lib.gaussian" />
+    package="com.demon.yu.lib.gaussian">
+
+    <application>
+
+        <activity
+            android:name="com.demon.yu.lib.gaussian.GaussianActivity"
+            android:exported="true"
+            android:label="na/GaussianActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="com.example.apidemons.CATEGORY_SAMPLES" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.demon.yu.lib.gaussian.CStandardActivity"
+            android:exported="true"
+            android:label="na/CStandardActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="com.example.apidemons.CATEGORY_SAMPLES" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>
